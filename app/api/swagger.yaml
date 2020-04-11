@@ -1,0 +1,907 @@
+---
+swagger: "2.0"
+info:
+  description: "This is the API for COVID-19 Global Church Hack 'Hello Neighbour'\
+    \ project"
+  version: "0.0.1"
+  title: "COVID-19 Global Church Hack 'Hello Neighbour'"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost"
+basePath: "/v0"
+tags:
+- name: "leader"
+  description: "Everything that relates to church leaders interacting with the system"
+- name: "member"
+  description: "Everything relating to church members interacting with the system"
+schemes:
+- "https"
+paths:
+  /church:
+    post:
+      tags:
+      - "leader"
+      summary: "Add new church"
+      description: "Add new church to the system to invite members to"
+      operationId: "addChurch"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Church details for new account"
+        required: true
+        schema:
+          $ref: "#/definitions/ChurchIn"
+        x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Church added"
+          schema:
+            $ref: "#/definitions/Church"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /church/{churchUuid}:
+    get:
+      tags:
+      - "leader"
+      summary: "Retrieve church details"
+      description: "Retrieve church details."
+      operationId: "getChurch"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "ChurchUuid"
+      responses:
+        "200":
+          description: "Church details"
+          schema:
+            $ref: "#/definitions/Church"
+        "404":
+          description: "Church not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    put:
+      tags:
+      - "leader"
+      summary: "Update church"
+      description: "Update church identified by church's UUID. All attributes can\
+        \ be edited."
+      operationId: "editChurch"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "ChurchUuid"
+      - in: "body"
+        name: "body"
+        description: "New church details"
+        required: true
+        schema:
+          $ref: "#/definitions/ChurchIn"
+        x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Church profile modified"
+          schema:
+            $ref: "#/definitions/ChurchIn"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: "Church not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    delete:
+      tags:
+      - "leader"
+      summary: "Delete church"
+      description: "Delete a church from the system."
+      operationId: "deleteChurch"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "ChurchUuid"
+      responses:
+        "204":
+          description: "Church deleted"
+        "404":
+          description: "Church not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /church/invite:
+    post:
+      tags:
+      - "leader"
+      summary: "Send invite"
+      description: "Send an email invite to add new church members"
+      operationId: "sendInvite"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "ChurchUuid"
+      - in: "body"
+        name: "email"
+        required: true
+        schema:
+          type: "array"
+          items:
+            type: "string"
+            format: "email"
+        x-exportParamName: "Email"
+      responses:
+        "204":
+          description: "Invites sent"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /church/question:
+    get:
+      tags:
+      - "leader"
+      summary: "Retrieve list of all your church's questions"
+      description: "Retrieve questions of a specific church."
+      operationId: "getQuestions"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "ChurchUuid"
+      responses:
+        "200":
+          description: "Question list"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Question"
+        "404":
+          description: "Church not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      tags:
+      - "leader"
+      summary: "Add question"
+      description: "Add a question to the system."
+      operationId: "addQuestion"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "ChurchUuid"
+      - in: "body"
+        name: "body"
+        description: "Question for the church"
+        required: true
+        schema:
+          $ref: "#/definitions/QuestionIn"
+        x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Question added"
+          schema:
+            $ref: "#/definitions/Question"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: "Church not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /church/question/{questionUuid}:
+    get:
+      tags:
+      - "leader"
+      summary: "Retrieve question"
+      description: "Retrieve a question for church for given UUIDs."
+      operationId: "getQuestion"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "ChurchUuid"
+      - name: "questionUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "QuestionUuid"
+      responses:
+        "200":
+          description: "Church question"
+          schema:
+            $ref: "#/definitions/Question"
+        "404":
+          description: "Question not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    put:
+      tags:
+      - "leader"
+      summary: "Update question"
+      description: "Update a question that's already in the system."
+      operationId: "modifyQuestion"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "ChurchUuid"
+      - name: "questionUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "QuestionUuid"
+      - in: "body"
+        name: "body"
+        description: "Question for the church"
+        required: true
+        schema:
+          $ref: "#/definitions/QuestionIn"
+        x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Question updated"
+          schema:
+            $ref: "#/definitions/Question"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: "Question not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    delete:
+      tags:
+      - "leader"
+      summary: "Delete question"
+      description: "Delete a question from the system."
+      operationId: "deleteQuestion"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "ChurchUuid"
+      - name: "questionUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "QuestionUuid"
+      responses:
+        "204":
+          description: "Question deleted"
+        "404":
+          description: "Question not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /church/matchgroups:
+    get:
+      tags:
+      - "leader"
+      summary: "Retrieve list of all your church match groups"
+      description: "Retrieve all match groups of a specific church."
+      operationId: "getMatchGroups"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "ChurchUuid"
+      responses:
+        "200":
+          description: "Match group list"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Group"
+        "404":
+          description: "Church not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /user:
+    post:
+      tags:
+      - "member"
+      summary: "Create new user account"
+      description: "Create a new user to be authenticated via Firebase. Both church\
+        \ leaders and members need such an account."
+      operationId: "createUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "User details for new account"
+        required: true
+        schema:
+          $ref: "#/definitions/UserIn"
+        x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "User account created"
+          schema:
+            $ref: "#/definitions/User"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /user/{userUuid}:
+    get:
+      tags:
+      - "member"
+      summary: "Retrieve user details"
+      description: "Retrieve user details."
+      operationId: "getUser"
+      parameters:
+      - name: "userUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "UserUuid"
+      responses:
+        "200":
+          description: "User details"
+          schema:
+            $ref: "#/definitions/User"
+        "404":
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    put:
+      tags:
+      - "member"
+      summary: "Update user"
+      description: "Update user identified by user's UUID. All attributes can be edited."
+      operationId: "editUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "UserUuid"
+      - in: "body"
+        name: "body"
+        description: "New user details"
+        required: true
+        schema:
+          $ref: "#/definitions/UserIn"
+        x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "User account updated"
+          schema:
+            $ref: "#/definitions/User"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    delete:
+      tags:
+      - "member"
+      summary: "Delete user"
+      description: "Delete identified by user's UUID."
+      operationId: "deleteUser"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "UserUuid"
+      responses:
+        "204":
+          description: "User deleted"
+        "404":
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /user/contactmethod:
+    post:
+      tags:
+      - "member"
+      summary: "Add a contact method to a user profile"
+      description: "Add a new contact method to an existing user profile."
+      operationId: "addContactMethod"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userUuid"
+        in: "path"
+        description: "User's UUID"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "UserUuid"
+      - in: "body"
+        name: "body"
+        description: "Details of new contact method"
+        required: true
+        schema:
+          $ref: "#/definitions/ContactMethodIn"
+        x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Contact method created"
+          schema:
+            $ref: "#/definitions/ContactMethod"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /user/contactmethod/{methodUuid}:
+    put:
+      tags:
+      - "member"
+      summary: "Update a contact method for a user"
+      description: "Update a contact method for a user profile."
+      operationId: "updateContactMethod"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userUuid"
+        in: "path"
+        description: "User's UUID"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "UserUuid"
+      - name: "methodUuid"
+        in: "path"
+        description: "Contact method's UUID"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "MethodUuid"
+      - in: "body"
+        name: "body"
+        description: "New details of contact method"
+        required: true
+        schema:
+          $ref: "#/definitions/ContactMethodIn"
+        x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Contact method updated"
+          schema:
+            $ref: "#/definitions/ContactMethod"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: "Contact method or user not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    delete:
+      tags:
+      - "member"
+      summary: "Delete a contact method from a user profile"
+      description: "Delete a contact method from a user profile."
+      operationId: "deleteContactMethod"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userUuid"
+        in: "path"
+        description: "User's UUID"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "UserUuid"
+      - name: "methodUuid"
+        in: "path"
+        description: "Contact method's UUID"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "MethodUuid"
+      responses:
+        "204":
+          description: "Contact method deleted"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: "Contact method or user not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /user/church/{churchUuid}:
+    get:
+      tags:
+      - "member"
+      summary: "Retrieve public church details"
+      description: "Retrieve public church details."
+      operationId: "getChurchPublic"
+      parameters:
+      - name: "userUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "UserUuid"
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "ChurchUuid"
+      responses:
+        "200":
+          description: "Public church details"
+          schema:
+            $ref: "#/definitions/ChurchPublic"
+        "404":
+          description: "Church not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /user/matchgroup:
+    get:
+      tags:
+      - "member"
+      summary: "Retrieve group"
+      description: "Retrieve the group of the matched user."
+      operationId: "getMatchGroup"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "ChurchUuid"
+      - name: "userUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "UserUuid"
+      responses:
+        "200":
+          description: "Group of matched church members"
+          schema:
+            $ref: "#/definitions/Group"
+        "404":
+          description: "Group not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /user/bulletin:
+    get:
+      tags:
+      - "member"
+      summary: "Retrieve all messages"
+      description: "Retrieve messages posted on a group's bulletin."
+      operationId: "getMessages"
+      parameters:
+      - name: "userUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "UserUuid"
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "ChurchUuid"
+      - name: "matchGroupUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "MatchGroupUuid"
+      responses:
+        "200":
+          description: "Messages on a group's bulletin."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Message"
+        "404":
+          description: "Church/group not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      tags:
+      - "member"
+      summary: "Send message"
+      description: "Post a message to the group's bulletin."
+      operationId: "sendMessage"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "UserUuid"
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "ChurchUuid"
+      - name: "matchGroupUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "MatchGroupUuid"
+      - in: "body"
+        name: "body"
+        description: "Message to send to group"
+        required: true
+        schema:
+          $ref: "#/definitions/MessageIn"
+        x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Message sent"
+          schema:
+            $ref: "#/definitions/MessageIn"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: "Church/group not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+definitions:
+  UserBase:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+        format: "email"
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      description:
+        type: "string"
+      church:
+        type: "string"
+        format: "uuid"
+  UserPublic:
+    allOf:
+    - $ref: "#/definitions/UserBase"
+    - type: "object"
+      properties:
+        uuid:
+          type: "string"
+          format: "uuid"
+        contact:
+          type: "array"
+          items:
+            $ref: "#/definitions/ContactMethod"
+  UserIn:
+    allOf:
+    - $ref: "#/definitions/UserBase"
+    - type: "object"
+      properties:
+        dateOfBirth:
+          type: "string"
+          format: "date"
+  User:
+    allOf:
+    - $ref: "#/definitions/UserIn"
+    - type: "object"
+      properties:
+        uuid:
+          type: "string"
+          format: "uuid"
+        contact:
+          type: "array"
+          items:
+            $ref: "#/definitions/ContactMethod"
+  ChurchBase:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      description:
+        type: "string"
+      address:
+        type: "string"
+      website:
+        type: "string"
+        format: "url"
+      email:
+        type: "string"
+        format: "email"
+      phone:
+        type: "string"
+      main_contact:
+        type: "string"
+        format: "uuid"
+  ChurchPublic:
+    allOf:
+    - $ref: "#/definitions/ChurchBase"
+    - type: "object"
+      properties:
+        uuid:
+          type: "string"
+          format: "uuid"
+  ChurchIn:
+    allOf:
+    - $ref: "#/definitions/ChurchBase"
+    - type: "object"
+      properties:
+        group_size:
+          type: "integer"
+          minimum: 2
+          maximum: 10
+          multipleOf: 2
+        same_gender:
+          type: "boolean"
+        min_age:
+          type: "integer"
+  Church:
+    allOf:
+    - $ref: "#/definitions/ChurchIn"
+    - type: "object"
+      properties:
+        uuid:
+          type: "string"
+          format: "uuid"
+  ContactMethodIn:
+    type: "object"
+    properties:
+      label:
+        type: "string"
+      contactDetails:
+        type: "string"
+      user:
+        type: "string"
+        format: "uuid"
+  ContactMethod:
+    allOf:
+    - $ref: "#/definitions/ContactMethodIn"
+    - type: "object"
+      properties:
+        uuid:
+          type: "string"
+          format: "uuid"
+  QuestionIn:
+    type: "object"
+    properties:
+      question:
+        type: "string"
+      church:
+        type: "string"
+        format: "uuid"
+    example:
+      question: "question"
+      church: "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
+  Question:
+    allOf:
+    - $ref: "#/definitions/QuestionIn"
+    - type: "object"
+      properties:
+        uuid:
+          type: "string"
+          format: "uuid"
+  Group:
+    type: "object"
+    properties:
+      uuid:
+        type: "string"
+        format: "uuid"
+      created:
+        type: "string"
+        format: "date"
+      users:
+        type: "array"
+        items:
+          $ref: "#/definitions/UserPublic"
+    example:
+      created: "2000-01-23"
+      uuid: "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
+      users:
+      - ""
+      - ""
+  MessageIn:
+    type: "object"
+    properties:
+      group:
+        type: "string"
+        format: "uuid"
+      user:
+        type: "string"
+        format: "uuid"
+      sent:
+        type: "string"
+        format: "datetime"
+      message:
+        type: "string"
+    example:
+      message: "message"
+      user: "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
+      sent: "sent"
+      group: "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
+  Message:
+    allOf:
+    - $ref: "#/definitions/MessageIn"
+    - type: "object"
+      properties:
+        uuid:
+          type: "string"
+          format: "uuid"
+  ErrorResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      message:
+        type: "string"
