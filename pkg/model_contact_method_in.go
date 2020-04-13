@@ -11,7 +11,6 @@
 package pkg
 
 type ContactMethodIn struct {
-
 	Label string `json:"label,omitempty"`
 
 	ContactDetails string `json:"contactDetails,omitempty"`

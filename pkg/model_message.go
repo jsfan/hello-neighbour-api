@@ -11,7 +11,6 @@
 package pkg
 
 type Message struct {
-
 	Group string `json:"group,omitempty"`
 
 	User string `json:"user,omitempty"`

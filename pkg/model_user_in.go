@@ -10,7 +10,6 @@
 package pkg
 
 type UserIn struct {
-
 	Email string `json:"email,omitempty"`
 
 	FirstName string `json:"firstName,omitempty"`

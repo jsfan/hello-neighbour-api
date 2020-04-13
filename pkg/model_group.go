@@ -11,7 +11,6 @@
 package pkg
 
 type Group struct {
-
 	Uuid string `json:"uuid,omitempty"`
 
 	Created string `json:"created,omitempty"`
