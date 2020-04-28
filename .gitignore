@@ -96,3 +96,6 @@ fabric.properties
 
 # Mac
 .DS_Store
+
+# certificates and keys
+deploy/certbot
