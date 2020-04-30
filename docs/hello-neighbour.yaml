@@ -15,6 +15,15 @@ tags:
   description: "Everything relating to church members interacting with the system"
 schemes:
 - "https"
+securityDefinitions:
+  jwtAuth:
+    type: apiKey
+    name: X-JWT
+    in: header
+  basicAuth:
+    type: basic
+security:
+  - jwtAuth: []
 paths:
   /church:
     post:
@@ -42,7 +51,9 @@ paths:
         400:
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+        401:
+          $ref: "#/responses/Unauthenticated"
     get:
       tags:
       - "leader"
@@ -54,10 +65,12 @@ paths:
           description: "Church details"
           schema:
             $ref: "#/definitions/Church"
+        401:
+          $ref: "#/responses/Unauthenticated"
         404:
           description: "Church not found"
           schema:
-            $ref:  "#/definitions/ErrorResponse"
+            $ref:  "#/definitions/Error"
     put:
       tags:
       - "leader"
@@ -80,14 +93,16 @@ paths:
           description: "Church profile modified"
           schema:
             $ref: "#/definitions/ChurchIn"
-        404:
-          description: "Church not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         400:
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        404:
+          description: "Church not found"
+          schema:
+            $ref: "#/definitions/Error"
     delete:
       tags:
       - "leader"
@@ -99,10 +114,12 @@ paths:
       responses:
         204:
           description: "Church deleted"
+        401:
+          $ref: "#/responses/Unauthenticated"
         404:
           description: "Church not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
   
   /church/invite: # church is determined by requesting user's affiliation
     post:
@@ -127,10 +144,12 @@ paths:
       responses:
         204:
           description: "Invites sent"
+        401:
+          $ref: "#/responses/Unauthenticated"
         400:
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
   
   /church/question: # church is determined by requesting user's affiliation
     post:
@@ -155,14 +174,16 @@ paths:
           description: "Question added"
           schema:
             $ref: "#/definitions/Question"
-        404:
-          description: "Church not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         400:
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        404:
+          description: "Church not found"
+          schema:
+            $ref: "#/definitions/Error"
     get:
       tags:
       - "leader"
@@ -176,10 +197,12 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Question"
+        401:
+          $ref: "#/responses/Unauthenticated"
         404:
           description: "Church not found"
           schema:
-            $ref:  "#/definitions/ErrorResponse"
+            $ref:  "#/definitions/Error"
 
   /church/question/{questionUuid}: # church is determined by requesting user's affiliation
     get:
@@ -199,10 +222,12 @@ paths:
           description: "Church question"
           schema:
             $ref: "#/definitions/Question"
+        401:
+          $ref: "#/responses/Unauthenticated"
         404:
           description: "Question not found"
           schema:
-            $ref:  "#/definitions/ErrorResponse"
+            $ref:  "#/definitions/Error"
     put:
       tags:
       - "leader"
@@ -230,14 +255,16 @@ paths:
           description: "Question updated"
           schema:
             $ref: "#/definitions/Question"
-        404:
-          description: "Question not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         400:
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        404:
+          description: "Question not found"
+          schema:
+            $ref: "#/definitions/Error"
     delete:
       tags:
       - "leader"
@@ -255,10 +282,12 @@ paths:
       responses:
         204:
           description: "Question deleted"
+        401:
+          $ref: "#/responses/Unauthenticated"
         404:
           description: "Question not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
 
   /church/matchgroups: # church and user are determined based on user session
     get:
@@ -274,15 +303,18 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Group"
+        401:
+          $ref: "#/responses/Unauthenticated"
         404:
           description: "Church not found"
           schema:
-            $ref:  "#/definitions/ErrorResponse"
+            $ref:  "#/definitions/Error"
             
   /user/register:
     post:
       tags:
       - "member"
+      security: []
       summary: "Create new user account"
       description: "Create a new user. Both church leaders and members need such an account."
       operationId: "createUser"
@@ -305,7 +337,26 @@ paths:
         400:
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+            
+  /user/login:
+    get:
+      tags:
+      - "member"
+      security: 
+        - basicAuth: []
+      summary: "Login user"
+      description: "Login to a user account with the specified credentials. Issues a JWT on success."
+      operationId: "loginUser"
+      responses:
+        200:
+          description: "User successfully logged in."
+          schema:
+            $ref: "#/definitions/JWT"
+        401:
+          description: "Invalid credentials"
+          schema:
+            $ref: "#/definitions/Error"
   
   /user:
     get:
@@ -319,10 +370,12 @@ paths:
           description: "User details"
           schema:
             $ref: "#/definitions/User"
+        401:
+          $ref: "#/responses/Unauthenticated"
         404:
           description: "User not found"
           schema:
-            $ref:  "#/definitions/ErrorResponse"
+            $ref:  "#/definitions/Error"
     put:
       tags:
       - "member"
@@ -345,14 +398,16 @@ paths:
           description: "User account updated"
           schema:
             $ref: "#/definitions/User"
-        404:
-          description: "User not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         400:
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/Error"
     delete:
       tags:
       - "member"
@@ -364,10 +419,12 @@ paths:
       responses:
         204:
           description: "User deleted"
+        401:
+          $ref: "#/responses/Unauthenticated"
         404:
           description: "User not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
 
   /user/contactmethod:
     post:
@@ -393,7 +450,9 @@ paths:
         400:
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+        401:
+          $ref: "#/responses/Unauthenticated"
 
   /user/contactmethod/{methodUuid}:
     put:
@@ -422,14 +481,16 @@ paths:
           description: "Contact method updated"
           schema:
             $ref: "#/definitions/ContactMethod"
-        404:
-          description: "Contact method or user not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         400:
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        404:
+          description: "Contact method or user not found"
+          schema:
+            $ref: "#/definitions/Error"
     delete:
       tags:
       - "member"
@@ -448,14 +509,16 @@ paths:
       responses:
         204:
           description: "Contact method deleted"
-        404:
-          description: "Contact method or user not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         400:
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        404:
+          description: "Contact method or user not found"
+          schema:
+            $ref: "#/definitions/Error"
 
   /user/church:
    get:
@@ -469,10 +532,12 @@ paths:
           description: "Public church details"
           schema:
             $ref: "#/definitions/ChurchPublic"
+        401:
+          $ref: "#/responses/Unauthenticated"
         404:
           description: "Church not found"
           schema:
-            $ref:  "#/definitions/ErrorResponse"
+            $ref:  "#/definitions/Error"
             
   /user/matchgroup:  # refers to requesting user's current match group
     get:
@@ -486,10 +551,12 @@ paths:
           description: "Group of matched church members"
           schema:
             $ref: "#/definitions/Group"
+        401:
+          $ref: "#/responses/Unauthenticated"
         404:
           description: "Group not found"
           schema:
-            $ref:  "#/definitions/ErrorResponse"
+            $ref:  "#/definitions/Error"
             
   /user/bulletin: # refers to requesting user's current match group's bulletin
     post:
@@ -514,14 +581,16 @@ paths:
           description: "Message sent"
           schema:
             $ref: "#/definitions/MessageIn"
-        404:
-          description: "Church/group not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
         400:
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        404:
+          description: "Church/group not found"
+          schema:
+            $ref: "#/definitions/Error"
     get:
       tags:
       - "member"
@@ -535,12 +604,20 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Message"
+        401:
+          $ref: "#/responses/Unauthenticated"
         404:
           description: "Church/group not found"
           schema:
-            $ref:  "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
 
 definitions:
+  JWT:
+    type: "object"
+    properties:
+      jwt:
+        type: "string"
+        
   UserBase:
     type: "object"
     properties:
@@ -723,8 +800,8 @@ definitions:
         uuid:
           type: "string"
           format: "uuid"
-
-  ErrorResponse:
+          
+  Error:
     type: "object"
     properties:
       code:
@@ -732,3 +809,12 @@ definitions:
         format: "int32"
       message:
         type: "string"
+        
+responses:
+  Unauthenticated:
+    description: "JWT is missing or invalid"
+    headers:
+      WWW_Authenticate:
+        type: "string"
+    schema:
+      $ref: "#/definitions/Error"
