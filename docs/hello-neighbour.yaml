@@ -1,8 +1,8 @@
 swagger: "2.0"
 info:
-  description: "This is the API for COVID-19 Global Church Hack 'Hello Neighbour' project"
+  description: "This is the API for the 'Hello Neighbour' project inspired from the COVID-19 Global Church Hack"
   version: "0.0.1"
-  title: "COVID-19 Global Church Hack 'Hello Neighbour'"
+  title: "Hello Neighbour"
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -43,20 +43,12 @@ paths:
           description: "Invalid input"
           schema:
             $ref: "#/definitions/ErrorResponse"
-            
-  /church/{churchUuid}:
     get:
       tags:
       - "leader"
       summary: "Retrieve church details"
       description: "Retrieve church details."
       operationId: "getChurch"
-      parameters:
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
       responses:
         200:
           description: "Church details"
@@ -77,11 +69,6 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
       - in: "body"
         name: "body"
         description: "New church details"
@@ -105,16 +92,10 @@ paths:
       tags:
       - "leader"
       summary: "Delete church"
-      description: "Delete a church from the system."
+      description: "Delete the leader's church from the system."
       operationId: "deleteChurch"
       produces:
       - "application/json"
-      parameters:
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
       responses:
         204:
           description: "Church deleted"
@@ -135,11 +116,6 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
       - in: "body"
         name: "email"
         schema:
@@ -168,11 +144,6 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
       - in: "body"
         name: "body"
         description: "Question for the church"
@@ -198,12 +169,6 @@ paths:
       summary: "Retrieve list of all your church's questions"
       description: "Retrieve questions of a specific church."
       operationId: "getQuestions"
-      parameters:
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
       responses:
         200:
           description: "Question list"
@@ -221,14 +186,9 @@ paths:
       tags:
       - "leader"
       summary: "Retrieve question"
-      description: "Retrieve a question for church for given UUIDs."
+      description: "Retrieve a question for church for given UUID."
       operationId: "getQuestion"
       parameters:
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
       - in: "path"
         name: "questionUuid"
         type: "string"
@@ -254,11 +214,6 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
       - in: "path"
         name: "questionUuid"
         type: "string"
@@ -293,11 +248,6 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "path"
         name: "questionUuid"
         type: "string"
         format: "uuid"
@@ -317,12 +267,6 @@ paths:
       summary: "Retrieve list of all your church match groups"
       description: "Retrieve all match groups of a specific church."
       operationId: "getMatchGroups"
-      parameters:
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
       responses:
         200:
           description: "Match group list"
@@ -335,12 +279,12 @@ paths:
           schema:
             $ref:  "#/definitions/ErrorResponse"
             
-  /user:
+  /user/register:
     post:
       tags:
       - "member"
       summary: "Create new user account"
-      description: "Create a new user to be authenticated via Firebase. Both church leaders and members need such an account."
+      description: "Create a new user. Both church leaders and members need such an account."
       operationId: "createUser"
       consumes:
       - "application/json"
@@ -362,20 +306,14 @@ paths:
           description: "Invalid input"
           schema:
             $ref: "#/definitions/ErrorResponse"
-      
-  /user/{userUuid}:
+  
+  /user:
     get:
       tags:
       - "member"
-      summary: "Retrieve user details"
-      description: "Retrieve user details."
+      summary: "Retrieve user's personal details"
+      description: "Retrieve user's personal details."
       operationId: "getUser"
-      parameters:
-      - in: "path"
-        name: "userUuid"
-        type: "string"
-        format: "uuid"
-        required: true
       responses:
         200:
           description: "User details"
@@ -389,18 +327,13 @@ paths:
       tags:
       - "member"
       summary: "Update user"
-      description: "Update user identified by user's UUID. All attributes can be edited."
+      description: "Update user. All attributes can be edited."
       operationId: "editUser"
       consumes:
       - "application/json"
       produces:
       - "application/json"
       parameters:
-      - in: "path"
-        name: "userUuid"
-        type: "string"
-        format: "uuid"
-        required: true
       - in: "body"
         name: "body"
         description: "New user details"
@@ -424,16 +357,10 @@ paths:
       tags:
       - "member"
       summary: "Delete user"
-      description: "Delete identified by user's UUID."
+      description: "Delete user."
       operationId: "deleteUser"
       produces:
       - "application/json"
-      parameters:
-      - in: "path"
-        name: "userUuid"
-        type: "string"
-        format: "uuid"
-        required: true
       responses:
         204:
           description: "User deleted"
@@ -452,12 +379,6 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - in: "path"
-        name: "userUuid"
-        description: "User's UUID"
-        type: "string"
-        format: "uuid"
-        required: true
       - in: "body"
         name: "body"
         description: "Details of new contact method"
@@ -485,12 +406,6 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "userUuid"
-        description: "User's UUID"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "path"
         name: "methodUuid"
         description: "Contact method's UUID"
         type: "string"
@@ -515,7 +430,6 @@ paths:
           description: "Invalid input"
           schema:
             $ref: "#/definitions/ErrorResponse"
-
     delete:
       tags:
       - "member"
@@ -525,12 +439,6 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - in: "path"
-        name: "userUuid"
-        description: "User's UUID"
-        type: "string"
-        format: "uuid"
-        required: true
       - in: "path"
         name: "methodUuid"
         description: "Contact method's UUID"
@@ -549,24 +457,13 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
 
-  /user/church/{churchUuid}:
+  /user/church:
    get:
       tags:
       - "member"
       summary: "Retrieve public church details"
       description: "Retrieve public church details."
       operationId: "getChurchPublic"
-      parameters:
-      - in: "path"
-        name: "userUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
       responses:
         200:
           description: "Public church details"
@@ -584,17 +481,6 @@ paths:
       summary: "Retrieve group"
       description: "Retrieve the group of the matched user."
       operationId: "getMatchGroup"
-      parameters:
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "path"
-        name: "userUuid"
-        type: "string"
-        format: "uuid"
-        required: true
       responses:
         200:
           description: "Group of matched church members"
@@ -617,21 +503,6 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - in: "path"
-        name: "userUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "path"
-        name: "matchGroupUuid"
-        type: "string"
-        format: "uuid"
-        required: true
       - in: "body"
         name: "body"
         description: "Message to send to group"
@@ -651,29 +522,12 @@ paths:
           description: "Invalid input"
           schema:
             $ref: "#/definitions/ErrorResponse"
-  
     get:
       tags:
       - "member"
       summary: "Retrieve all messages"
       description: "Retrieve messages posted on a group's bulletin."
       operationId: "getMessages"
-      parameters:
-      - in: "path"
-        name: "userUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "path"
-        name: "matchGroupUuid"
-        type: "string"
-        format: "uuid"
-        required: true
       responses:
         200:
           description: "Messages on a group's bulletin."
@@ -702,6 +556,9 @@ definitions:
       church:
         type: "string"
         format: "uuid"
+      role:
+        type: "string"
+        enum: ["leader", "member"]
 
   UserPublic:
     allOf:
@@ -724,6 +581,8 @@ definitions:
           dateOfBirth:
             type: "string"
             format: "date"
+          password:
+            type: "string"
             
   User:
     allOf:
@@ -755,9 +614,6 @@ definitions:
         format: "email"
       phone:
         type: "string"
-      main_contact:
-        type: "string"
-        format: "uuid"
 
   ChurchPublic:
     allOf:
