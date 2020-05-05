@@ -294,115 +294,6 @@ paths:
           description: "Church not found"
           schema:
             $ref:  "#/definitions/Error"
-  /question:
-    get:
-      tags:
-      - "administrator"
-      summary: "Retrieve all questions"
-      description: "Retrieve all questions in the system."
-      operationId: "getQuestions"
-      produces:
-      - "application/json"
-      responses:
-        200:
-          description: "All questions"
-          schema:
-            $ref: "#/definitions/Question"
-        400:
-          $ref: "#/responses/ClientError"
-        401:
-          $ref: "#/responses/Unauthenticated"
-        403:
-          $ref: "#/responses/Unauthorized"
-
-  /question/{questionUuid}:
-    get:
-      tags:
-      - "leader"
-      summary: "Retrieve question"
-      description: "Retrieve a question for church for given UUID."
-      operationId: "getQuestion"
-      parameters:
-      - in: "path"
-        name: "questionUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      responses:
-        200:
-          description: "Church question"
-          schema:
-            $ref: "#/definitions/Question"
-        401:
-          $ref: "#/responses/Unauthenticated"
-        403:
-          $ref: "#/responses/Unauthorized"
-        404:
-          description: "Question not found"
-          schema:
-            $ref:  "#/definitions/Error"
-    put:
-      tags:
-      - "leader"
-      summary: "Update question"
-      description: "Update a question that's already in the system."
-      operationId: "modifyQuestion"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "path"
-        name: "questionUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "body"
-        name: "body"
-        description: "Question for the church"
-        required: true
-        schema:
-          $ref: "#/definitions/QuestionIn"
-      responses:
-        200:
-          description: "Question updated"
-          schema:
-            $ref: "#/definitions/Question"
-        400:
-          $ref: "#/responses/ClientError"
-        401:
-          $ref: "#/responses/Unauthenticated"
-        403:
-          $ref: "#/responses/Unauthorized"
-        404:
-          description: "Question not found"
-          schema:
-            $ref: "#/definitions/Error"
-    delete:
-      tags:
-      - "leader"
-      summary: "Delete question"
-      description: "Delete a question from the system."
-      operationId: "deleteQuestion"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "path"
-        name: "questionUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      responses:
-        204:
-          description: "Question deleted"
-        401:
-          $ref: "#/responses/Unauthenticated"
-        403:
-          $ref: "#/responses/Unauthorized"
-        404:
-          description: "Question not found"
-          schema:
-            $ref: "#/definitions/Error"
 
   /user:
     post:
@@ -548,6 +439,72 @@ paths:
         403:
           $ref: "#/responses/Unauthorized"
 
+  /user/{userUuid}/bulletin:
+    post:
+      tags:
+      - "member"
+      summary: "Send message"
+      description: "Post a message to the group's bulletin."
+      operationId: "sendMessage"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "userUuid"
+        type: "string"
+        format: "uuid"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Message to send to group"
+        required: true
+        schema:
+          $ref: "#/definitions/MessageIn"
+      responses:
+        200:
+          description: "Message sent"
+          schema:
+            $ref: "#/definitions/MessageIn"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+        404:
+          description: "Church/group not found"
+          schema:
+            $ref: "#/definitions/Error"
+    get:
+      tags:
+      - "member"
+      summary: "Retrieve all messages"
+      description: "Retrieve messages posted on a group's bulletin."
+      operationId: "getMessages"
+      parameters:
+      - in: "path"
+        name: "userUuid"
+        type: "string"
+        format: "uuid"
+        required: true
+      responses:
+        200:
+          description: "Messages on a group's bulletin."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Message"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+        404:
+          description: "Church/group not found"
+          schema:
+            $ref: "#/definitions/Error"
+
   /contactmethod/{methodUuid}:
     put:
       tags:
@@ -614,34 +571,80 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
-  /user/{userUuid}/bulletin:
-    post:
+  /question:
+    get:
       tags:
-      - "member"
-      summary: "Send message"
-      description: "Post a message to the group's bulletin."
-      operationId: "sendMessage"
+      - "administrator"
+      summary: "Retrieve all questions"
+      description: "Retrieve all questions in the system."
+      operationId: "getQuestions"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "All questions"
+          schema:
+            $ref: "#/definitions/Question"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+
+  /question/{questionUuid}:
+    get:
+      tags:
+      - "leader"
+      summary: "Retrieve question"
+      description: "Retrieve a question for church for given UUID."
+      operationId: "getQuestion"
+      parameters:
+      - in: "path"
+        name: "questionUuid"
+        type: "string"
+        format: "uuid"
+        required: true
+      responses:
+        200:
+          description: "Church question"
+          schema:
+            $ref: "#/definitions/Question"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+        404:
+          description: "Question not found"
+          schema:
+            $ref:  "#/definitions/Error"
+    put:
+      tags:
+      - "leader"
+      summary: "Update question"
+      description: "Update a question that's already in the system."
+      operationId: "modifyQuestion"
       consumes:
       - "application/json"
       produces:
       - "application/json"
       parameters:
       - in: "path"
-        name: "userUuid"
+        name: "questionUuid"
         type: "string"
         format: "uuid"
         required: true
       - in: "body"
         name: "body"
-        description: "Message to send to group"
+        description: "Question for the church"
         required: true
         schema:
-          $ref: "#/definitions/MessageIn"
+          $ref: "#/definitions/QuestionIn"
       responses:
         200:
-          description: "Message sent"
+          description: "Question updated"
           schema:
-            $ref: "#/definitions/MessageIn"
+            $ref: "#/definitions/Question"
         400:
           $ref: "#/responses/ClientError"
         401:
@@ -649,34 +652,32 @@ paths:
         403:
           $ref: "#/responses/Unauthorized"
         404:
-          description: "Church/group not found"
+          description: "Question not found"
           schema:
             $ref: "#/definitions/Error"
-    get:
+    delete:
       tags:
-      - "member"
-      summary: "Retrieve all messages"
-      description: "Retrieve messages posted on a group's bulletin."
-      operationId: "getMessages"
+      - "leader"
+      summary: "Delete question"
+      description: "Delete a question from the system."
+      operationId: "deleteQuestion"
+      produces:
+      - "application/json"
       parameters:
       - in: "path"
-        name: "userUuid"
+        name: "questionUuid"
         type: "string"
         format: "uuid"
         required: true
       responses:
-        200:
-          description: "Messages on a group's bulletin."
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Message"
+        204:
+          description: "Question deleted"
         401:
           $ref: "#/responses/Unauthenticated"
         403:
           $ref: "#/responses/Unauthorized"
         404:
-          description: "Church/group not found"
+          description: "Question not found"
           schema:
             $ref: "#/definitions/Error"
 
