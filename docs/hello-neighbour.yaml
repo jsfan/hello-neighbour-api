@@ -65,13 +65,14 @@ paths:
         200:
           description: "Church details"
           schema:
-            $ref: "#/definitions/Church"
+            $ref: "#/definitions/ChurchPublic"
         401:
           $ref: "#/responses/Unauthenticated"
         404:
           description: "Church not found"
           schema:
             $ref:  "#/definitions/Error"
+  
   /church/{churchUuid}:
     get:
       tags:
@@ -103,8 +104,8 @@ paths:
     put:
       tags:
       - "leader"
-      summary: "Update church"
-      description: "Update church"
+      summary: "Update church details"
+      description: "Update church details."
       operationId: "editChurch"
       consumes:
       - "application/json"
@@ -195,6 +196,73 @@ paths:
           $ref: "#/responses/Unauthenticated"
         403:
           $ref: "#/responses/Unauthorized"
+        404:
+          description: "Church not found"
+          schema:
+            $ref:  "#/definitions/Error"
+
+  /church/{churchUuid}/user:
+    get:
+      tags:
+      - "leader"
+      summary: "Retrieve church members"
+      description: "Retrieve all members associated with a specific church."
+      operationId: "getChurchMembers"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        200:
+          description: "Member list"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/UserPublic"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+        404:
+          description: "Church not found"
+          schema:
+            $ref:  "#/definitions/Error"
+            
+  /church/{churchUuid}/user/{userUuid}:
+    delete:
+      tags:
+      - "leader"
+      summary: "Remove member from church"
+      description: "Disassociates member from church system. User account will still exist."
+      operationId: "deleteChurchMember"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+      - name: "userUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        204:
+          description: "Church member removed"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+        404:
+          description: "Church/user not found"
+          schema:
+            $ref: "#/definitions/Error"
 
   /church/{churchUuid}/question:
     post:
@@ -264,7 +332,7 @@ paths:
           schema:
             $ref:  "#/definitions/Error"
 
-  /church/{churchUuid}/matchgroup: # church and user are determined based on user session
+  /church/{churchUuid}/matchgroup:
     get:
       tags:
       - "leader"
@@ -326,10 +394,35 @@ paths:
           $ref: "#/responses/Unauthorized"
     get:
       tags:
-      - "leader"
-      summary: "Retrieve users"
-      description: "Retrieve all users (administrator) or those associated with church (leader)."
+      - "administrator"
+      summary: "Retrieve all users"
+      description: "Retrieve all users in the system."
       operationId: "getUsers"
+      responses:
+        200:
+          description: "User list"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+
+  /user/{userUuid}:
+    get:
+      tags:
+      - "member"
+      summary: "Retrieve user details"
+      description: "Retrieve all user information."
+      operationId: "getUser"
+      parameters:
+      - in: "path"
+        name: "userUuid"
+        type: "string"
+        format: "uuid"
+        required: true
       responses:
         200:
           description: "User details"
@@ -337,12 +430,12 @@ paths:
             $ref: "#/definitions/User"
         401:
           $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
         404:
           description: "User not found"
           schema:
             $ref:  "#/definitions/Error"
-
-  /user/{userUuid}:
     put:
       tags:
       - "member"
@@ -597,7 +690,7 @@ paths:
       tags:
       - "leader"
       summary: "Retrieve question"
-      description: "Retrieve a question for church for given UUID."
+      description: "Retrieve a question by UUID (restricted to logged in user's church)."
       operationId: "getQuestion"
       parameters:
       - in: "path"
@@ -733,7 +826,7 @@ paths:
       - "member"
       security:
         - basicAuth: []
-      summary: "Logged in user's details"
+      summary: "Logged in user's UUID and church UUID"
       description: "Returns the church and user UUID for the logged in user."
       operationId: "userProfile"
       responses:
@@ -921,6 +1014,10 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/UserPublic"
+      questions:
+        type: "array"
+        items:
+          $ref: "#/definitions/Question"
 
   MessageIn:
     type: "object"
@@ -968,7 +1065,7 @@ responses:
     schema:
       $ref: "#/definitions/Error"
   Unauthorized:
-    description: "User is not autorized to access"
+    description: "User is not authorized to access"
     headers:
       WWW_Authenticate:
         type: "string"
