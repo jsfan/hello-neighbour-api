@@ -52,9 +52,7 @@ paths:
           schema:
             $ref: "#/definitions/Church"
         400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/Error"
+          $ref: "#/responses/ClientError"
         401:
           $ref: "#/responses/Unauthenticated"
     get:
@@ -62,7 +60,7 @@ paths:
       - "member"
       summary: "Retrieve all signed up churches"
       description: "Retrieve church details."
-      operationId: "getChurch"
+      operationId: "getChurches"
       responses:
         200:
           description: "Church details"
@@ -130,9 +128,7 @@ paths:
           schema:
             $ref: "#/definitions/ChurchIn"
         400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/Error"
+          $ref: "#/responses/ClientError"
         401:
           $ref: "#/responses/Unauthenticated"
         404:
@@ -193,16 +189,14 @@ paths:
       responses:
         204:
           description: "Invites sent"
+        400:
+          $ref: "#/responses/ClientError"
         401:
           $ref: "#/responses/Unauthenticated"
         403:
           $ref: "#/responses/Unauthorized"
-        400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/Error"
-  
-  /church/{churchuuid}/question:
+
+  /church/{churchUuid}/question:
     post:
       tags:
       - "leader"
@@ -231,9 +225,7 @@ paths:
           schema:
             $ref: "#/definitions/Question"
         400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/Error"
+          $ref: "#/responses/ClientError"
         401:
           $ref: "#/responses/Unauthenticated"
         403:
@@ -247,7 +239,7 @@ paths:
       - "leader"
       summary: "Retrieve list of all questions"
       description: "Retrieve questions of a specific church."
-      operationId: "getQuestions"
+      operationId: "getChurchQuestions"
       produces:
       - "application/json"
       parameters:
@@ -294,6 +286,8 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Group"
+        400:
+          $ref: "#/responses/ClientError"
         401:
           $ref: "#/responses/Unauthenticated"
         404:
@@ -306,7 +300,7 @@ paths:
       - "administrator"
       summary: "Retrieve all questions"
       description: "Retrieve all questions in the system."
-      operationId: "getQuestion"
+      operationId: "getQuestions"
       produces:
       - "application/json"
       responses:
@@ -314,6 +308,8 @@ paths:
           description: "All questions"
           schema:
             $ref: "#/definitions/Question"
+        400:
+          $ref: "#/responses/ClientError"
         401:
           $ref: "#/responses/Unauthenticated"
         403:
@@ -373,9 +369,7 @@ paths:
           schema:
             $ref: "#/definitions/Question"
         400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/Error"
+          $ref: "#/responses/ClientError"
         401:
           $ref: "#/responses/Unauthenticated"
         403:
@@ -434,9 +428,7 @@ paths:
           schema:
             $ref: "#/definitions/Question"
         400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/Error"
+          $ref: "#/responses/ClientError"
         401:
           $ref: "#/responses/Unauthenticated"
         403:
@@ -446,7 +438,7 @@ paths:
       - "leader"
       summary: "Retrieve users"
       description: "Retrieve all users (administrator) or those associated with church (leader)."
-      operationId: "getUser"
+      operationId: "getUsers"
       responses:
         200:
           description: "User details"
@@ -488,9 +480,7 @@ paths:
           schema:
             $ref: "#/definitions/User"
         400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/Error"
+          $ref: "#/responses/ClientError"
         401:
           $ref: "#/responses/Unauthenticated"
         403:
@@ -507,6 +497,12 @@ paths:
       operationId: "deleteUser"
       produces:
       - "application/json"
+      parameters:
+        - in: "path"
+          name: "userUuid"
+          type: "string"
+          format: "uuid"
+          required: true
       responses:
         204:
           description: "User deleted"
@@ -546,9 +542,7 @@ paths:
           schema:
             $ref: "#/definitions/ContactMethod"
         400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/Error"
+          $ref: "#/responses/ClientError"
         401:
           $ref: "#/responses/Unauthenticated"
         403:
@@ -582,9 +576,7 @@ paths:
           schema:
             $ref: "#/definitions/ContactMethod"
         400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/Error"
+          $ref: "#/responses/ClientError"
         401:
           $ref: "#/responses/Unauthenticated"
         403:
@@ -612,9 +604,7 @@ paths:
         204:
           description: "Contact method deleted"
         400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/Error"
+          $ref: "#/responses/ClientError"
         401:
           $ref: "#/responses/Unauthenticated"
         403:
@@ -653,9 +643,7 @@ paths:
           schema:
             $ref: "#/definitions/MessageIn"
         400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/Error"
+          $ref: "#/responses/ClientError"
         401:
           $ref: "#/responses/Unauthenticated"
         403:
@@ -670,6 +658,12 @@ paths:
       summary: "Retrieve all messages"
       description: "Retrieve messages posted on a group's bulletin."
       operationId: "getMessages"
+      parameters:
+      - in: "path"
+        name: "userUuid"
+        type: "string"
+        format: "uuid"
+        required: true
       responses:
         200:
           description: "Messages on a group's bulletin."
@@ -709,9 +703,7 @@ paths:
           schema:
             $ref: "#/definitions/User"
         400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/Error"
+          $ref: "#/responses/ClientError"
 
   /login:
     get:
@@ -727,6 +719,8 @@ paths:
           description: "User successfully logged in."
           schema:
             $ref: "#/definitions/JWT"
+        400:
+          $ref: "#/responses/ClientError"
         401:
           description: "Invalid credentials"
           schema:
@@ -746,9 +740,10 @@ paths:
           description: "User details."
           schema:
             $ref: "#/definitions/UserProfile"
+        400:
+          $ref: "#/responses/ClientError"
         401:
-          schema:
-            $ref: "#/definitions/Unauthenticated"
+          $ref: "#/definitions/Unauthenticated"
 
 definitions:
   JWT:
@@ -812,6 +807,7 @@ definitions:
             type: "array"
             items:
               $ref: "#/definitions/ContactMethod"
+
   UserProfile:
     type: "object"
     properties:
@@ -819,7 +815,7 @@ definitions:
         type: "string"
         format: "uuid"
       churchUuid:
-        type: "array"
+        type: "string"
         format: "uuid"
 
   ChurchBase:
@@ -959,6 +955,10 @@ definitions:
         type: "string"
         
 responses:
+  ClientError:
+    description: "Invalid input"
+    schema:
+      $ref: "#/definitions/Error"
   Unauthenticated:
     description: "JWT is missing or invalid"
     headers:
@@ -966,7 +966,7 @@ responses:
         type: "string"
     schema:
       $ref: "#/definitions/Error"
-  Unauthentorised:
+  Unauthorised:
     description: "User is not autorised to access"
     headers:
       WWW_Authenticate:
