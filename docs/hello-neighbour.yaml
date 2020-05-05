@@ -744,7 +744,7 @@ paths:
         400:
           $ref: "#/responses/ClientError"
         401:
-          $ref: "#/definitions/Unauthenticated"
+          $ref: "#/responses/Unauthenticated"
 
 definitions:
   JWT:
@@ -967,8 +967,8 @@ responses:
         type: "string"
     schema:
       $ref: "#/definitions/Error"
-  Unauthorised:
-    description: "User is not autorised to access"
+  Unauthorized:
+    description: "User is not autorized to access"
     headers:
       WWW_Authenticate:
         type: "string"
