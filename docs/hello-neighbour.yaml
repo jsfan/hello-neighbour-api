@@ -32,8 +32,8 @@ paths:
     post:
       tags:
       - "member"
-      summary: "Add new church"
-      description: "Add new church to the system to invite members to"
+      summary: "Request new church"
+      description: "Request for adding new church to the system to invite members to"
       operationId: "addChurch"
       consumes:
       - "application/json"
@@ -47,10 +47,8 @@ paths:
         schema:
           $ref: "#/definitions/ChurchIn"
       responses:
-        200:
-          description: "Church added"
-          schema:
-            $ref: "#/definitions/Church"
+        204:
+          description: "Church request sent"
         400:
           $ref: "#/responses/ClientError"
         401:
@@ -798,6 +796,42 @@ paths:
             $ref: "#/definitions/User"
         400:
           $ref: "#/responses/ClientError"
+          
+  /register/{userUuid}:
+    post:
+      tags:
+      - "member"
+      security: []
+      summary: "Accept invite"
+      description: "Accept member invite and fill in remainder of user details."
+      operationId: "acceptInvite"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "userUuid"
+        type: "string"
+        format: "uuid"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "User details for new member account"
+        required: true
+        schema:
+          $ref: "#/definitions/UserIn"
+      responses:
+        200:
+          description: "Member account registered"
+          schema:
+            $ref: "#/definitions/User"
+        400:
+          $ref: "#/responses/ClientError"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/Error"
 
   /login:
     get:
