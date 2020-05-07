@@ -138,7 +138,7 @@ paths:
       tags:
       - "leader"
       summary: "Delete church"
-      description: "Delete a church from the system."
+      description: "Delete a church from the system, disassociating member accounts."
       operationId: "deleteChurch"
       produces:
       - "application/json"
@@ -334,8 +334,8 @@ paths:
     get:
       tags:
       - "leader"
-      summary: "Retrieve list of all your church match groups"
-      description: "Retrieve all match groups of a specific church (leader) or the ones you are currently part of (member)."
+      summary: "Retrieve list of current match groups"
+      description: "Retrieve all current match groups for a specific church."
       operationId: "getMatchGroups"
       produces:
       - "application/json"
@@ -356,6 +356,8 @@ paths:
           $ref: "#/responses/ClientError"
         401:
           $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
         404:
           description: "Church not found"
           schema:
@@ -496,6 +498,37 @@ paths:
           description: "User not found"
           schema:
             $ref: "#/definitions/Error"
+
+  /user/{userUuid}/matchGroup:
+    get:
+      tags:
+      - "member"
+      summary: "Retrieve current match group"
+      description: "Retrieve current match group for a user."
+      operationId: "getMatchGroup"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        200:
+          description: "Match group"
+          schema:
+            $ref: "#/definitions/Group"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+        404:
+          description: "User not found"
+          schema:
+            $ref:  "#/definitions/Error"
 
   /user/{userUuid}/contactmethod:
     post:
@@ -897,7 +930,7 @@ definitions:
         format: "uuid"
       role:
         type: "string"
-        enum: ["leader", "member"]
+        enum: ["leader", "member", "admin"]
 
   UserPublic:
     allOf:
