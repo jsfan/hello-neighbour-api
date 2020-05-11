@@ -160,6 +160,43 @@ paths:
           schema:
             $ref: "#/definitions/Error"
   
+  /church/{churchUuid/activate:
+    put:
+      tags:
+      - "administrator"
+      summary: "Activate or deactivate church"
+      description: "Activate or deactivate a church, such as for accepting a new church request."
+      operationId: "updateChurchActivate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+      - in: "body"
+        name: "isActive"
+        description: "Active flag - T/F"
+        schema:
+          type: "boolean"
+        required: true
+      responses:
+        204:
+          description: "Activation status changed"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+        404:
+          description: "Church not found"
+          schema:
+            $ref:  "#/definitions/Error"
+  
   /church/{churchUuid}/invite:
     post:
       tags:
@@ -182,8 +219,7 @@ paths:
         schema:
           type: "array"
           items:
-            type: "string"
-            format: "email"
+            $ref: "#/definitions/MemberInvite"
         required: true
       responses:
         204:
@@ -365,8 +401,7 @@ paths:
 
   /user:
     post:
-      tags:
-      - "administrator"
+      security: []
       summary: "Create new user"
       description: "Add a new user to the system."
       operationId: "addUser"
@@ -383,15 +418,11 @@ paths:
           $ref: "#/definitions/UserIn"
       responses:
         200:
-          description: "User added"
+          description: "User created"
           schema:
             $ref: "#/definitions/Question"
         400:
           $ref: "#/responses/ClientError"
-        401:
-          $ref: "#/responses/Unauthenticated"
-        403:
-          $ref: "#/responses/Unauthorized"
     get:
       tags:
       - "administrator"
@@ -440,7 +471,7 @@ paths:
       tags:
       - "member"
       summary: "Update user"
-      description: "Update user. All attributes can be edited."
+      description: "Update user information."
       operationId: "editUser"
       consumes:
       - "application/json"
@@ -454,7 +485,7 @@ paths:
         required: true
       - in: "body"
         name: "body"
-        description: "New user details"
+        description: "User details"
         required: true
         schema:
           $ref: "#/definitions/UserIn"
@@ -530,40 +561,7 @@ paths:
           schema:
             $ref:  "#/definitions/Error"
 
-  /user/{userUuid}/contactmethod:
-    post:
-      tags:
-      - "member"
-      summary: "Add a contact method to a user profile"
-      description: "Add a new contact method to an existing user profile."
-      operationId: "addContactMethod"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "path"
-        name: "userUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "body"
-        name: "body"
-        description: "Details of new contact method"
-        required: true
-        schema:
-          $ref: "#/definitions/ContactMethodIn"
-      responses:
-        200:
-          description: "Contact method created"
-          schema:
-            $ref: "#/definitions/ContactMethod"
-        400:
-          $ref: "#/responses/ClientError"
-        401:
-          $ref: "#/responses/Unauthenticated"
-        403:
-          $ref: "#/responses/Unauthorized"
-
-  /user/{userUuid}/bulletin:
+  /user/{userUuid}/matchgroup/{groupUuid}/bulletin:
     post:
       tags:
       - "member"
@@ -577,6 +575,11 @@ paths:
       parameters:
       - in: "path"
         name: "userUuid"
+        type: "string"
+        format: "uuid"
+        required: true
+      - in: "path"
+        name: "groupUuid"
         type: "string"
         format: "uuid"
         required: true
@@ -613,6 +616,11 @@ paths:
         type: "string"
         format: "uuid"
         required: true
+      - in: "path"
+        name: "groupUuid"
+        type: "string"
+        format: "uuid"
+        required: true
       responses:
         200:
           description: "Messages on a group's bulletin."
@@ -629,7 +637,40 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
-  /contactmethod/{methodUuid}:
+  /user/{userUuid}/contactmethod:
+    post:
+      tags:
+      - "member"
+      summary: "Add a contact method to a user profile"
+      description: "Add a new contact method to an existing user profile."
+      operationId: "addContactMethod"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "userUuid"
+        type: "string"
+        format: "uuid"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Details of new contact method"
+        required: true
+        schema:
+          $ref: "#/definitions/ContactMethodIn"
+      responses:
+        200:
+          description: "Contact method created"
+          schema:
+            $ref: "#/definitions/ContactMethod"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+
+  /user/{userUuid}/contactmethod/{methodUuid}:
     put:
       tags:
       - "member"
@@ -639,6 +680,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "userUuid"
+        type: "string"
+        format: "uuid"
+        required: true
       - in: "path"
         name: "methodUuid"
         description: "Contact method's UUID"
@@ -675,6 +721,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "userUuid"
+        type: "string"
+        format: "uuid"
+        required: true
       - in: "path"
         name: "methodUuid"
         description: "Contact method's UUID"
@@ -804,34 +855,9 @@ paths:
           description: "Question not found"
           schema:
             $ref: "#/definitions/Error"
-
-  /register:
-    post:
-      security: []
-      summary: "Create new user account"
-      description: "Create a new user. Both church leaders and members need such an account."
-      operationId: "createUser"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "User details for new account"
-        required: true
-        schema:
-          $ref: "#/definitions/UserIn"
-      responses:
-        200:
-          description: "User account created"
-          schema:
-            $ref: "#/definitions/User"
-        400:
-          $ref: "#/responses/ClientError"
-          
+ 
   /register/{userUuid}:
-    post:
+    put:
       tags:
       - "member"
       security: []
@@ -912,7 +938,23 @@ definitions:
     properties:
       jwt:
         type: "string"
-        
+    required: [jwt]
+  
+  MemberInvite:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+        format: "email"
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      dateOfBirth:
+        type: "string"
+        format: "date"
+    required: [email]
+  
   UserBase:
     type: "object"
     properties:
@@ -931,6 +973,7 @@ definitions:
       role:
         type: "string"
         enum: ["leader", "member", "admin"]
+    required: [email, firstName, lastName]
 
   UserPublic:
     allOf:
@@ -944,7 +987,8 @@ definitions:
             type: "array"
             items:
               $ref: "#/definitions/ContactMethod"
-            
+        required: [uuid]
+  
   UserIn:
     allOf:
       - $ref: "#/definitions/UserBase"
@@ -955,6 +999,7 @@ definitions:
             format: "date"
           password:
             type: "string"
+        required: [dateOfBirth, password]
             
   User:
     allOf:
@@ -968,6 +1013,7 @@ definitions:
             type: "array"
             items:
               $ref: "#/definitions/ContactMethod"
+        required: [uuid]
 
   UserProfile:
     type: "object"
@@ -978,6 +1024,7 @@ definitions:
       churchUuid:
         type: "string"
         format: "uuid"
+    required: [userUuid, churchUuid]
 
   ChurchBase:
     type: "object"
@@ -996,6 +1043,7 @@ definitions:
         format: "email"
       phone:
         type: "string"
+    required: [name, description, address]
 
   ChurchPublic:
     allOf:
@@ -1005,6 +1053,7 @@ definitions:
           uuid:
             type: "string"
             format: "uuid"
+        required: [uuid]
 
   ChurchIn:
     allOf:
@@ -1020,6 +1069,9 @@ definitions:
             type: "boolean"
           min_age:
             type: "integer"
+          memberBasicInfoUpdate:
+            type: "boolean"
+        required: [group_size, same_gender, min_age, memberBasicInfoUpdate]
 
   Church:
     allOf:
@@ -1029,6 +1081,7 @@ definitions:
           uuid:
             type: "string"
             format: "uuid"
+        required: [uuid]
 
   ContactMethodIn:
     type: "object"
@@ -1040,6 +1093,7 @@ definitions:
       user:
         type: "string"
         format: "uuid"
+    required: [label, contactDetails, user]
 
   ContactMethod:
     allOf:
@@ -1049,6 +1103,7 @@ definitions:
         uuid:
          type: "string"
          format: "uuid"
+      required: [uuid]
 
   QuestionIn:
     type: "object"
@@ -1058,6 +1113,7 @@ definitions:
       church:
         type: "string"
         format: "uuid"
+    required: [question, church]
 
   Question:
     allOf:
@@ -1067,6 +1123,7 @@ definitions:
         uuid:
          type: "string"
          format: "uuid"
+      required: [uuid]
 
   Group:
     type: "object"
@@ -1085,6 +1142,7 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/Question"
+    required: [uuid, created, users]
 
   MessageIn:
     type: "object"
@@ -1100,7 +1158,8 @@ definitions:
         format: "datetime"
       message:
         type: "string"
-          
+    required: [group, user, sent, message]
+  
   Message:
     allOf:
     - $ref: "#/definitions/MessageIn"
@@ -1109,7 +1168,8 @@ definitions:
         uuid:
           type: "string"
           format: "uuid"
-          
+      required: [uuid]
+  
   Error:
     type: "object"
     properties:
@@ -1118,7 +1178,8 @@ definitions:
         format: "int32"
       message:
         type: "string"
-        
+    required: [code, message]
+  
 responses:
   ClientError:
     description: "Invalid input"
