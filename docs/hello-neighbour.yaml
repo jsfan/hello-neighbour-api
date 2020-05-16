@@ -973,7 +973,7 @@ definitions:
       role:
         type: "string"
         enum: ["leader", "member", "admin"]
-    required: [email, firstName, lastName]
+    required: [email, first_name, last_name]
 
   UserPublic:
     allOf:
@@ -999,7 +999,7 @@ definitions:
             format: "date"
           password:
             type: "string"
-        required: [dateOfBirth, password]
+        required: [date_of_birth, password]
             
   User:
     allOf:
@@ -1024,7 +1024,7 @@ definitions:
       church_uuid:
         type: "string"
         format: "uuid"
-    required: [userUuid, churchUuid]
+    required: [user_uuid, church_uuid]
 
   ChurchBase:
     type: "object"
@@ -1071,7 +1071,7 @@ definitions:
             type: "integer"
           member_basic_info_update:
             type: "boolean"
-        required: [group_size, same_gender, min_age, memberBasicInfoUpdate]
+        required: [group_size, same_gender, min_age, member_basic_info_update]
 
   Church:
     allOf:
@@ -1179,7 +1179,7 @@ definitions:
       message:
         type: "string"
     required: [code, message]
-  
+
 responses:
   ClientError:
     description: "Invalid input"
