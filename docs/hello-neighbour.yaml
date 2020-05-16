@@ -946,11 +946,11 @@ definitions:
       email:
         type: "string"
         format: "email"
-      firstName:
+      first_name:
         type: "string"
-      lastName:
+      last_name:
         type: "string"
-      dateOfBirth:
+      date_of_birth:
         type: "string"
         format: "date"
     required: [email]
@@ -961,9 +961,9 @@ definitions:
       email:
         type: "string"
         format: "email"
-      firstName:
+      first_name:
         type: "string"
-      lastName:
+      last_name:
         type: "string"
       description:
         type: "string"
@@ -994,7 +994,7 @@ definitions:
       - $ref: "#/definitions/UserBase"
       - type: "object"
         properties:
-          dateOfBirth:
+          date_of_birth:
             type: "string"
             format: "date"
           password:
@@ -1018,10 +1018,10 @@ definitions:
   UserProfile:
     type: "object"
     properties:
-      userUuid:
+      user_uuid:
         type: "string"
         format: "uuid"
-      churchUuid:
+      church_uuid:
         type: "string"
         format: "uuid"
     required: [userUuid, churchUuid]
@@ -1069,7 +1069,7 @@ definitions:
             type: "boolean"
           min_age:
             type: "integer"
-          memberBasicInfoUpdate:
+          member_basic_info_update:
             type: "boolean"
         required: [group_size, same_gender, min_age, memberBasicInfoUpdate]
 
@@ -1088,12 +1088,12 @@ definitions:
     properties:
       label:
         type: "string"
-      contactDetails:
+      contact_detail:
         type: "string"
       user:
         type: "string"
         format: "uuid"
-    required: [label, contactDetails, user]
+    required: [label, contact_detail, user]
 
   ContactMethod:
     allOf:
