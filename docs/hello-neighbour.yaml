@@ -1,27 +1,39 @@
 swagger: "2.0"
 info:
-  description: "This is the API for COVID-19 Global Church Hack 'Hello Neighbour' project"
-  version: "0.0.1"
-  title: "COVID-19 Global Church Hack 'Hello Neighbour'"
+  description: "This is the API for the 'Hello Neighbour' project inspired from the COVID-19 Global Church Hack"
+  version: "0.0.2"
+  title: "Hello Neighbour"
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "localhost"
+host: "api.hello-neighbour.org"
 basePath: "/v0"
 tags:
+- name: "administrator"
+  description: "Actions only a system administrator can take"
 - name: "leader"
   description: "Everything that relates to church leaders interacting with the system"
 - name: "member"
   description: "Everything relating to church members interacting with the system"
 schemes:
 - "https"
+securityDefinitions:
+  jwtAuth:
+    type: apiKey
+    name: Authorization
+    in: header
+    x-token-type: Bearer
+  basicAuth:
+    type: basic
+security:
+  - jwtAuth: []
 paths:
   /church:
     post:
       tags:
-      - "leader"
-      summary: "Add new church"
-      description: "Add new church to the system to invite members to"
+      - "member"
+      summary: "Request new church"
+      description: "Request for adding new church to the system to invite members to"
       operationId: "addChurch"
       consumes:
       - "application/json"
@@ -35,53 +47,74 @@ paths:
         schema:
           $ref: "#/definitions/ChurchIn"
       responses:
-        200:
-          description: "Church added"
-          schema:
-            $ref: "#/definitions/Church"
+        204:
+          description: "Church request sent"
         400:
-          description: "Invalid input"
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+    get:
+      tags:
+      - "member"
+      summary: "Retrieve all signed up churches"
+      description: "Retrieve church details."
+      operationId: "getChurches"
+      responses:
+        200:
+          description: "Church details"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-            
+            $ref: "#/definitions/ChurchPublic"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        404:
+          description: "Church not found"
+          schema:
+            $ref:  "#/definitions/Error"
+  
   /church/{churchUuid}:
     get:
       tags:
       - "leader"
-      summary: "Retrieve church details"
+      summary: "Retrieve details of a specific church"
       description: "Retrieve church details."
       operationId: "getChurch"
+      produces:
+      - "application/json"
       parameters:
-      - in: "path"
-        name: "churchUuid"
+      - name: "churchUuid"
+        in: "path"
+        required: true
         type: "string"
         format: "uuid"
-        required: true
       responses:
         200:
           description: "Church details"
           schema:
             $ref: "#/definitions/Church"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
         404:
           description: "Church not found"
           schema:
-            $ref:  "#/definitions/ErrorResponse"
+            $ref:  "#/definitions/Error"
     put:
       tags:
       - "leader"
-      summary: "Update church"
-      description: "Update church identified by church's UUID. All attributes can be edited."
+      summary: "Update church details"
+      description: "Update church details."
       operationId: "editChurch"
       consumes:
       - "application/json"
       produces:
       - "application/json"
       parameters:
-      - in: "path"
-        name: "churchUuid"
+      - name: "churchUuid"
+        in: "path"
+        required: true
         type: "string"
         format: "uuid"
-        required: true
       - in: "body"
         name: "body"
         description: "New church details"
@@ -93,37 +126,78 @@ paths:
           description: "Church profile modified"
           schema:
             $ref: "#/definitions/ChurchIn"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
         404:
           description: "Church not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-        400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
     delete:
       tags:
       - "leader"
       summary: "Delete church"
-      description: "Delete a church from the system."
+      description: "Delete a church from the system, disassociating member accounts."
       operationId: "deleteChurch"
       produces:
       - "application/json"
       parameters:
-      - in: "path"
-        name: "churchUuid"
+      - name: "churchUuid"
+        in: "path"
+        required: true
         type: "string"
         format: "uuid"
-        required: true
       responses:
         204:
           description: "Church deleted"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
         404:
           description: "Church not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
   
-  /church/invite: # church is determined by requesting user's affiliation
+  /church/{churchUuid/activate:
+    put:
+      tags:
+      - "administrator"
+      summary: "Activate or deactivate church"
+      description: "Activate or deactivate a church, such as for accepting a new church request."
+      operationId: "updateChurchActivate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+      - in: "body"
+        name: "isActive"
+        description: "Active flag - T/F"
+        schema:
+          type: "boolean"
+        required: true
+      responses:
+        204:
+          description: "Activation status changed"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+        404:
+          description: "Church not found"
+          schema:
+            $ref:  "#/definitions/Error"
+  
+  /church/{churchUuid}/invite:
     post:
       tags:
       - "leader"
@@ -135,28 +209,96 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - in: "path"
-        name: "churchUuid"
+      - name: "churchUuid"
+        in: "path"
+        required: true
         type: "string"
         format: "uuid"
-        required: true
       - in: "body"
         name: "email"
         schema:
           type: "array"
           items:
-            type: "string"
-            format: "email"
+            $ref: "#/definitions/MemberInvite"
         required: true
       responses:
         204:
           description: "Invites sent"
         400:
-          description: "Invalid input"
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+        404:
+          description: "Church not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-  
-  /church/question: # church is determined by requesting user's affiliation
+            $ref:  "#/definitions/Error"
+
+  /church/{churchUuid}/user:
+    get:
+      tags:
+      - "leader"
+      summary: "Retrieve church members"
+      description: "Retrieve all members associated with a specific church."
+      operationId: "getChurchMembers"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        200:
+          description: "Member list"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/UserPublic"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+        404:
+          description: "Church not found"
+          schema:
+            $ref:  "#/definitions/Error"
+            
+  /church/{churchUuid}/user/{userUuid}:
+    delete:
+      tags:
+      - "leader"
+      summary: "Remove member from church"
+      description: "Disassociates member from church system. User account will still exist."
+      operationId: "deleteChurchMember"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+      - name: "userUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        204:
+          description: "Church member removed"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+        404:
+          description: "Church/user not found"
+          schema:
+            $ref: "#/definitions/Error"
+
+  /church/{churchUuid}/question:
     post:
       tags:
       - "leader"
@@ -168,11 +310,11 @@ paths:
       produces:
       - "application/json"
       parameters:
-      - in: "path"
-        name: "churchUuid"
+      - name: "churchUuid"
+        in: "path"
+        required: true
         type: "string"
         format: "uuid"
-        required: true
       - in: "body"
         name: "body"
         description: "Question for the church"
@@ -184,26 +326,30 @@ paths:
           description: "Question added"
           schema:
             $ref: "#/definitions/Question"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
         404:
           description: "Church not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-        400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
     get:
       tags:
       - "leader"
-      summary: "Retrieve list of all your church's questions"
+      summary: "Retrieve list of all questions"
       description: "Retrieve questions of a specific church."
-      operationId: "getQuestions"
+      operationId: "getChurchQuestions"
+      produces:
+      - "application/json"
       parameters:
-      - in: "path"
-        name: "churchUuid"
+      - name: "churchUuid"
+        in: "path"
+        required: true
         type: "string"
         format: "uuid"
-        required: true
       responses:
         200:
           description: "Question list"
@@ -211,118 +357,30 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Question"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
         404:
           description: "Church not found"
           schema:
-            $ref:  "#/definitions/ErrorResponse"
+            $ref:  "#/definitions/Error"
 
-  /church/question/{questionUuid}: # church is determined by requesting user's affiliation
+  /church/{churchUuid}/matchgroup:
     get:
       tags:
       - "leader"
-      summary: "Retrieve question"
-      description: "Retrieve a question for church for given UUIDs."
-      operationId: "getQuestion"
-      parameters:
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "path"
-        name: "questionUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      responses:
-        200:
-          description: "Church question"
-          schema:
-            $ref: "#/definitions/Question"
-        404:
-          description: "Question not found"
-          schema:
-            $ref:  "#/definitions/ErrorResponse"
-    put:
-      tags:
-      - "leader"
-      summary: "Update question"
-      description: "Update a question that's already in the system."
-      operationId: "modifyQuestion"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "path"
-        name: "questionUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "body"
-        name: "body"
-        description: "Question for the church"
-        required: true
-        schema:
-          $ref: "#/definitions/QuestionIn"
-      responses:
-        200:
-          description: "Question updated"
-          schema:
-            $ref: "#/definitions/Question"
-        404:
-          description: "Question not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-    delete:
-      tags:
-      - "leader"
-      summary: "Delete question"
-      description: "Delete a question from the system."
-      operationId: "deleteQuestion"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "path"
-        name: "questionUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      responses:
-        204:
-          description: "Question deleted"
-        404:
-          description: "Question not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-
-  /church/matchgroups: # church and user are determined based on user session
-    get:
-      tags:
-      - "leader"
-      summary: "Retrieve list of all your church match groups"
-      description: "Retrieve all match groups of a specific church."
+      summary: "Retrieve list of current match groups"
+      description: "Retrieve all current match groups for a specific church."
       operationId: "getMatchGroups"
+      produces:
+      - "application/json"
       parameters:
-      - in: "path"
-        name: "churchUuid"
+      - name: "churchUuid"
+        in: "path"
+        required: true
         type: "string"
         format: "uuid"
-        required: true
       responses:
         200:
           description: "Match group list"
@@ -330,18 +388,23 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Group"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
         404:
           description: "Church not found"
           schema:
-            $ref:  "#/definitions/ErrorResponse"
-            
+            $ref:  "#/definitions/Error"
+
   /user:
     post:
-      tags:
-      - "member"
-      summary: "Create new user account"
-      description: "Create a new user to be authenticated via Firebase. Both church leaders and members need such an account."
-      operationId: "createUser"
+      security: []
+      summary: "Create new user"
+      description: "Add a new user to the system."
+      operationId: "addUser"
       consumes:
       - "application/json"
       produces:
@@ -349,26 +412,41 @@ paths:
       parameters:
       - in: "body"
         name: "body"
-        description: "User details for new account"
+        description: "User details"
         required: true
         schema:
           $ref: "#/definitions/UserIn"
       responses:
         200:
-          description: "User account created"
+          description: "User created"
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/Question"
         400:
-          description: "Invalid input"
+          $ref: "#/responses/ClientError"
+    get:
+      tags:
+      - "administrator"
+      summary: "Retrieve all users"
+      description: "Retrieve all users in the system."
+      operationId: "getUsers"
+      responses:
+        200:
+          description: "User list"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-      
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+
   /user/{userUuid}:
     get:
       tags:
       - "member"
       summary: "Retrieve user details"
-      description: "Retrieve user details."
+      description: "Retrieve all user information."
       operationId: "getUser"
       parameters:
       - in: "path"
@@ -381,15 +459,19 @@ paths:
           description: "User details"
           schema:
             $ref: "#/definitions/User"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
         404:
           description: "User not found"
           schema:
-            $ref:  "#/definitions/ErrorResponse"
+            $ref:  "#/definitions/Error"
     put:
       tags:
       - "member"
       summary: "Update user"
-      description: "Update user identified by user's UUID. All attributes can be edited."
+      description: "Update user information."
       operationId: "editUser"
       consumes:
       - "application/json"
@@ -403,7 +485,7 @@ paths:
         required: true
       - in: "body"
         name: "body"
-        description: "New user details"
+        description: "User details"
         required: true
         schema:
           $ref: "#/definitions/UserIn"
@@ -412,20 +494,82 @@ paths:
           description: "User account updated"
           schema:
             $ref: "#/definitions/User"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
         404:
           description: "User not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-        400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
     delete:
       tags:
       - "member"
       summary: "Delete user"
-      description: "Delete identified by user's UUID."
+      description: "Delete user."
       operationId: "deleteUser"
+      produces:
+      - "application/json"
+      parameters:
+        - in: "path"
+          name: "userUuid"
+          type: "string"
+          format: "uuid"
+          required: true
+      responses:
+        204:
+          description: "User deleted"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+        404:
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/Error"
+
+  /user/{userUuid}/matchGroup:
+    get:
+      tags:
+      - "member"
+      summary: "Retrieve current match group"
+      description: "Retrieve current match group for a user."
+      operationId: "getMatchGroup"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+      responses:
+        200:
+          description: "Match group"
+          schema:
+            $ref: "#/definitions/Group"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+        404:
+          description: "User not found"
+          schema:
+            $ref:  "#/definitions/Error"
+
+  /user/{userUuid}/matchgroup/{groupUuid}/bulletin:
+    post:
+      tags:
+      - "member"
+      summary: "Send message"
+      description: "Post a message to the group's bulletin."
+      operationId: "sendMessage"
+      consumes:
+      - "application/json"
       produces:
       - "application/json"
       parameters:
@@ -434,15 +578,66 @@ paths:
         type: "string"
         format: "uuid"
         required: true
+      - in: "path"
+        name: "groupUuid"
+        type: "string"
+        format: "uuid"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Message to send to group"
+        required: true
+        schema:
+          $ref: "#/definitions/MessageIn"
       responses:
-        204:
-          description: "User deleted"
-        404:
-          description: "User not found"
+        200:
+          description: "Message sent"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/MessageIn"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+        404:
+          description: "Church/group not found"
+          schema:
+            $ref: "#/definitions/Error"
+    get:
+      tags:
+      - "member"
+      summary: "Retrieve all messages"
+      description: "Retrieve messages posted on a group's bulletin."
+      operationId: "getMessages"
+      parameters:
+      - in: "path"
+        name: "userUuid"
+        type: "string"
+        format: "uuid"
+        required: true
+      - in: "path"
+        name: "groupUuid"
+        type: "string"
+        format: "uuid"
+        required: true
+      responses:
+        200:
+          description: "Messages on a group's bulletin."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Message"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+        404:
+          description: "Church/group not found"
+          schema:
+            $ref: "#/definitions/Error"
 
-  /user/contactmethod:
+  /user/{userUuid}/contactmethod:
     post:
       tags:
       - "member"
@@ -454,7 +649,6 @@ paths:
       parameters:
       - in: "path"
         name: "userUuid"
-        description: "User's UUID"
         type: "string"
         format: "uuid"
         required: true
@@ -470,11 +664,13 @@ paths:
           schema:
             $ref: "#/definitions/ContactMethod"
         400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
 
-  /user/contactmethod/{methodUuid}:
+  /user/{userUuid}/contactmethod/{methodUuid}:
     put:
       tags:
       - "member"
@@ -486,7 +682,6 @@ paths:
       parameters:
       - in: "path"
         name: "userUuid"
-        description: "User's UUID"
         type: "string"
         format: "uuid"
         required: true
@@ -507,15 +702,16 @@ paths:
           description: "Contact method updated"
           schema:
             $ref: "#/definitions/ContactMethod"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
         404:
           description: "Contact method or user not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-        400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-
+            $ref: "#/definitions/Error"
     delete:
       tags:
       - "member"
@@ -527,7 +723,6 @@ paths:
       parameters:
       - in: "path"
         name: "userUuid"
-        description: "User's UUID"
         type: "string"
         format: "uuid"
         required: true
@@ -540,78 +735,135 @@ paths:
       responses:
         204:
           description: "Contact method deleted"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
         404:
           description: "Contact method or user not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-        400:
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
 
-  /user/church/{churchUuid}:
-   get:
-      tags:
-      - "member"
-      summary: "Retrieve public church details"
-      description: "Retrieve public church details."
-      operationId: "getChurchPublic"
-      parameters:
-      - in: "path"
-        name: "userUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      responses:
-        200:
-          description: "Public church details"
-          schema:
-            $ref: "#/definitions/ChurchPublic"
-        404:
-          description: "Church not found"
-          schema:
-            $ref:  "#/definitions/ErrorResponse"
-            
-  /user/matchgroup:  # refers to requesting user's current match group
+  /question:
     get:
       tags:
-      - "member"
-      summary: "Retrieve group"
-      description: "Retrieve the group of the matched user."
-      operationId: "getMatchGroup"
+      - "administrator"
+      summary: "Retrieve all questions"
+      description: "Retrieve all questions in the system."
+      operationId: "getQuestions"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "All questions"
+          schema:
+            $ref: "#/definitions/Question"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+
+  /question/{questionUuid}:
+    get:
+      tags:
+      - "leader"
+      summary: "Retrieve question"
+      description: "Retrieve a question by UUID (restricted to logged in user's church)."
+      operationId: "getQuestion"
       parameters:
       - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "path"
-        name: "userUuid"
+        name: "questionUuid"
         type: "string"
         format: "uuid"
         required: true
       responses:
         200:
-          description: "Group of matched church members"
+          description: "Church question"
           schema:
-            $ref: "#/definitions/Group"
+            $ref: "#/definitions/Question"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
         404:
-          description: "Group not found"
+          description: "Question not found"
           schema:
-            $ref:  "#/definitions/ErrorResponse"
-            
-  /user/bulletin: # refers to requesting user's current match group's bulletin
-    post:
+            $ref:  "#/definitions/Error"
+    put:
+      tags:
+      - "leader"
+      summary: "Update question"
+      description: "Update a question that's already in the system."
+      operationId: "modifyQuestion"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "questionUuid"
+        type: "string"
+        format: "uuid"
+        required: true
+      - in: "body"
+        name: "body"
+        description: "Question for the church"
+        required: true
+        schema:
+          $ref: "#/definitions/QuestionIn"
+      responses:
+        200:
+          description: "Question updated"
+          schema:
+            $ref: "#/definitions/Question"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+        404:
+          description: "Question not found"
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      tags:
+      - "leader"
+      summary: "Delete question"
+      description: "Delete a question from the system."
+      operationId: "deleteQuestion"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "questionUuid"
+        type: "string"
+        format: "uuid"
+        required: true
+      responses:
+        204:
+          description: "Question deleted"
+        401:
+          $ref: "#/responses/Unauthenticated"
+        403:
+          $ref: "#/responses/Unauthorized"
+        404:
+          description: "Question not found"
+          schema:
+            $ref: "#/definitions/Error"
+ 
+  /register/{userUuid}:
+    put:
       tags:
       - "member"
-      summary: "Send message"
-      description: "Post a message to the group's bulletin."
-      operationId: "sendMessage"
+      security: []
+      summary: "Accept invite"
+      description: "Accept member invite and fill in remainder of user details."
+      operationId: "acceptInvite"
       consumes:
       - "application/json"
       produces:
@@ -622,86 +874,106 @@ paths:
         type: "string"
         format: "uuid"
         required: true
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "path"
-        name: "matchGroupUuid"
-        type: "string"
-        format: "uuid"
-        required: true
       - in: "body"
         name: "body"
-        description: "Message to send to group"
+        description: "User details for new member account"
         required: true
         schema:
-          $ref: "#/definitions/MessageIn"
+          $ref: "#/definitions/UserIn"
       responses:
         200:
-          description: "Message sent"
+          description: "Member account registered"
           schema:
-            $ref: "#/definitions/MessageIn"
-        404:
-          description: "Church/group not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/User"
         400:
-          description: "Invalid input"
+          $ref: "#/responses/ClientError"
+        404:
+          description: "User not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-  
+            $ref: "#/definitions/Error"
+
+  /login:
     get:
       tags:
       - "member"
-      summary: "Retrieve all messages"
-      description: "Retrieve messages posted on a group's bulletin."
-      operationId: "getMessages"
-      parameters:
-      - in: "path"
-        name: "userUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "path"
-        name: "churchUuid"
-        type: "string"
-        format: "uuid"
-        required: true
-      - in: "path"
-        name: "matchGroupUuid"
-        type: "string"
-        format: "uuid"
-        required: true
+      security:
+        - basicAuth: []
+      summary: "Login user"
+      description: "Login to a user account with the specified credentials. Issues a JWT on success."
+      operationId: "loginUser"
       responses:
         200:
-          description: "Messages on a group's bulletin."
+          description: "User successfully logged in."
           schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Message"
-        404:
-          description: "Church/group not found"
+            $ref: "#/definitions/JWT"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          description: "Invalid credentials"
           schema:
-            $ref:  "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+
+  /profile:
+    get:
+      tags:
+      - "member"
+      security:
+        - basicAuth: []
+      summary: "Logged in user's UUID and church UUID"
+      description: "Returns the church and user UUID for the logged in user."
+      operationId: "userProfile"
+      responses:
+        200:
+          description: "User details."
+          schema:
+            $ref: "#/definitions/UserProfile"
+        400:
+          $ref: "#/responses/ClientError"
+        401:
+          $ref: "#/responses/Unauthenticated"
 
 definitions:
+  JWT:
+    type: "object"
+    properties:
+      jwt:
+        type: "string"
+    required: [jwt]
+  
+  MemberInvite:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+        format: "email"
+      first_name:
+        type: "string"
+      last_name:
+        type: "string"
+      date_of_birth:
+        type: "string"
+        format: "date"
+    required: [email]
+  
   UserBase:
     type: "object"
     properties:
       email:
         type: "string"
         format: "email"
-      firstName:
+      first_name:
         type: "string"
-      lastName:
+      last_name:
         type: "string"
       description:
         type: "string"
       church:
         type: "string"
         format: "uuid"
+      role:
+        type: "string"
+        enum: ["leader", "member", "admin"]
+    required: [email, first_name, last_name]
 
   UserPublic:
     allOf:
@@ -715,15 +987,19 @@ definitions:
             type: "array"
             items:
               $ref: "#/definitions/ContactMethod"
-            
+        required: [uuid]
+  
   UserIn:
     allOf:
       - $ref: "#/definitions/UserBase"
       - type: "object"
         properties:
-          dateOfBirth:
+          date_of_birth:
             type: "string"
             format: "date"
+          password:
+            type: "string"
+        required: [date_of_birth, password]
             
   User:
     allOf:
@@ -737,6 +1013,18 @@ definitions:
             type: "array"
             items:
               $ref: "#/definitions/ContactMethod"
+        required: [uuid]
+
+  UserProfile:
+    type: "object"
+    properties:
+      user_uuid:
+        type: "string"
+        format: "uuid"
+      church_uuid:
+        type: "string"
+        format: "uuid"
+    required: [user_uuid, church_uuid]
 
   ChurchBase:
     type: "object"
@@ -755,9 +1043,7 @@ definitions:
         format: "email"
       phone:
         type: "string"
-      main_contact:
-        type: "string"
-        format: "uuid"
+    required: [name, description, address]
 
   ChurchPublic:
     allOf:
@@ -767,6 +1053,7 @@ definitions:
           uuid:
             type: "string"
             format: "uuid"
+        required: [uuid]
 
   ChurchIn:
     allOf:
@@ -782,6 +1069,9 @@ definitions:
             type: "boolean"
           min_age:
             type: "integer"
+          member_basic_info_update:
+            type: "boolean"
+        required: [group_size, same_gender, min_age, member_basic_info_update]
 
   Church:
     allOf:
@@ -791,17 +1081,19 @@ definitions:
           uuid:
             type: "string"
             format: "uuid"
+        required: [uuid]
 
   ContactMethodIn:
     type: "object"
     properties:
       label:
         type: "string"
-      contactDetails:
+      contact_detail:
         type: "string"
       user:
         type: "string"
         format: "uuid"
+    required: [label, contact_detail, user]
 
   ContactMethod:
     allOf:
@@ -811,6 +1103,7 @@ definitions:
         uuid:
          type: "string"
          format: "uuid"
+      required: [uuid]
 
   QuestionIn:
     type: "object"
@@ -820,6 +1113,7 @@ definitions:
       church:
         type: "string"
         format: "uuid"
+    required: [question, church]
 
   Question:
     allOf:
@@ -829,6 +1123,7 @@ definitions:
         uuid:
          type: "string"
          format: "uuid"
+      required: [uuid]
 
   Group:
     type: "object"
@@ -843,6 +1138,11 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/UserPublic"
+      questions:
+        type: "array"
+        items:
+          $ref: "#/definitions/Question"
+    required: [uuid, created, users]
 
   MessageIn:
     type: "object"
@@ -858,7 +1158,8 @@ definitions:
         format: "datetime"
       message:
         type: "string"
-          
+    required: [group, user, sent, message]
+  
   Message:
     allOf:
     - $ref: "#/definitions/MessageIn"
@@ -867,8 +1168,9 @@ definitions:
         uuid:
           type: "string"
           format: "uuid"
-
-  ErrorResponse:
+      required: [uuid]
+  
+  Error:
     type: "object"
     properties:
       code:
@@ -876,3 +1178,24 @@ definitions:
         format: "int32"
       message:
         type: "string"
+    required: [code, message]
+
+responses:
+  ClientError:
+    description: "Invalid input"
+    schema:
+      $ref: "#/definitions/Error"
+  Unauthenticated:
+    description: "JWT is missing or invalid"
+    headers:
+      WWW_Authenticate:
+        type: "string"
+    schema:
+      $ref: "#/definitions/Error"
+  Unauthorized:
+    description: "User is not authorized to access"
+    headers:
+      WWW_Authenticate:
+        type: "string"
+    schema:
+      $ref: "#/definitions/Error"
