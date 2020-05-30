@@ -1,29 +1,57 @@
 ---
 swagger: "2.0"
 info:
-  description: "This is the API for COVID-19 Global Church Hack 'Hello Neighbour'\
-    \ project"
-  version: "0.0.1"
-  title: "COVID-19 Global Church Hack 'Hello Neighbour'"
+  description: "This is the API for the 'Hello Neighbour' project inspired from the\
+    \ COVID-19 Global Church Hack"
+  version: "0.0.2"
+  title: "Hello Neighbour"
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "localhost"
+host: "api.hello-neighbour.org"
 basePath: "/v0"
 tags:
+- name: "administrator"
+  description: "Actions only a system administrator can take"
 - name: "leader"
   description: "Everything that relates to church leaders interacting with the system"
 - name: "member"
   description: "Everything relating to church members interacting with the system"
 schemes:
 - "https"
+security:
+- jwtAuth: []
 paths:
   /church:
+    get:
+      tags:
+      - "member"
+      summary: "Retrieve all signed up churches"
+      description: "Retrieve church details."
+      operationId: "getChurches"
+      parameters: []
+      responses:
+        "200":
+          description: "Church details"
+          schema:
+            $ref: "#/definitions/ChurchPublic"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: "Church not found"
+          schema:
+            $ref: "#/definitions/Error"
     post:
       tags:
-      - "leader"
-      summary: "Add new church"
-      description: "Add new church to the system to invite members to"
+      - "member"
+      summary: "Request new church"
+      description: "Request for adding new church to the system to invite members\
+        \ to"
       operationId: "addChurch"
       consumes:
       - "application/json"
@@ -38,21 +66,28 @@ paths:
           $ref: "#/definitions/ChurchIn"
         x-exportParamName: "Body"
       responses:
-        "200":
-          description: "Church added"
-          schema:
-            $ref: "#/definitions/Church"
+        "204":
+          description: "Church request sent"
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
   /church/{churchUuid}:
     get:
       tags:
       - "leader"
-      summary: "Retrieve church details"
+      summary: "Retrieve details of a specific church"
       description: "Retrieve church details."
       operationId: "getChurch"
+      produces:
+      - "application/json"
       parameters:
       - name: "churchUuid"
         in: "path"
@@ -65,16 +100,29 @@ paths:
           description: "Church details"
           schema:
             $ref: "#/definitions/Church"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
         "404":
           description: "Church not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
     put:
       tags:
       - "leader"
-      summary: "Update church"
-      description: "Update church identified by church's UUID. All attributes can\
-        \ be edited."
+      summary: "Update church details"
+      description: "Update church details."
       operationId: "editChurch"
       consumes:
       - "application/json"
@@ -102,16 +150,23 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
         "404":
           description: "Church not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
     delete:
       tags:
       - "leader"
       summary: "Delete church"
-      description: "Delete a church from the system."
+      description: "Delete a church from the system, disassociating member accounts."
       operationId: "deleteChurch"
       produces:
       - "application/json"
@@ -125,11 +180,76 @@ paths:
       responses:
         "204":
           description: "Church deleted"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
         "404":
           description: "Church not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-  /church/invite:
+            $ref: "#/definitions/Error"
+  /church/{churchUuid/activate:
+    put:
+      tags:
+      - "administrator"
+      summary: "Activate or deactivate church"
+      description: "Activate or deactivate a church, such as for accepting a new church\
+        \ request."
+      operationId: "updateChurchActivate"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "ChurchUuid"
+      - in: "body"
+        name: "isActive"
+        description: "Active flag - T/F"
+        required: true
+        schema:
+          type: "boolean"
+        x-exportParamName: "IsActive"
+      responses:
+        "204":
+          description: "Activation status changed"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: "Church not found"
+          schema:
+            $ref: "#/definitions/Error"
+  /church/{churchUuid}/invite:
     post:
       tags:
       - "leader"
@@ -153,8 +273,7 @@ paths:
         schema:
           type: "array"
           items:
-            type: "string"
-            format: "email"
+            $ref: "#/definitions/MemberInvite"
         x-exportParamName: "Email"
       responses:
         "204":
@@ -162,14 +281,119 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-  /church/question:
+            $ref: "#/definitions/Error"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: "Church not found"
+          schema:
+            $ref: "#/definitions/Error"
+  /church/{churchUuid}/user:
     get:
       tags:
       - "leader"
-      summary: "Retrieve list of all your church's questions"
+      summary: "Retrieve church members"
+      description: "Retrieve all members associated with a specific church."
+      operationId: "getChurchMembers"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "ChurchUuid"
+      responses:
+        "200":
+          description: "Member list"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/UserPublic"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: "Church not found"
+          schema:
+            $ref: "#/definitions/Error"
+  /church/{churchUuid}/user/{userUuid}:
+    delete:
+      tags:
+      - "leader"
+      summary: "Remove member from church"
+      description: "Disassociates member from church system. User account will still\
+        \ exist."
+      operationId: "deleteChurchMember"
+      parameters:
+      - name: "churchUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "ChurchUuid"
+      - name: "userUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "UserUuid"
+      responses:
+        "204":
+          description: "Church member removed"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: "Church/user not found"
+          schema:
+            $ref: "#/definitions/Error"
+  /church/{churchUuid}/question:
+    get:
+      tags:
+      - "leader"
+      summary: "Retrieve list of all questions"
       description: "Retrieve questions of a specific church."
-      operationId: "getQuestions"
+      operationId: "getChurchQuestions"
+      produces:
+      - "application/json"
       parameters:
       - name: "churchUuid"
         in: "path"
@@ -184,10 +408,24 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Question"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
         "404":
           description: "Church not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
     post:
       tags:
       - "leader"
@@ -220,118 +458,34 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
         "404":
           description: "Church not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-  /church/question/{questionUuid}:
+            $ref: "#/definitions/Error"
+  /church/{churchUuid}/matchgroup:
     get:
       tags:
       - "leader"
-      summary: "Retrieve question"
-      description: "Retrieve a question for church for given UUIDs."
-      operationId: "getQuestion"
-      parameters:
-      - name: "churchUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "ChurchUuid"
-      - name: "questionUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "QuestionUuid"
-      responses:
-        "200":
-          description: "Church question"
-          schema:
-            $ref: "#/definitions/Question"
-        "404":
-          description: "Question not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-    put:
-      tags:
-      - "leader"
-      summary: "Update question"
-      description: "Update a question that's already in the system."
-      operationId: "modifyQuestion"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "churchUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "ChurchUuid"
-      - name: "questionUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "QuestionUuid"
-      - in: "body"
-        name: "body"
-        description: "Question for the church"
-        required: true
-        schema:
-          $ref: "#/definitions/QuestionIn"
-        x-exportParamName: "Body"
-      responses:
-        "200":
-          description: "Question updated"
-          schema:
-            $ref: "#/definitions/Question"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Question not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-    delete:
-      tags:
-      - "leader"
-      summary: "Delete question"
-      description: "Delete a question from the system."
-      operationId: "deleteQuestion"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "churchUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "ChurchUuid"
-      - name: "questionUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "QuestionUuid"
-      responses:
-        "204":
-          description: "Question deleted"
-        "404":
-          description: "Question not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /church/matchgroups:
-    get:
-      tags:
-      - "leader"
-      summary: "Retrieve list of all your church match groups"
-      description: "Retrieve all match groups of a specific church."
+      summary: "Retrieve list of current match groups"
+      description: "Retrieve all current match groups for a specific church."
       operationId: "getMatchGroups"
+      produces:
+      - "application/json"
       parameters:
       - name: "churchUuid"
         in: "path"
@@ -346,18 +500,61 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Group"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
         "404":
           description: "Church not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
   /user:
-    post:
+    get:
       tags:
-      - "member"
-      summary: "Create new user account"
-      description: "Create a new user to be authenticated via Firebase. Both church\
-        \ leaders and members need such an account."
-      operationId: "createUser"
+      - "administrator"
+      summary: "Retrieve all users"
+      description: "Retrieve all users in the system."
+      operationId: "getUsers"
+      parameters: []
+      responses:
+        "200":
+          description: "User list"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      summary: "Create new user"
+      description: "Add a new user to the system."
+      operationId: "addUser"
       consumes:
       - "application/json"
       produces:
@@ -365,26 +562,27 @@ paths:
       parameters:
       - in: "body"
         name: "body"
-        description: "User details for new account"
+        description: "User details"
         required: true
         schema:
           $ref: "#/definitions/UserIn"
         x-exportParamName: "Body"
       responses:
         "200":
-          description: "User account created"
+          description: "User created"
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/Question"
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+      security: []
   /user/{userUuid}:
     get:
       tags:
       - "member"
       summary: "Retrieve user details"
-      description: "Retrieve user details."
+      description: "Retrieve all user information."
       operationId: "getUser"
       parameters:
       - name: "userUuid"
@@ -398,15 +596,29 @@ paths:
           description: "User details"
           schema:
             $ref: "#/definitions/User"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
         "404":
           description: "User not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
     put:
       tags:
       - "member"
       summary: "Update user"
-      description: "Update user identified by user's UUID. All attributes can be edited."
+      description: "Update user information."
       operationId: "editUser"
       consumes:
       - "application/json"
@@ -421,7 +633,7 @@ paths:
         x-exportParamName: "UserUuid"
       - in: "body"
         name: "body"
-        description: "New user details"
+        description: "User details"
         required: true
         schema:
           $ref: "#/definitions/UserIn"
@@ -434,16 +646,30 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
         "404":
           description: "User not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
     delete:
       tags:
       - "member"
       summary: "Delete user"
-      description: "Delete identified by user's UUID."
+      description: "Delete user."
       operationId: "deleteUser"
       produces:
       - "application/json"
@@ -457,11 +683,170 @@ paths:
       responses:
         "204":
           description: "User deleted"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
         "404":
           description: "User not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-  /user/contactmethod:
+            $ref: "#/definitions/Error"
+  /user/{userUuid}/matchGroup:
+    get:
+      tags:
+      - "member"
+      summary: "Retrieve current match group"
+      description: "Retrieve current match group for a user."
+      operationId: "getMatchGroup"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "UserUuid"
+      responses:
+        "200":
+          description: "Match group"
+          schema:
+            $ref: "#/definitions/Group"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/Error"
+  /user/{userUuid}/matchgroup/{groupUuid}/bulletin:
+    get:
+      tags:
+      - "member"
+      summary: "Retrieve all messages"
+      description: "Retrieve messages posted on a group's bulletin."
+      operationId: "getMessages"
+      parameters:
+      - name: "userUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "UserUuid"
+      - name: "groupUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "GroupUuid"
+      responses:
+        "200":
+          description: "Messages on a group's bulletin."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Message"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: "Church/group not found"
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      tags:
+      - "member"
+      summary: "Send message"
+      description: "Post a message to the group's bulletin."
+      operationId: "sendMessage"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "UserUuid"
+      - name: "groupUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "GroupUuid"
+      - in: "body"
+        name: "body"
+        description: "Message to send to group"
+        required: true
+        schema:
+          $ref: "#/definitions/MessageIn"
+        x-exportParamName: "Body"
+      responses:
+        "200":
+          description: "Message sent"
+          schema:
+            $ref: "#/definitions/MessageIn"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: "Church/group not found"
+          schema:
+            $ref: "#/definitions/Error"
+  /user/{userUuid}/contactmethod:
     post:
       tags:
       - "member"
@@ -473,7 +858,6 @@ paths:
       parameters:
       - name: "userUuid"
         in: "path"
-        description: "User's UUID"
         required: true
         type: "string"
         format: "uuid"
@@ -493,8 +877,22 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-  /user/contactmethod/{methodUuid}:
+            $ref: "#/definitions/Error"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+  /user/{userUuid}/contactmethod/{methodUuid}:
     put:
       tags:
       - "member"
@@ -506,7 +904,6 @@ paths:
       parameters:
       - name: "userUuid"
         in: "path"
-        description: "User's UUID"
         required: true
         type: "string"
         format: "uuid"
@@ -533,11 +930,25 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
         "404":
           description: "Contact method or user not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
     delete:
       tags:
       - "member"
@@ -549,7 +960,6 @@ paths:
       parameters:
       - name: "userUuid"
         in: "path"
-        description: "User's UUID"
         required: true
         type: "string"
         format: "uuid"
@@ -567,112 +977,189 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
         "404":
           description: "Contact method or user not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-  /user/church/{churchUuid}:
+            $ref: "#/definitions/Error"
+  /question:
     get:
       tags:
-      - "member"
-      summary: "Retrieve public church details"
-      description: "Retrieve public church details."
-      operationId: "getChurchPublic"
-      parameters:
-      - name: "userUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "UserUuid"
-      - name: "churchUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "ChurchUuid"
+      - "administrator"
+      summary: "Retrieve all questions"
+      description: "Retrieve all questions in the system."
+      operationId: "getQuestions"
+      produces:
+      - "application/json"
+      parameters: []
       responses:
         "200":
-          description: "Public church details"
+          description: "All questions"
           schema:
-            $ref: "#/definitions/ChurchPublic"
-        "404":
-          description: "Church not found"
+            $ref: "#/definitions/Question"
+        "400":
+          description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-  /user/matchgroup:
+            $ref: "#/definitions/Error"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+  /question/{questionUuid}:
     get:
       tags:
-      - "member"
-      summary: "Retrieve group"
-      description: "Retrieve the group of the matched user."
-      operationId: "getMatchGroup"
+      - "leader"
+      summary: "Retrieve question"
+      description: "Retrieve a question by UUID (restricted to logged in user's church)."
+      operationId: "getQuestion"
       parameters:
-      - name: "churchUuid"
+      - name: "questionUuid"
         in: "path"
         required: true
         type: "string"
         format: "uuid"
-        x-exportParamName: "ChurchUuid"
-      - name: "userUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "UserUuid"
+        x-exportParamName: "QuestionUuid"
       responses:
         "200":
-          description: "Group of matched church members"
+          description: "Church question"
           schema:
-            $ref: "#/definitions/Group"
+            $ref: "#/definitions/Question"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
         "404":
-          description: "Group not found"
+          description: "Question not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-  /user/bulletin:
-    get:
+            $ref: "#/definitions/Error"
+    put:
       tags:
-      - "member"
-      summary: "Retrieve all messages"
-      description: "Retrieve messages posted on a group's bulletin."
-      operationId: "getMessages"
+      - "leader"
+      summary: "Update question"
+      description: "Update a question that's already in the system."
+      operationId: "modifyQuestion"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
       parameters:
-      - name: "userUuid"
+      - name: "questionUuid"
         in: "path"
         required: true
         type: "string"
         format: "uuid"
-        x-exportParamName: "UserUuid"
-      - name: "churchUuid"
-        in: "path"
+        x-exportParamName: "QuestionUuid"
+      - in: "body"
+        name: "body"
+        description: "Question for the church"
         required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "ChurchUuid"
-      - name: "matchGroupUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "MatchGroupUuid"
+        schema:
+          $ref: "#/definitions/QuestionIn"
+        x-exportParamName: "Body"
       responses:
         "200":
-          description: "Messages on a group's bulletin."
+          description: "Question updated"
           schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Message"
+            $ref: "#/definitions/Question"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
         "404":
-          description: "Church/group not found"
+          description: "Question not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
-    post:
+            $ref: "#/definitions/Error"
+    delete:
+      tags:
+      - "leader"
+      summary: "Delete question"
+      description: "Delete a question from the system."
+      operationId: "deleteQuestion"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "questionUuid"
+        in: "path"
+        required: true
+        type: "string"
+        format: "uuid"
+        x-exportParamName: "QuestionUuid"
+      responses:
+        "204":
+          description: "Question deleted"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: "User is not authorized to access"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: "Question not found"
+          schema:
+            $ref: "#/definitions/Error"
+  /register/{userUuid}:
+    put:
       tags:
       - "member"
-      summary: "Send message"
-      description: "Post a message to the group's bulletin."
-      operationId: "sendMessage"
+      summary: "Accept invite"
+      description: "Accept member invite and fill in remainder of user details."
+      operationId: "acceptInvite"
       consumes:
       - "application/json"
       produces:
@@ -684,58 +1171,141 @@ paths:
         type: "string"
         format: "uuid"
         x-exportParamName: "UserUuid"
-      - name: "churchUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "ChurchUuid"
-      - name: "matchGroupUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "MatchGroupUuid"
       - in: "body"
         name: "body"
-        description: "Message to send to group"
+        description: "User details for new member account"
         required: true
         schema:
-          $ref: "#/definitions/MessageIn"
+          $ref: "#/definitions/UserIn"
         x-exportParamName: "Body"
       responses:
         "200":
-          description: "Message sent"
+          description: "Member account registered"
           schema:
-            $ref: "#/definitions/MessageIn"
+            $ref: "#/definitions/User"
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
         "404":
-          description: "Church/group not found"
+          description: "User not found"
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+      security: []
+  /login:
+    get:
+      tags:
+      - "member"
+      summary: "Login user"
+      description: "Login to a user account with the specified credentials. Issues\
+        \ a JWT on success."
+      operationId: "loginUser"
+      parameters: []
+      responses:
+        "200":
+          description: "User successfully logged in."
+          schema:
+            $ref: "#/definitions/JWT"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
+        "401":
+          description: "Invalid credentials"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+      - basicAuth: []
+  /profile:
+    get:
+      tags:
+      - "member"
+      summary: "Logged in user's UUID and church UUID"
+      description: "Returns the church and user UUID for the logged in user."
+      operationId: "userProfile"
+      parameters: []
+      responses:
+        "200":
+          description: "User details."
+          schema:
+            $ref: "#/definitions/UserProfile"
+        "400":
+          description: "Invalid input"
+          schema:
+            $ref: "#/definitions/Error"
+        "401":
+          description: "JWT is missing or invalid"
+          headers:
+            WWW_Authenticate:
+              type: "string"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+      - basicAuth: []
+securityDefinitions:
+  jwtAuth:
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+    x-token-type: "Bearer"
+  basicAuth:
+    type: "basic"
 definitions:
-  UserBase:
+  JWT:
     type: "object"
+    required:
+    - "jwt"
+    properties:
+      jwt:
+        type: "string"
+    example:
+      jwt: "jwt"
+  MemberInvite:
+    type: "object"
+    required:
+    - "email"
     properties:
       email:
         type: "string"
         format: "email"
-      firstName:
+      first_name:
         type: "string"
-      lastName:
+      last_name:
+        type: "string"
+      date_of_birth:
+        type: "string"
+        format: "date"
+  UserBase:
+    type: "object"
+    required:
+    - "email"
+    - "first_name"
+    - "last_name"
+    properties:
+      email:
+        type: "string"
+        format: "email"
+      first_name:
+        type: "string"
+      last_name:
         type: "string"
       description:
         type: "string"
       church:
         type: "string"
         format: "uuid"
+      role:
+        type: "string"
+        enum:
+        - "leader"
+        - "member"
+        - "admin"
   UserPublic:
     allOf:
     - $ref: "#/definitions/UserBase"
     - type: "object"
+      required:
+      - "uuid"
       properties:
         uuid:
           type: "string"
@@ -748,14 +1318,21 @@ definitions:
     allOf:
     - $ref: "#/definitions/UserBase"
     - type: "object"
+      required:
+      - "date_of_birth"
+      - "password"
       properties:
-        dateOfBirth:
+        date_of_birth:
           type: "string"
           format: "date"
+        password:
+          type: "string"
   User:
     allOf:
     - $ref: "#/definitions/UserIn"
     - type: "object"
+      required:
+      - "uuid"
       properties:
         uuid:
           type: "string"
@@ -764,8 +1341,27 @@ definitions:
           type: "array"
           items:
             $ref: "#/definitions/ContactMethod"
+  UserProfile:
+    type: "object"
+    required:
+    - "church_uuid"
+    - "user_uuid"
+    properties:
+      user_uuid:
+        type: "string"
+        format: "uuid"
+      church_uuid:
+        type: "string"
+        format: "uuid"
+    example:
+      user_uuid: "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
+      church_uuid: "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
   ChurchBase:
     type: "object"
+    required:
+    - "address"
+    - "description"
+    - "name"
     properties:
       name:
         type: "string"
@@ -781,13 +1377,12 @@ definitions:
         format: "email"
       phone:
         type: "string"
-      main_contact:
-        type: "string"
-        format: "uuid"
   ChurchPublic:
     allOf:
     - $ref: "#/definitions/ChurchBase"
     - type: "object"
+      required:
+      - "uuid"
       properties:
         uuid:
           type: "string"
@@ -796,6 +1391,11 @@ definitions:
     allOf:
     - $ref: "#/definitions/ChurchBase"
     - type: "object"
+      required:
+      - "group_size"
+      - "member_basic_info_update"
+      - "min_age"
+      - "same_gender"
       properties:
         group_size:
           type: "integer"
@@ -806,20 +1406,28 @@ definitions:
           type: "boolean"
         min_age:
           type: "integer"
+        member_basic_info_update:
+          type: "boolean"
   Church:
     allOf:
     - $ref: "#/definitions/ChurchIn"
     - type: "object"
+      required:
+      - "uuid"
       properties:
         uuid:
           type: "string"
           format: "uuid"
   ContactMethodIn:
     type: "object"
+    required:
+    - "contact_detail"
+    - "label"
+    - "user"
     properties:
       label:
         type: "string"
-      contactDetails:
+      contact_detail:
         type: "string"
       user:
         type: "string"
@@ -828,12 +1436,17 @@ definitions:
     allOf:
     - $ref: "#/definitions/ContactMethodIn"
     - type: "object"
+      required:
+      - "uuid"
       properties:
         uuid:
           type: "string"
           format: "uuid"
   QuestionIn:
     type: "object"
+    required:
+    - "church"
+    - "question"
     properties:
       question:
         type: "string"
@@ -847,12 +1460,18 @@ definitions:
     allOf:
     - $ref: "#/definitions/QuestionIn"
     - type: "object"
+      required:
+      - "uuid"
       properties:
         uuid:
           type: "string"
           format: "uuid"
   Group:
     type: "object"
+    required:
+    - "created"
+    - "users"
+    - "uuid"
     properties:
       uuid:
         type: "string"
@@ -864,14 +1483,26 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/UserPublic"
+      questions:
+        type: "array"
+        items:
+          $ref: "#/definitions/Question"
     example:
       created: "2000-01-23"
+      questions:
+      - ""
+      - ""
       uuid: "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
       users:
       - ""
       - ""
   MessageIn:
     type: "object"
+    required:
+    - "group"
+    - "message"
+    - "sent"
+    - "user"
     properties:
       group:
         type: "string"
@@ -893,15 +1524,39 @@ definitions:
     allOf:
     - $ref: "#/definitions/MessageIn"
     - type: "object"
+      required:
+      - "uuid"
       properties:
         uuid:
           type: "string"
           format: "uuid"
-  ErrorResponse:
+  Error:
     type: "object"
+    required:
+    - "code"
+    - "message"
     properties:
       code:
         type: "integer"
         format: "int32"
       message:
         type: "string"
+responses:
+  ClientError:
+    description: "Invalid input"
+    schema:
+      $ref: "#/definitions/Error"
+  Unauthenticated:
+    description: "JWT is missing or invalid"
+    headers:
+      WWW_Authenticate:
+        type: "string"
+    schema:
+      $ref: "#/definitions/Error"
+  Unauthorized:
+    description: "User is not authorized to access"
+    headers:
+      WWW_Authenticate:
+        type: "string"
+    schema:
+      $ref: "#/definitions/Error"
