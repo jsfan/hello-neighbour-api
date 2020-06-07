@@ -9,10 +9,8 @@
 
 package pkg
 
-type Question struct {
-	Question string `json:"question"`
+type ModelError struct {
+	Code int32 `json:"code"`
 
-	Church string `json:"church"`
-
-	Uuid string `json:"uuid"`
+	Message string `json:"message"`
 }

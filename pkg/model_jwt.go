@@ -9,10 +9,6 @@
 
 package pkg
 
-type Question struct {
-	Question string `json:"question"`
-
-	Church string `json:"church"`
-
-	Uuid string `json:"uuid"`
+type Jwt struct {
+	Jwt string `json:"jwt"`
 }

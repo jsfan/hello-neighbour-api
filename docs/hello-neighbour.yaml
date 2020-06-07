@@ -160,7 +160,7 @@ paths:
           schema:
             $ref: "#/definitions/Error"
   
-  /church/{churchUuid/activate:
+  /church/{churchUuid}/activate:
     put:
       tags:
       - "administrator"
@@ -965,6 +965,9 @@ definitions:
         type: "string"
       last_name:
         type: "string"
+      gender:
+        type: "string"
+        enum: ["male", "female"]
       description:
         type: "string"
       church:
@@ -999,7 +1002,7 @@ definitions:
             format: "date"
           password:
             type: "string"
-        required: [date_of_birth, password]
+        required: [date_of_birth, password, gender]
             
   User:
     allOf:

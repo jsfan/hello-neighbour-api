@@ -9,10 +9,12 @@
 
 package pkg
 
-type Question struct {
-	Question string `json:"question"`
+type MemberInvite struct {
+	Email string `json:"email"`
 
-	Church string `json:"church"`
+	FirstName string `json:"first_name,omitempty"`
 
-	Uuid string `json:"uuid"`
+	LastName string `json:"last_name,omitempty"`
+
+	DateOfBirth string `json:"date_of_birth,omitempty"`
 }
