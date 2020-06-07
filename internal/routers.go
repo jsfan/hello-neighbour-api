@@ -72,7 +72,7 @@ var routes = Routes{
 	Route{
 		"UpdateChurchActivate",
 		strings.ToUpper("Put"),
-		"/v0/church/{churchUuid/activate",
+		"/v0/church/{churchUuid}/activate",
 		UpdateChurchActivate,
 	},
 

@@ -16,6 +16,8 @@ type User struct {
 
 	LastName string `json:"last_name"`
 
+	Gender string `json:"gender,omitempty"`
+
 	Description string `json:"description,omitempty"`
 
 	Church string `json:"church,omitempty"`
