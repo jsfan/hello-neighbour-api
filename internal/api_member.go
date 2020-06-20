@@ -10,6 +10,7 @@
 package internal
 
 import (
+	"github.com/jsfan/hello-neighbour/internal/endpoints"
 	"net/http"
 )
 
@@ -65,7 +66,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 func LoginUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	endpoints.Login(w, r)
 }
 
 func SendMessage(w http.ResponseWriter, r *http.Request) {
