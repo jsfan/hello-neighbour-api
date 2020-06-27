@@ -10,6 +10,7 @@
 package pkg
 
 type UserProfile struct {
+
 	UserUuid string `json:"user_uuid"`
 
 	ChurchUuid string `json:"church_uuid"`

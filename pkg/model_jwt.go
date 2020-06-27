@@ -10,5 +10,6 @@
 package pkg
 
 type Jwt struct {
+
 	Jwt string `json:"jwt"`
 }

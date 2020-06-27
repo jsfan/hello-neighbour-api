@@ -10,6 +10,7 @@
 package pkg
 
 type MemberInvite struct {
+
 	Email string `json:"email"`
 
 	FirstName string `json:"first_name,omitempty"`

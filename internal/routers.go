@@ -71,7 +71,7 @@ var routes = Routes{
 
 	Route{
 		"UpdateChurchActivate",
-		strings.ToUpper("Put"),
+		strings.ToUpper("Patch"),
 		"/v0/church/{churchUuid}/activate",
 		UpdateChurchActivate,
 	},
@@ -169,7 +169,7 @@ var routes = Routes{
 
 	Route{
 		"AcceptInvite",
-		strings.ToUpper("Put"),
+		strings.ToUpper("Patch"),
 		"/v0/register/{userUuid}",
 		AcceptInvite,
 	},
