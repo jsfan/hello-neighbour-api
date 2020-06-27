@@ -11,6 +11,9 @@
 package main
 
 import (
+	"flag"
+	"github.com/jsfan/hello-neighbour/internal/config"
+	"github.com/jsfan/hello-neighbour/internal/storage"
 	"log"
 	"net/http"
 
@@ -18,9 +21,29 @@ import (
 )
 
 func main() {
+
+	cfgFileOpt := flag.String("config", "config.yaml", "Configuration YAML file")
+
+	flag.Parse()
+
+	cfg, err := config.ReadConfig(*cfgFileOpt)
+	if err != nil {
+		log.Fatalf(`[ERROR] Could not read configuration file "%s": %v`, *cfgFileOpt, err)
+	}
+
+	jwtKeys, err := config.ReadKeyPair(&cfg.JwtSignKeys)
+	if err != nil {
+		log.Fatalf(`[ERROR] Could not load key pair: %v`, err)
+	}
+
+	_, err = storage.Connect(&cfg.Database)
+	if err != nil {
+		log.Fatalf("[ERROR] Could not connect to database: %v", err)
+	}
+
 	log.Printf("Server started")
 
-	router := sw.NewRouter()
+	router := sw.NewRouter(jwtKeys)
 	router.Use(sw.AuthMiddleware)
 
 	log.Fatal(http.ListenAndServe(":8080", router))

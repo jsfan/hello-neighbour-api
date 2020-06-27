@@ -13,13 +13,13 @@ type DBConnection struct {
 
 var backend *DBConnection
 
-func (conn *DBConnection) Connect(dbConfig *config.DatabaseConfig) (connection *DBConnection, errVal error) {
+func Connect(dbConfig *config.DatabaseConfig) (connection *DBConnection, errVal error) {
 	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbConfig.Host, dbConfig.Port, dbConfig.User, dbConfig.Password, dbConfig.DbName)
 	database, err := sql.Open("postgres", psqlconn)
 	if err != nil {
 		return nil, err
 	}
-	conn.Db = database
+	backend.Db = database
 	return backend, nil
 }
 

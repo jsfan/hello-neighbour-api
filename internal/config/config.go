@@ -25,16 +25,20 @@ type KeyPair struct {
 }
 
 type Config struct {
-	Database DatabaseConfig `yaml:"dbName"`
-	JwtKeys  KeyPair        `yaml:"JWTKeys"`
+	Database    DatabaseConfig `yaml:"dbName"`
+	JwtSignKeys KeyPair        `yaml:"JWTKeys"`
 }
 
-func ReadConfig(fileName string) (cfg *Config, errVal error) {
-	cfgFile, err := os.Open(fileName)
+func readFile(fileName string) (fileContents []byte, errVal error) {
+	fileHandle, err := os.Open(fileName)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Could not open config file %s: ", fileName))
 	}
-	rawCfg, err := ioutil.ReadAll(cfgFile)
+	return ioutil.ReadAll(fileHandle)
+}
+
+func ReadConfig(fileName string) (cfg *Config, errVal error) {
+	rawCfg, err := readFile(fileName)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("Could not read config file %s: ", fileName))
 	}
