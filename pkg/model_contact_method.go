@@ -10,7 +10,6 @@
 package pkg
 
 type ContactMethod struct {
-
 	Label string `json:"label"`
 
 	ContactDetail string `json:"contact_detail"`

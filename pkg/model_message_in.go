@@ -10,7 +10,6 @@
 package pkg
 
 type MessageIn struct {
-
 	Group string `json:"group"`
 
 	User string `json:"user"`

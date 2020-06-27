@@ -10,7 +10,6 @@
 package pkg
 
 type QuestionIn struct {
-
 	Question string `json:"question"`
 
 	Church string `json:"church"`

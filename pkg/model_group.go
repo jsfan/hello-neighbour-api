@@ -10,7 +10,6 @@
 package pkg
 
 type Group struct {
-
 	Uuid string `json:"uuid"`
 
 	Created string `json:"created"`

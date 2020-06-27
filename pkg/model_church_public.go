@@ -10,7 +10,6 @@
 package pkg
 
 type ChurchPublic struct {
-
 	Name string `json:"name"`
 
 	Description string `json:"description"`
