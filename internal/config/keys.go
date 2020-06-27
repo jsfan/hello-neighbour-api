@@ -5,8 +5,8 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"errors"
 	"fmt"
+	"github.com/pkg/errors"
 	"os"
 )
 
@@ -80,6 +80,11 @@ func readPublicKey(keyFile string) (pubKey *rsa.PublicKey, errVal error) {
 }
 
 func ReadKeyPair(keyFiles *KeyPair) (keyPair *rsa.PrivateKey, errVal error) {
+	if _, err := os.Stat(keyFiles.PrivateKey); err != nil && os.IsNotExist(err) {
+		if err := generateNewKeyPair(keyFiles); err != nil {
+			return nil, errors.Wrap(err, "could not generate new signing key pair")
+		}
+	}
 	keyPair, err := readPrivateKey(keyFiles.PrivateKey)
 	if err != nil {
 		return nil, err
