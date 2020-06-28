@@ -9,7 +9,7 @@ type UserProfile struct {
 	DateOfBirth  string
 	Gender       string
 	Description  string
-	ChurchId     int64
+	ChurchUUID   string
 	Role         string
 	Active       bool
 }
