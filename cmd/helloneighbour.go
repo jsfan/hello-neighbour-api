@@ -36,9 +36,13 @@ func main() {
 		log.Fatalf(`[ERROR] Could not load key pair: %v`, err)
 	}
 
-	_, err = storage.Connect(&cfg.Database)
+	con, err := storage.Connect(&cfg.Database)
 	if err != nil {
 		log.Fatalf("[ERROR] Could not connect to database: %v", err)
+	}
+
+	if err := storage.Migrate(con, cfg.DbMigration); err != nil {
+		log.Fatalf("[ERROR] Database migration failed: %v", err)
 	}
 
 	log.Printf("Server started")
