@@ -4,19 +4,20 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
+	"encoding/asn1"
 	"encoding/pem"
 	"fmt"
 	"github.com/pkg/errors"
 	"os"
 )
 
-func writePemEncoded(fileName string, contents []byte) error {
-	fh, err := os.Open(fileName)
+func writePemEncoded(fileName string, keyType string, contents []byte) error {
+	fh, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		return err
 	}
 	block := pem.Block{
-		Type:    "RSA PRIVATE KEY",
+		Type:    keyType,
 		Headers: nil,
 		Bytes:   contents,
 	}
@@ -24,19 +25,19 @@ func writePemEncoded(fileName string, contents []byte) error {
 }
 
 func generateNewKeyPair(keyFiles *KeyPair) error {
-	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	privateKey, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
 		panic(err)
 	}
-	err = writePemEncoded(keyFiles.PrivateKey, x509.MarshalPKCS1PrivateKey(privateKey))
+	err = writePemEncoded(keyFiles.PrivateKey, "RSA PRIVATE KEY", x509.MarshalPKCS1PrivateKey(privateKey))
 	if err != nil {
 		return err
 	}
-	pubKey, err := x509.MarshalPKIXPublicKey(privateKey.PublicKey)
+	pubKey, err := asn1.Marshal(privateKey.PublicKey)
 	if err != nil {
 		return err
 	}
-	err = writePemEncoded(keyFiles.PublicKey, pubKey)
+	err = writePemEncoded(keyFiles.PublicKey, "RSA PUBLIC KEY", pubKey)
 	if err != nil {
 		return err
 	}
@@ -68,13 +69,9 @@ func readPublicKey(keyFile string) (pubKey *rsa.PublicKey, errVal error) {
 	if err != nil {
 		return nil, err
 	}
-	genericPubKey, err := x509.ParsePKIXPublicKey(pubKeyRaw.Bytes)
+	pubKey, err = x509.ParsePKCS1PublicKey(pubKeyRaw.Bytes)
 	if err != nil {
 		return nil, err
-	}
-	pubKey, ok := genericPubKey.(*rsa.PublicKey)
-	if !ok {
-		return nil, errors.New(fmt.Sprintf(`Public key "%s" does not seem to be an RSA public key`, keyFile))
 	}
 	return pubKey, nil
 }
