@@ -6,14 +6,16 @@ func (dal *Dal) SelectUserByEmail(email string) (user *models.UserProfile, errVa
 	var userProfile models.UserProfile
 	err := dal.tx.QueryRowContext(
 		dal.ctx,
-		"SELECT user.pub_id," +
-			"user.email," +
-			"user.first_name," +
-			"user.last_name," +
-			"user.gender," +
-			"user.date_of_birth " +
-			"FROM user " +
-			"JOIN church ON user.church_id = church.id" +
+		"SELECT u.pub_id," +
+			"u.email," +
+			"u.first_name," +
+			"u.last_name," +
+			"u.gender," +
+			"u.date_of_birth " +
+			"u.role " +
+			"c.pub_id " +
+			"FROM app_user u" +
+			"JOIN church c ON u.church_id = c.id" +
 			"WHERE active is TRUE and email = ?", email).Scan(
 		&userProfile.PubId,
 		&userProfile.Email,
@@ -21,6 +23,7 @@ func (dal *Dal) SelectUserByEmail(email string) (user *models.UserProfile, errVa
 		&userProfile.LastName,
 		&userProfile.Gender,
 		&userProfile.DateOfBirth,
+		&userProfile.Role,
 		&userProfile.ChurchUUID,
 	)
 	if err != nil {
