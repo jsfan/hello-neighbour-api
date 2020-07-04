@@ -25,9 +25,8 @@ type KeyPair struct {
 }
 
 type Config struct {
-	Database    DatabaseConfig `yaml:"dbName"`
+	Database    DatabaseConfig `yaml:"database"`
 	JwtSignKeys KeyPair        `yaml:"JWTKeys"`
-	DbMigration int			   `yaml:"DbMigration"`
 }
 
 func readFile(fileName string) (fileContents []byte, errVal error) {
