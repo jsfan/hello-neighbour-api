@@ -41,7 +41,7 @@ func main() {
 		log.Fatalf("[ERROR] Could not connect to database: %v", err)
 	}
 
-	if err := storage.Migrate(con); err != nil {
+	if err := storage.Migrate(con, &cfg.Database.DbName); err != nil {
 		log.Fatalf("[ERROR] Database migration failed: %v", err)
 	}
 

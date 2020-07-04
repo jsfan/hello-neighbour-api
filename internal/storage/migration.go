@@ -7,9 +7,12 @@ import (
 )
 
 // Migrates the database schema to the latest schema version
-func Migrate(connection *DBConnection) (errVal error) {
+func Migrate(connection *DBConnection, dbName *string) (errVal error) {
 	driver, err := postgres.WithInstance(connection.Db, &postgres.Config{})
-	m, err := migrate.NewWithDatabaseInstance("file:///migrations", "postgres", driver)
+	if err != nil {
+		return err
+	}
+	m, err := migrate.NewWithDatabaseInstance("file://migrations", *dbName, driver)
     if err != nil {
 		return err
 	}

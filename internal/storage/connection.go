@@ -14,12 +14,14 @@ type DBConnection struct {
 var backend *DBConnection
 
 func Connect(dbConfig *config.DatabaseConfig) (connection *DBConnection, errVal error) {
-	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbConfig.Host, dbConfig.Port, dbConfig.User, dbConfig.Password, dbConfig.DbName)
+	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s", dbConfig.Host, dbConfig.Port, dbConfig.User, dbConfig.Password, dbConfig.DbName)
 	database, err := sql.Open("postgres", psqlconn)
 	if err != nil {
 		return nil, err
 	}
-	backend.Db = database
+	backend = &DBConnection{
+		Db: database,
+	}
 	return backend, nil
 }
 
