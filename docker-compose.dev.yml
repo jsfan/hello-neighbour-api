@@ -1,32 +1,12 @@
 version: "3.7"
 services:
-  helloneighbour:
-    build:
-      context: .
-      dockerfile: Dockerfile
   postgres:
     image: postgres:12-alpine
     volumes:
       - ./data:/var/lib/postgresql/data
     environment:
-      - "POSTGRES_DATABASE=helloneighbour"
-      - "POSTGRES_USER=helloneighbour"
-      - "POSTGRES_PASSWORD=changeme"
-  nginx:
-    image: nginx:1.15-alpine
-    restart: unless-stopped
-    volumes:
-      - ./deploy/nginx:/etc/nginx/conf.d
-      - ./deploy/certbot/conf:/etc/letsencrypt
-      - ./deploy/certbot/www:/var/www/certbot
+      - "POSTGRES_DATABASE=helloneighbourdev"
+      - "POSTGRES_USER=develop"
+      - "POSTGRES_PASSWORD=develop"
     ports:
-      - "80:80"
-      - "443:443"
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-  certbot:
-    image: certbot/certbot
-    restart: unless-stopped
-    volumes:
-      - ./deploy/certbot/conf:/etc/letsencrypt
-      - ./deploy/certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+      - "5432:5432"
