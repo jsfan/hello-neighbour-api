@@ -5,7 +5,7 @@ services:
     volumes:
       - ./data:/var/lib/postgresql/data
     environment:
-      - "POSTGRES_DATABASE=helloneighbourdev"
+      - "POSTGRES_DB=helloneighbourdev"
       - "POSTGRES_USER=develop"
       - "POSTGRES_PASSWORD=develop"
     ports:

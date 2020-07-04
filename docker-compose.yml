@@ -9,7 +9,7 @@ services:
     volumes:
       - ./data:/var/lib/postgresql/data
     environment:
-      - "POSTGRES_DATABASE=helloneighbour"
+      - "POSTGRES_DB=helloneighbour"
       - "POSTGRES_USER=helloneighbour"
       - "POSTGRES_PASSWORD=changeme"
   nginx:
