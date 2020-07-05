@@ -1,8 +1,12 @@
 version: "3.7"
 services:
   postgres:
-    image: postgres:12-alpine
+    image: postgres-ssl
+    build:
+      context: database
+      dockerfile: Dockerfile
     volumes:
+      - ./deploy/postgres/ssl:/etc/postgres/ssl
       - ./data:/var/lib/postgresql/data
     environment:
       - "POSTGRES_DB=helloneighbourdev"

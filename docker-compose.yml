@@ -5,8 +5,13 @@ services:
       context: .
       dockerfile: Dockerfile
   postgres:
-    image: postgres:12-alpine
+    image: postgres-ssl
+    user: postgres
+    build:
+      context: database
+      dockerfile: Dockerfile
     volumes:
+      - ./deploy/postgres/ssl:/etc/postgres/ssl
       - ./data:/var/lib/postgresql/data
     environment:
       - "POSTGRES_DB=helloneighbour"
