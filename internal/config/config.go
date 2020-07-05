@@ -16,7 +16,7 @@ type DatabaseConfig struct {
 	Port     int    `yaml:"port"`
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
-	DbName   string `yaml:"db"`
+	DbName   string `yaml:"dbName"`
 }
 
 type KeyPair struct {
