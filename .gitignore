@@ -99,6 +99,7 @@ fabric.properties
 
 # certificates and keys
 deploy/certbot
+deploy/postgres
 
 # default config file
 config.yaml
