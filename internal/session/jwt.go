@@ -41,9 +41,9 @@ func (userSession *jwtWrapper) Validate(rawJWT string) error {
 	}
 
 	expectedBase := jwt.Expected{
-		Issuer: issuer,
+		Issuer:  issuer,
 		Subject: subject,
-		Time: time.Now(),
+		Time:    time.Now(),
 	}
 	if err := tok.Claims(key, &expectedBase); err != nil {
 		return errors.Wrap(err, "could not validate claims")
@@ -67,10 +67,10 @@ func (userSession *jwtWrapper) Build(sessionClaims *UserSession) error {
 		return errors.Wrap(err, "could not create JWT signer")
 	}
 	claims := jwt.Claims{
-		Issuer:    issuer,
-		Subject:   subject,
-		Expiry:    jwt.NewNumericDate(time.Now().Add(jwtLifespan)),
-		IssuedAt:  jwt.NewNumericDate(time.Now()),
+		Issuer:   issuer,
+		Subject:  subject,
+		Expiry:   jwt.NewNumericDate(time.Now().Add(jwtLifespan)),
+		IssuedAt: jwt.NewNumericDate(time.Now()),
 	}
 	userSession.rawJWT, err = jwt.Signed(signer).Claims(claims).Claims(sessionClaims).CompactSerialize()
 	return errors.Wrap(err, "could not build JWT")
