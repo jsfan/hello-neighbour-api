@@ -3,7 +3,7 @@ services:
   postgres:
     image: postgres-ssl
     build:
-      context: database
+      context: database/docker
       dockerfile: Dockerfile
     volumes:
       - ./deploy/postgres/ssl:/etc/postgres/ssl

@@ -8,7 +8,7 @@ services:
     image: postgres-ssl
     user: postgres
     build:
-      context: database
+      context: database/docker
       dockerfile: Dockerfile
     volumes:
       - ./deploy/postgres/ssl:/etc/postgres/ssl

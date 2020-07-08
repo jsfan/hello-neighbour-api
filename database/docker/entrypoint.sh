@@ -7,4 +7,5 @@ then
     chown -R postgres:postgres /etc/postgres
 fi
 
+chown -R postgres /var/lib/postgresql
 /usr/local/bin/docker-entrypoint.sh -c 'config_file=/etc/postgres/postgresql.conf'
