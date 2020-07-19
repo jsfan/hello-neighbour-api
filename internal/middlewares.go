@@ -5,11 +5,11 @@ package internal
 
 import (
 	"context"
-	"encoding/json"
 	"github.com/jsfan/hello-neighbour/internal/config"
+	"github.com/jsfan/hello-neighbour/internal/endpoints"
 	"github.com/jsfan/hello-neighbour/internal/session"
 	"github.com/jsfan/hello-neighbour/internal/storage"
-	"github.com/jsfan/hello-neighbour/pkg"
+	"github.com/jsfan/hello-neighbour/internal/utils"
 	"log"
 	"net/http"
 	"strings"
@@ -18,25 +18,18 @@ import (
 const authHeader = "Authorization"
 
 func sendUnauthorizedResponse(w http.ResponseWriter) {
-	resp := pkg.ErrorResponse{
-		Code:    401,
-		Message: "Unauthenticated",
-	}
-	respJson, err := json.Marshal(resp)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusUnauthorized)
-	_, err = w.Write(respJson)
-	if err != nil {
-		log.Printf("[ERROR] Could not write response for unauthenticated request: %+v", err)
-	}
+	endpoints.SendErrorResponse(w, http.StatusUnauthorized, "Unauthenticated")
 
 }
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// check database connection first
+		if _, err := storage.GetConnection(); err != nil {
+			log.Printf("[ERROR] Database connection unavailable.")
+			endpoints.SendErrorResponse(w, http.StatusInternalServerError, "Internal Server Error")
+		}
+
 		bearerToken, ok := r.Header[authHeader]
 		if !ok {
 			sendUnauthorizedResponse(w)
@@ -45,24 +38,30 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		// validate JWT
 		// TODO: Go through all authorisation headers instead?
 		tokenDetails := strings.SplitN(bearerToken[0], " ", 2)
-		if strings.ToLower(tokenDetails[0]) != "bearer" {
-			sendUnauthorizedResponse(w)
-			return
-		}
-		if err := session.GetJWTWrapper().Validate(tokenDetails[1]); err != nil {
+		tokenType := strings.ToLower(tokenDetails[0])
+		var userSession *session.UserSession
+		switch tokenType {
+		case "bearer":
+			if err := session.GetJWTWrapper().Validate(tokenDetails[1]); err != nil {
+				sendUnauthorizedResponse(w)
+				return
+			}
+			// todo: populate user session from JWT
+		case "basic":
+			var authFail bool
+			if userSession, authFail = utils.CheckBasicAuth(r); authFail == true {
+				sendUnauthorizedResponse(w)
+				return
+			} else if userSession == nil {
+				endpoints.SendErrorResponse(w, http.StatusBadRequest, "Malformed basic authentication")
+				return
+			}
+		default:
 			sendUnauthorizedResponse(w)
 			return
 		}
 		// augment request context with user session
-		ctx := context.WithValue(r.Context(), config.SessionKey, "<session details to go here>")
-		// add storage connection to context
-		conn, err := storage.GetConnection()
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			log.Printf("[ERROR] Database connection unavailable.")
-			return
-		}
-		ctx = context.WithValue(ctx, config.DatabaseConnection, conn)
+		ctx := context.WithValue(r.Context(), config.SessionKey, userSession)
 		// Call the next handler, which can be another middleware in the chain, or the final handler.
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
