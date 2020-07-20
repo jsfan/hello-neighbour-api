@@ -30,8 +30,8 @@ func SendErrorResponse(w http.ResponseWriter, code int32, message string) {
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	userSession := session.GetSession(r)
-	jwtRef := session.GetJWTWrapper()
+	userSession := session.NewSession()
+	jwtRef := session.NewJWT()
 	err := jwtRef.Build(userSession)
 	if err != nil {
 		log.Printf("Could not build JWT: %+v", err)

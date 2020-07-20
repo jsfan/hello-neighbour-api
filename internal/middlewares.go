@@ -42,7 +42,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		var userSession *session.UserSession
 		switch tokenType {
 		case "bearer":
-			if err := session.GetJWTWrapper().Validate(tokenDetails[1]); err != nil {
+			if err := session.NewJWT().Validate(tokenDetails[1]); err != nil {
 				sendUnauthorizedResponse(w)
 				return
 			}

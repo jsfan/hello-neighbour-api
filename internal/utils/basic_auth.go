@@ -21,8 +21,8 @@ func userSessionFromProfile(profile *models.UserProfile) (userSession *session.U
 		panic(fmt.Sprintf("User's UUID from database could not be parsed: %+v", err))
 	}
 	return &session.UserSession{
-		UserUUID:   userUUID,
-		ChurchUUID: churchUUID,
+		UserUUID:   &userUUID,
+		ChurchUUID: &churchUUID,
 		Role:       profile.Role,
 	}
 }

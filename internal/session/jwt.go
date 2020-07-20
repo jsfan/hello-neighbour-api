@@ -22,18 +22,18 @@ var jwtLifespan, _ = time.ParseDuration("24h")
 // Key used to sign JWT
 var signingKey *rsa.PrivateKey
 
-// Holds the JWT amd the session details extracted from it
-var session *jwtWrapper
-
 func SetSigningKey(jwtKey *rsa.PrivateKey) {
 	signingKey = jwtKey
 }
 
-func GetJWTWrapper() *jwtWrapper {
-	return session
+func NewJWT() *jwtWrapper {
+	return &jwtWrapper{
+		rawJWT:         "",
+		sessionDetails: nil,
+	}
 }
 
-func (userSession *jwtWrapper) Validate(rawJWT string) error {
+func (jwtWrapper *jwtWrapper) Validate(rawJWT string) error {
 	key := jose.SigningKey{Algorithm: jose.PS512, Key: signingKey}
 	tok, err := jwt.ParseSigned(rawJWT)
 	if err != nil {
@@ -54,11 +54,11 @@ func (userSession *jwtWrapper) Validate(rawJWT string) error {
 		return errors.Wrap(err, "could not validate private claims")
 	}
 
-	userSession.sessionDetails = &ourClaims
+	jwtWrapper.sessionDetails = &ourClaims
 	return nil
 }
 
-func (userSession *jwtWrapper) Build(sessionClaims *UserSession) error {
+func (jwtWrapper *jwtWrapper) Build(sessionClaims *UserSession) error {
 	if signingKey == nil {
 		return errors.New("no signing key loaded")
 	}
@@ -72,10 +72,10 @@ func (userSession *jwtWrapper) Build(sessionClaims *UserSession) error {
 		Expiry:   jwt.NewNumericDate(time.Now().Add(jwtLifespan)),
 		IssuedAt: jwt.NewNumericDate(time.Now()),
 	}
-	userSession.rawJWT, err = jwt.Signed(signer).Claims(claims).Claims(sessionClaims).CompactSerialize()
+	jwtWrapper.rawJWT, err = jwt.Signed(signer).Claims(claims).Claims(sessionClaims).CompactSerialize()
 	return errors.Wrap(err, "could not build JWT")
 }
 
-func (userSession *jwtWrapper) GetRaw() string {
-	return userSession.rawJWT
+func (jwtWrapper *jwtWrapper) GetRaw() string {
+	return jwtWrapper.rawJWT
 }
