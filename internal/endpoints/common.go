@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"encoding/json"
+	"github.com/jsfan/hello-neighbour/internal/config"
 	"github.com/jsfan/hello-neighbour/internal/session"
 	"github.com/jsfan/hello-neighbour/pkg"
 	"log"
@@ -30,7 +31,7 @@ func SendErrorResponse(w http.ResponseWriter, code int32, message string) {
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	userSession := session.NewSession()
+	userSession := r.Context().Value(config.SessionKey).(*session.UserSession)
 	jwtRef := session.NewJWT()
 	err := jwtRef.Build(userSession)
 	if err != nil {
