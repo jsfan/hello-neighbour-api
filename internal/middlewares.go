@@ -42,11 +42,13 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		var userSession *session.UserSession
 		switch tokenType {
 		case "bearer":
-			if err := session.NewJWT().Validate(tokenDetails[1]); err != nil {
+			ourJwt := session.NewJWT()
+			if err := ourJwt.Validate(tokenDetails[1]); err != nil {
+				log.Printf("[INFO] Could not validate JWT: %+v", err)
 				sendUnauthorizedResponse(w)
 				return
 			}
-			// todo: populate user session from JWT
+			userSession = ourJwt.SessionDetails
 		case "basic":
 			var authFail bool
 			if userSession, authFail = utils.CheckBasicAuth(r); authFail == true {

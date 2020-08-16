@@ -13,7 +13,7 @@ const subject = "Hello Neighbour API"
 
 type jwtWrapper struct {
 	rawJWT         string
-	sessionDetails *UserSession
+	SessionDetails *UserSession
 }
 
 // JWT lifespan (i.e. time until it expires)
@@ -29,12 +29,11 @@ func SetSigningKey(jwtKey *rsa.PrivateKey) {
 func NewJWT() *jwtWrapper {
 	return &jwtWrapper{
 		rawJWT:         "",
-		sessionDetails: nil,
+		SessionDetails: nil,
 	}
 }
 
 func (jwtWrapper *jwtWrapper) Validate(rawJWT string) error {
-	key := jose.SigningKey{Algorithm: jose.PS512, Key: signingKey}
 	tok, err := jwt.ParseSigned(rawJWT)
 	if err != nil {
 		return errors.Wrap(err, "could not parse JWT")
@@ -45,16 +44,12 @@ func (jwtWrapper *jwtWrapper) Validate(rawJWT string) error {
 		Subject: subject,
 		Time:    time.Now(),
 	}
-	if err := tok.Claims(key, &expectedBase); err != nil {
+	ourClaims := UserSession{}
+	if err := tok.Claims(&signingKey.PublicKey, &expectedBase, &ourClaims); err != nil {
 		return errors.Wrap(err, "could not validate claims")
 	}
 
-	ourClaims := UserSession{}
-	if err := tok.Claims(key, &ourClaims); err != nil {
-		return errors.Wrap(err, "could not validate private claims")
-	}
-
-	jwtWrapper.sessionDetails = &ourClaims
+	jwtWrapper.SessionDetails = &ourClaims
 	return nil
 }
 
