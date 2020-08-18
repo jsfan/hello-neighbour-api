@@ -5,11 +5,16 @@ services:
       context: .
       dockerfile: Dockerfile
   postgres:
-    image: postgres:12-alpine
+    image: postgres-ssl
+    user: postgres
+    build:
+      context: database/docker
+      dockerfile: Dockerfile
     volumes:
+      - ./deploy/postgres/ssl:/etc/postgres/ssl
       - ./data:/var/lib/postgresql/data
     environment:
-      - "POSTGRES_DATABASE=helloneighbour"
+      - "POSTGRES_DB=helloneighbour"
       - "POSTGRES_USER=helloneighbour"
       - "POSTGRES_PASSWORD=changeme"
   nginx:

@@ -41,11 +41,11 @@ paths:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Church not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
     post:
       tags:
       - "member"
@@ -71,14 +71,14 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "401":
           description: "JWT is missing or invalid"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
   /church/{churchUuid}:
     get:
       tags:
@@ -106,18 +106,18 @@ paths:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Church not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
     put:
       tags:
       - "leader"
@@ -150,18 +150,18 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "401":
           description: "JWT is missing or invalid"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Church not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
     delete:
       tags:
       - "leader"
@@ -186,20 +186,20 @@ paths:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Church not found"
           schema:
-            $ref: "#/definitions/Error"
-  /church/{churchUuid/activate:
-    put:
+            $ref: "#/definitions/ErrorResponse"
+  /church/{churchUuid}/activate:
+    patch:
       tags:
       - "administrator"
       summary: "Activate or deactivate church"
@@ -230,25 +230,25 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "401":
           description: "JWT is missing or invalid"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Church not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
   /church/{churchUuid}/invite:
     post:
       tags:
@@ -281,25 +281,25 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "401":
           description: "JWT is missing or invalid"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Church not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
   /church/{churchUuid}/user:
     get:
       tags:
@@ -331,18 +331,18 @@ paths:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Church not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
   /church/{churchUuid}/user/{userUuid}:
     delete:
       tags:
@@ -373,18 +373,18 @@ paths:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Church/user not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
   /church/{churchUuid}/question:
     get:
       tags:
@@ -414,18 +414,18 @@ paths:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Church not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
     post:
       tags:
       - "leader"
@@ -451,32 +451,32 @@ paths:
           $ref: "#/definitions/QuestionIn"
         x-exportParamName: "Body"
       responses:
-        "200":
+        "201":
           description: "Question added"
           schema:
             $ref: "#/definitions/Question"
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "401":
           description: "JWT is missing or invalid"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Church not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
   /church/{churchUuid}/matchgroup:
     get:
       tags:
@@ -503,25 +503,25 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "401":
           description: "JWT is missing or invalid"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Church not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
   /user:
     get:
       tags:
@@ -543,14 +543,14 @@ paths:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
     post:
       summary: "Create new user"
       description: "Add a new user to the system."
@@ -568,14 +568,14 @@ paths:
           $ref: "#/definitions/UserIn"
         x-exportParamName: "Body"
       responses:
-        "200":
+        "201":
           description: "User created"
           schema:
             $ref: "#/definitions/Question"
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
       security: []
   /user/{userUuid}:
     get:
@@ -602,18 +602,18 @@ paths:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "User not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
     put:
       tags:
       - "member"
@@ -646,25 +646,25 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "401":
           description: "JWT is missing or invalid"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "User not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
     delete:
       tags:
       - "member"
@@ -689,18 +689,18 @@ paths:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "User not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
   /user/{userUuid}/matchGroup:
     get:
       tags:
@@ -725,25 +725,25 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "401":
           description: "JWT is missing or invalid"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "User not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
   /user/{userUuid}/matchgroup/{groupUuid}/bulletin:
     get:
       tags:
@@ -777,18 +777,18 @@ paths:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Church/group not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
     post:
       tags:
       - "member"
@@ -820,32 +820,32 @@ paths:
           $ref: "#/definitions/MessageIn"
         x-exportParamName: "Body"
       responses:
-        "200":
+        "201":
           description: "Message sent"
           schema:
             $ref: "#/definitions/MessageIn"
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "401":
           description: "JWT is missing or invalid"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Church/group not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
   /user/{userUuid}/contactmethod:
     post:
       tags:
@@ -870,28 +870,28 @@ paths:
           $ref: "#/definitions/ContactMethodIn"
         x-exportParamName: "Body"
       responses:
-        "200":
+        "201":
           description: "Contact method created"
           schema:
             $ref: "#/definitions/ContactMethod"
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "401":
           description: "JWT is missing or invalid"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
   /user/{userUuid}/contactmethod/{methodUuid}:
     put:
       tags:
@@ -930,25 +930,25 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "401":
           description: "JWT is missing or invalid"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Contact method or user not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
     delete:
       tags:
       - "member"
@@ -977,25 +977,25 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "401":
           description: "JWT is missing or invalid"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Contact method or user not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
   /question:
     get:
       tags:
@@ -1014,21 +1014,21 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "401":
           description: "JWT is missing or invalid"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
   /question/{questionUuid}:
     get:
       tags:
@@ -1054,18 +1054,18 @@ paths:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Question not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
     put:
       tags:
       - "leader"
@@ -1098,25 +1098,25 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "401":
           description: "JWT is missing or invalid"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Question not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
     delete:
       tags:
       - "leader"
@@ -1141,20 +1141,20 @@ paths:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "403":
           description: "User is not authorized to access"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "Question not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
   /register/{userUuid}:
-    put:
+    patch:
       tags:
       - "member"
       summary: "Accept invite"
@@ -1186,11 +1186,11 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "404":
           description: "User not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
       security: []
   /login:
     get:
@@ -1209,11 +1209,11 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "401":
           description: "Invalid credentials"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
       security:
       - basicAuth: []
   /profile:
@@ -1232,14 +1232,14 @@ paths:
         "400":
           description: "Invalid input"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
         "401":
           description: "JWT is missing or invalid"
           headers:
             WWW_Authenticate:
               type: "string"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
       security:
       - basicAuth: []
 securityDefinitions:
@@ -1289,6 +1289,11 @@ definitions:
         type: "string"
       last_name:
         type: "string"
+      gender:
+        type: "string"
+        enum:
+        - "male"
+        - "female"
       description:
         type: "string"
       church:
@@ -1530,7 +1535,7 @@ definitions:
         uuid:
           type: "string"
           format: "uuid"
-  Error:
+  ErrorResponse:
     type: "object"
     required:
     - "code"
@@ -1545,18 +1550,18 @@ responses:
   ClientError:
     description: "Invalid input"
     schema:
-      $ref: "#/definitions/Error"
+      $ref: "#/definitions/ErrorResponse"
   Unauthenticated:
     description: "JWT is missing or invalid"
     headers:
       WWW_Authenticate:
         type: "string"
     schema:
-      $ref: "#/definitions/Error"
+      $ref: "#/definitions/ErrorResponse"
   Unauthorized:
     description: "User is not authorized to access"
     headers:
       WWW_Authenticate:
         type: "string"
     schema:
-      $ref: "#/definitions/Error"
+      $ref: "#/definitions/ErrorResponse"

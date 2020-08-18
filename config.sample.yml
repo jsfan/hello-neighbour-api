@@ -1,0 +1,9 @@
+database:
+  host: "postgres"
+  port: 5432
+  user: "helloneighbour"
+  password: "changeme"
+  dbName: "helloneighbour"
+JWTKeys:
+  publicKey: helloneighbour-public.pem
+  privateKey: helloneighbour-private.pem

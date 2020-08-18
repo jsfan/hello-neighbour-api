@@ -10,7 +10,9 @@
 package internal
 
 import (
+	"crypto/rsa"
 	"fmt"
+	"github.com/jsfan/hello-neighbour/internal/session"
 	"net/http"
 	"strings"
 
@@ -26,7 +28,8 @@ type Route struct {
 
 type Routes []Route
 
-func NewRouter() *mux.Router {
+func NewRouter(jwtKeys *rsa.PrivateKey) *mux.Router {
+	session.SetSigningKey(jwtKeys)
 	router := mux.NewRouter().StrictSlash(true)
 	for _, route := range routes {
 		var handler http.Handler
@@ -71,7 +74,7 @@ var routes = Routes{
 
 	Route{
 		"UpdateChurchActivate",
-		strings.ToUpper("Put"),
+		strings.ToUpper("Patch"),
 		"/v0/church/{churchUuid}/activate",
 		UpdateChurchActivate,
 	},
@@ -169,7 +172,7 @@ var routes = Routes{
 
 	Route{
 		"AcceptInvite",
-		strings.ToUpper("Put"),
+		strings.ToUpper("Patch"),
 		"/v0/register/{userUuid}",
 		AcceptInvite,
 	},

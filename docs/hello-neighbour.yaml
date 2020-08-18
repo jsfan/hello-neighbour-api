@@ -69,7 +69,7 @@ paths:
         404:
           description: "Church not found"
           schema:
-            $ref:  "#/definitions/Error"
+            $ref:  "#/definitions/ErrorResponse"
   
   /church/{churchUuid}:
     get:
@@ -98,7 +98,7 @@ paths:
         404:
           description: "Church not found"
           schema:
-            $ref:  "#/definitions/Error"
+            $ref:  "#/definitions/ErrorResponse"
     put:
       tags:
       - "leader"
@@ -133,7 +133,7 @@ paths:
         404:
           description: "Church not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
     delete:
       tags:
       - "leader"
@@ -158,10 +158,10 @@ paths:
         404:
           description: "Church not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
   
   /church/{churchUuid}/activate:
-    put:
+    patch:
       tags:
       - "administrator"
       summary: "Activate or deactivate church"
@@ -195,7 +195,7 @@ paths:
         404:
           description: "Church not found"
           schema:
-            $ref:  "#/definitions/Error"
+            $ref:  "#/definitions/ErrorResponse"
   
   /church/{churchUuid}/invite:
     post:
@@ -233,7 +233,7 @@ paths:
         404:
           description: "Church not found"
           schema:
-            $ref:  "#/definitions/Error"
+            $ref:  "#/definitions/ErrorResponse"
 
   /church/{churchUuid}/user:
     get:
@@ -266,7 +266,7 @@ paths:
         404:
           description: "Church not found"
           schema:
-            $ref:  "#/definitions/Error"
+            $ref:  "#/definitions/ErrorResponse"
             
   /church/{churchUuid}/user/{userUuid}:
     delete:
@@ -296,7 +296,7 @@ paths:
         404:
           description: "Church/user not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
 
   /church/{churchUuid}/question:
     post:
@@ -322,7 +322,7 @@ paths:
         schema:
           $ref: "#/definitions/QuestionIn"
       responses:
-        200:
+        201:
           description: "Question added"
           schema:
             $ref: "#/definitions/Question"
@@ -335,7 +335,7 @@ paths:
         404:
           description: "Church not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
     get:
       tags:
       - "leader"
@@ -364,7 +364,7 @@ paths:
         404:
           description: "Church not found"
           schema:
-            $ref:  "#/definitions/Error"
+            $ref:  "#/definitions/ErrorResponse"
 
   /church/{churchUuid}/matchgroup:
     get:
@@ -397,7 +397,7 @@ paths:
         404:
           description: "Church not found"
           schema:
-            $ref:  "#/definitions/Error"
+            $ref:  "#/definitions/ErrorResponse"
 
   /user:
     post:
@@ -417,7 +417,7 @@ paths:
         schema:
           $ref: "#/definitions/UserIn"
       responses:
-        200:
+        201:
           description: "User created"
           schema:
             $ref: "#/definitions/Question"
@@ -466,7 +466,7 @@ paths:
         404:
           description: "User not found"
           schema:
-            $ref:  "#/definitions/Error"
+            $ref:  "#/definitions/ErrorResponse"
     put:
       tags:
       - "member"
@@ -503,7 +503,7 @@ paths:
         404:
           description: "User not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
     delete:
       tags:
       - "member"
@@ -528,7 +528,7 @@ paths:
         404:
           description: "User not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
 
   /user/{userUuid}/matchGroup:
     get:
@@ -559,7 +559,7 @@ paths:
         404:
           description: "User not found"
           schema:
-            $ref:  "#/definitions/Error"
+            $ref:  "#/definitions/ErrorResponse"
 
   /user/{userUuid}/matchgroup/{groupUuid}/bulletin:
     post:
@@ -590,7 +590,7 @@ paths:
         schema:
           $ref: "#/definitions/MessageIn"
       responses:
-        200:
+        201:
           description: "Message sent"
           schema:
             $ref: "#/definitions/MessageIn"
@@ -603,7 +603,7 @@ paths:
         404:
           description: "Church/group not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
     get:
       tags:
       - "member"
@@ -635,7 +635,7 @@ paths:
         404:
           description: "Church/group not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
 
   /user/{userUuid}/contactmethod:
     post:
@@ -659,7 +659,7 @@ paths:
         schema:
           $ref: "#/definitions/ContactMethodIn"
       responses:
-        200:
+        201:
           description: "Contact method created"
           schema:
             $ref: "#/definitions/ContactMethod"
@@ -711,7 +711,7 @@ paths:
         404:
           description: "Contact method or user not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
     delete:
       tags:
       - "member"
@@ -744,7 +744,7 @@ paths:
         404:
           description: "Contact method or user not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
 
   /question:
     get:
@@ -792,7 +792,7 @@ paths:
         404:
           description: "Question not found"
           schema:
-            $ref:  "#/definitions/Error"
+            $ref:  "#/definitions/ErrorResponse"
     put:
       tags:
       - "leader"
@@ -829,7 +829,7 @@ paths:
         404:
           description: "Question not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
     delete:
       tags:
       - "leader"
@@ -854,10 +854,10 @@ paths:
         404:
           description: "Question not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
  
   /register/{userUuid}:
-    put:
+    patch:
       tags:
       - "member"
       security: []
@@ -890,7 +890,7 @@ paths:
         404:
           description: "User not found"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
 
   /login:
     get:
@@ -911,7 +911,7 @@ paths:
         401:
           description: "Invalid credentials"
           schema:
-            $ref: "#/definitions/Error"
+            $ref: "#/definitions/ErrorResponse"
 
   /profile:
     get:
@@ -1173,7 +1173,7 @@ definitions:
           format: "uuid"
       required: [uuid]
   
-  Error:
+  ErrorResponse:
     type: "object"
     properties:
       code:
@@ -1187,18 +1187,18 @@ responses:
   ClientError:
     description: "Invalid input"
     schema:
-      $ref: "#/definitions/Error"
+      $ref: "#/definitions/ErrorResponse"
   Unauthenticated:
     description: "JWT is missing or invalid"
     headers:
       WWW_Authenticate:
         type: "string"
     schema:
-      $ref: "#/definitions/Error"
+      $ref: "#/definitions/ErrorResponse"
   Unauthorized:
     description: "User is not authorized to access"
     headers:
       WWW_Authenticate:
         type: "string"
     schema:
-      $ref: "#/definitions/Error"
+      $ref: "#/definitions/ErrorResponse"

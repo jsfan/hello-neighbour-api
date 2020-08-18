@@ -1,0 +1,16 @@
+version: "3.7"
+services:
+  postgres:
+    image: postgres-ssl
+    build:
+      context: database/docker
+      dockerfile: Dockerfile
+    volumes:
+      - ./deploy/postgres/ssl:/etc/postgres/ssl
+      - ./data:/var/lib/postgresql/data
+    environment:
+      - "POSTGRES_DB=helloneighbourdev"
+      - "POSTGRES_USER=develop"
+      - "POSTGRES_PASSWORD=develop"
+    ports:
+      - "5432:5432"
