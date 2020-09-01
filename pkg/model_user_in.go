@@ -9,6 +9,12 @@
 
 package pkg
 
+import (
+	"encoding/json"
+	"fmt"
+	"reflect"
+)
+
 type UserIn struct {
 	Email string `json:"email"`
 
@@ -27,4 +33,24 @@ type UserIn struct {
 	DateOfBirth string `json:"date_of_birth"`
 
 	Password string `json:"password"`
+}
+
+// UnmarshalJSON overrides default Unmarshal method to verify JSON fields 
+func (userIn *UserIn) UnmarshalJSON(data []byte) error {
+	type UserIn2 UserIn
+	var userIn2 UserIn2
+	if err := json.Unmarshal(data, &userIn2); err != nil {
+		return err
+	}
+	
+	value := reflect.ValueOf(userIn2)
+	for i := 0; i < value.NumField(); i++ {
+		field := value.Field(i).Interface()
+		if field == "" {
+			return fmt.Errorf("Missing or empty field '%+v' for UserIn", value.Type().Field(i).Name)
+		}
+	}
+	
+	*userIn = UserIn(userIn2)
+	return nil
 }

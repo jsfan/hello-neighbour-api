@@ -7,6 +7,7 @@ import (
 	"github.com/jsfan/hello-neighbour/pkg"
 	"log"
 	"net/http"
+	"io/ioutil"
 )
 
 func SendJsonResponse(w http.ResponseWriter, jsonIn interface{}) {
@@ -36,11 +37,29 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	err := jwtRef.Build(userSession)
 	if err != nil {
 		log.Printf("Could not build JWT: %+v", err)
-		w.WriteHeader(http.StatusInternalServerError)
 		SendErrorResponse(w, http.StatusInternalServerError, "Internal server error")
 	}
 	successResp := pkg.Jwt{
 		Jwt: jwtRef.GetRaw(),
 	}
 	SendJsonResponse(w, successResp)
+}
+
+// DefaultUserRegister is the default signup when creating a new church
+func DefaultUserRegister(w http.ResponseWriter, r *http.Request) {
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("[ERROR] Could not read request body: %+v", err)
+		SendErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	var userIn *pkg.UserIn
+	if err = json.Unmarshal(b, &userIn); err != nil {
+		log.Printf("[ERROR] Could not unmarshal JSON: %+v", err)
+		SendErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	
 }

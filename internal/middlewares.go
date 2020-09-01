@@ -32,7 +32,11 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		bearerToken, ok := r.Header[authHeader]
 		if !ok {
-			sendUnauthorizedResponse(w)
+			if r.RequestURI == "/v0/user" {
+				next.ServeHTTP(w, r)
+			} else {
+				sendUnauthorizedResponse(w)
+			}
 			return
 		}
 		// validate JWT
