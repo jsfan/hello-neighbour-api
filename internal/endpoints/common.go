@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"io/ioutil"
+	"github.com/jsfan/hello-neighbour/internal/storage"
 )
 
 func SendJsonResponse(w http.ResponseWriter, jsonIn interface{}) {
@@ -36,7 +37,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	jwtRef := session.NewJWT()
 	err := jwtRef.Build(userSession)
 	if err != nil {
-		log.Printf("Could not build JWT: %+v", err)
+		log.Printf("[ERROR] Could not build JWT: %+v", err)
 		SendErrorResponse(w, http.StatusInternalServerError, "Internal server error")
 	}
 	successResp := pkg.Jwt{
@@ -61,5 +62,18 @@ func DefaultUserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	
+	db, err := storage.GetConnection()
+	if err != nil {
+		log.Printf("[ERROR] Could not get db connection: %+v", err.Error())
+		SendErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	user, err := db.UserRegister(r.Context(), userIn)
+	if err != nil {
+		log.Printf("[ERROR] Database error: %+v", err.Error())
+		SendErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	SendJsonResponse(w, user)
 }
