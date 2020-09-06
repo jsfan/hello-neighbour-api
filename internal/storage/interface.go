@@ -3,7 +3,7 @@ package storage
 import "github.com/jsfan/hello-neighbour/internal/storage/dal"
 
 type Store struct {
-	dal *dal.DAL
+	dal dal.AccessInterface
 }
 
 type DataInterface interface {
