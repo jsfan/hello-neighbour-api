@@ -25,7 +25,7 @@ func sendUnauthorizedResponse(w http.ResponseWriter) {
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// check database connection first
-		if _, err := storage.GetConnection(); err != nil {
+		if _, err := storage.GetStore(); err != nil {
 			log.Printf("[ERROR] Database connection unavailable.")
 			endpoints.SendErrorResponse(w, http.StatusInternalServerError, "Internal Server Error")
 		}

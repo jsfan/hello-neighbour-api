@@ -7,18 +7,18 @@ import (
 	"log"
 )
 
-func setupContextAndDbConnection(ctx context.Context) (ctext context.Context, cancelCtx context.CancelFunc, db *DBConnection) {
+func setupContextAndDbConnection(ctx context.Context) (ctext context.Context, cancelCtx context.CancelFunc, store *Store) {
 	ctext, cancelCtx = context.WithCancel(ctx)
-	db, err := GetConnection()
+	conn, err := GetStore()
 	if err != nil { // panic here as we have checked before
 		panic("Database connection unavailable")
 	}
-	return ctext, cancelCtx, db
+	return ctext, cancelCtx, conn
 }
 
-func (conn *DBConnection) GetUserByEmail(ctx context.Context, email string) (user *models.UserProfile, errVal error) {
-	ctx, cancelCtx, db := setupContextAndDbConnection(ctx)
-	dbAccess, commitFunc, err := dal.GetDal(ctx, db.Db)
+func (store *Store) GetUserByEmail(ctx context.Context, email string) (user *models.UserProfile, errVal error) {
+	ctx, cancelCtx, store := setupContextAndDbConnection(ctx)
+	dbAccess, commitFunc, err := dal.GetDAL(ctx)
 	defer func() {
 		if err := commitFunc(); err != nil && errVal == nil {
 			errVal = err

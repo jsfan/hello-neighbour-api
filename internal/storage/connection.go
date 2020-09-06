@@ -1,31 +1,25 @@
 package storage
 
 import (
-	"database/sql"
-	"fmt"
 	"github.com/jsfan/hello-neighbour/internal/config"
+	"github.com/jsfan/hello-neighbour/internal/storage/dal"
 	"github.com/pkg/errors"
 )
 
-type DBConnection struct {
-	Db *sql.DB
-}
+var backend *Store
 
-var backend *DBConnection
-
-func Connect(dbConfig *config.DatabaseConfig) (connection *DBConnection, errVal error) {
-	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s", dbConfig.Host, dbConfig.Port, dbConfig.User, dbConfig.Password, dbConfig.DbName)
-	database, err := sql.Open("postgres", psqlconn)
+func Connect(dbConfig *config.DatabaseConfig) (connection *Store, errVal error) {
+	dalInstance, err := dal.Connect(dbConfig)
 	if err != nil {
 		return nil, err
 	}
-	backend = &DBConnection{
-		Db: database,
+	backend = &Store{
+		dal: dalInstance,
 	}
 	return backend, nil
 }
 
-func GetConnection() (conn *DBConnection, errVal error) {
+func GetStore() (conn *Store, errVal error) {
 	if backend == nil {
 		return nil, errors.New("No database connection.")
 	}

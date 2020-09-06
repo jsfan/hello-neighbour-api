@@ -6,22 +6,14 @@ import (
 	"github.com/jsfan/hello-neighbour/internal/storage/models"
 )
 
-type Dal struct {
+type DAL struct {
+	Db *sql.DB
 	ctx context.Context
 	tx  *sql.Tx
 }
 
-type DalInterface interface {
-	SelectUserByEmail(email string) (user models.UserProfile, errVal error)
+
+type AccessInterface interface {
+	SelectUserByEmail(email string) (user *models.UserProfile, errVal error)
 }
 
-func GetDal(ctx context.Context, db *sql.DB) (dbAccess *Dal, commit func() error, errVal error) {
-	tx, err := db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-	return &Dal{
-		ctx: ctx,
-		tx:  tx,
-	}, func() error { return tx.Commit() }, nil
-}

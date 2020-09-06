@@ -2,7 +2,7 @@ package dal
 
 import "github.com/jsfan/hello-neighbour/internal/storage/models"
 
-func (dal *Dal) SelectUserByEmail(email string) (user *models.UserProfile, errVal error) {
+func (dal *DAL) SelectUserByEmail(email string) (user *models.UserProfile, errVal error) {
 	var userProfile models.UserProfile
 	err := dal.tx.QueryRowContext(
 		dal.ctx,
