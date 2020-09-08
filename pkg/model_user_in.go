@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"github.com/jsfan/hello-neighbour/internal/utils/crypto"
 )
 
 type UserIn struct {
@@ -45,9 +46,19 @@ func (userIn *UserIn) UnmarshalJSON(data []byte) error {
 	
 	value := reflect.ValueOf(userIn2)
 	for i := 0; i < value.NumField(); i++ {
-		field := value.Field(i).Interface()
-		if field == "" {
-			return fmt.Errorf("Missing or empty field '%+v' for UserIn", value.Type().Field(i).Name)
+		fieldName := value.Type().Field(i).Name
+		fieldValue := value.Field(i).Interface()
+		if fieldValue == "" {
+			return fmt.Errorf("Missing or empty field '%+v' for UserIn", fieldName)
+		} else if fieldName == "Password" {
+			if len(fieldValue.(string)) < 6 {
+				return fmt.Errorf("Password must be 6 or more characters")
+			}
+			password, err := crypto.GeneratePasswordHash(userIn2.Password)
+			if err != nil {
+				return err
+			}
+			userIn2.Password = string(password)
 		}
 	}
 	

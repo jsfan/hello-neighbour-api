@@ -57,7 +57,7 @@ func DefaultUserRegister(w http.ResponseWriter, r *http.Request) {
 
 	var userIn *pkg.UserIn
 	if err = json.Unmarshal(b, &userIn); err != nil {
-		log.Printf("[ERROR] Could not unmarshal JSON: %+v", err)
+		log.Printf("[ERROR] Problem with unmarshaling JSON: %+v", err)
 		SendErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -75,5 +75,6 @@ func DefaultUserRegister(w http.ResponseWriter, r *http.Request) {
 		SendErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
+	w.WriteHeader(201)
 	SendJsonResponse(w, user)
 }

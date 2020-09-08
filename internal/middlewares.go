@@ -19,7 +19,6 @@ const authHeader = "Authorization"
 
 func sendUnauthorizedResponse(w http.ResponseWriter) {
 	endpoints.SendErrorResponse(w, http.StatusUnauthorized, "Unauthenticated")
-
 }
 
 func AuthMiddleware(next http.Handler) http.Handler {
