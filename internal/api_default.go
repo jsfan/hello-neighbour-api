@@ -11,9 +11,10 @@ package internal
 
 import (
 	"net/http"
+	"github.com/jsfan/hello-neighbour/internal/endpoints"
 )
 
 func AddUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	endpoints.DefaultUserRegister(w, r)
 }

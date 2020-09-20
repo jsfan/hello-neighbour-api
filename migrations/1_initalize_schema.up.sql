@@ -37,7 +37,7 @@ END $$;
 CREATE TABLE IF NOT EXISTS app_user(
     id SERIAL PRIMARY KEY,
     pub_id UUID DEFAULT uuid_generate_v4() NOT NULL,
-    church_id INTEGER REFERENCES church(id) NOT NULL,
+    church_id INTEGER REFERENCES church(id),
     email TEXT UNIQUE NOT NULL,
     password_hash TEXT,
     first_name TEXT NOT NULL,

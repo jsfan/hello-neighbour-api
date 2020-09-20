@@ -571,7 +571,7 @@ paths:
         "201":
           description: "User created"
           schema:
-            $ref: "#/definitions/Question"
+            $ref: "#/definitions/User"
         "400":
           description: "Invalid input"
           schema:

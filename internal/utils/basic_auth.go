@@ -6,6 +6,7 @@ import (
 	"github.com/jsfan/hello-neighbour/internal/session"
 	"github.com/jsfan/hello-neighbour/internal/storage"
 	"github.com/jsfan/hello-neighbour/internal/storage/models"
+	"github.com/jsfan/hello-neighbour/internal/utils/crypto"
 	"net/http"
 )
 
@@ -44,7 +45,7 @@ func CheckBasicAuth(r *http.Request) (userSession *session.UserSession, authFail
 		// todo: Send a 500 unless this was a "Not found"
 		return nil, true
 	}
-	if ok := CheckPassword([]byte(userProfile.PasswordHash), []byte(password)); !ok {
+	if ok := crypto.CheckPassword([]byte(userProfile.PasswordHash), []byte(password)); !ok {
 		return nil, true
 	}
 	return userSessionFromProfile(userProfile), false
