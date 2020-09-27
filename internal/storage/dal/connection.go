@@ -10,7 +10,7 @@ import (
 
 var dal *DAL
 
-func Connect(dbConfig *config.DatabaseConfig) (connection *DAL, errVal error) {
+func Connect(dbConfig *config.DatabaseConfig) (connection AccessInterface, errVal error) {
 	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s", dbConfig.Host, dbConfig.Port, dbConfig.User, dbConfig.Password, dbConfig.DbName)
 	database, err := sql.Open("postgres", psqlconn)
 	if err != nil {
@@ -22,7 +22,7 @@ func Connect(dbConfig *config.DatabaseConfig) (connection *DAL, errVal error) {
 	return dal, nil
 }
 
-func GetDAL(ctx context.Context) (conn *DAL, commit func() error, errVal error) {
+func GetDAL(ctx context.Context) (conn AccessInterface, commit func() error, errVal error) {
 	if dal == nil {
 		return nil, nil, errors.New("No database connection.")
 	}

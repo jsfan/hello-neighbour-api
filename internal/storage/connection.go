@@ -8,7 +8,7 @@ import (
 
 var backend *Store
 
-func Connect(dbConfig *config.DatabaseConfig) (connection *Store, errVal error) {
+func Connect(dbConfig *config.DatabaseConfig) (connection DataInterface, errVal error) {
 	dalInstance, err := dal.Connect(dbConfig)
 	if err != nil {
 		return nil, err

@@ -15,6 +15,7 @@ type DAL struct {
 
 type AccessInterface interface {
 	SelectUserByEmail(email string) (user *models.UserProfile, errVal error)
-	RegisterUser(userIn *pkg.UserIn) (error)
+	RegisterUser(userIn *pkg.UserIn) error
+	Migrate(dbName *string) (errVal error)
 }
 

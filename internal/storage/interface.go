@@ -1,7 +1,9 @@
 package storage
 
 import (
+	"context"
 	"github.com/jsfan/hello-neighbour/internal/storage/dal"
+	"github.com/jsfan/hello-neighbour/internal/storage/models"
 	"github.com/jsfan/hello-neighbour/pkg"
 )
 
@@ -11,6 +13,6 @@ type Store struct {
 
 type DataInterface interface {
 	Migrate(dbName *string) (errVal error)
-	GetUserByEmail(username string)
-	UserRegister(userIn *pkg.UserIn)
+	GetUserByEmail(ctx context.Context, email string) (user *models.UserProfile, errVal error)
+	UserRegister(ctx context.Context, userIn *pkg.UserIn) (user *models.UserProfile, errVal error)
 }
