@@ -51,9 +51,6 @@ func (userIn *UserIn) UnmarshalJSON(data []byte) error {
 		if fieldValue == "" {
 			return fmt.Errorf("Missing or empty field '%+v' for UserIn", fieldName)
 		} else if fieldName == "Password" {
-			if len(fieldValue.(string)) < 6 {
-				return fmt.Errorf("Password must be 6 or more characters")
-			}
 			password, err := crypto.GeneratePasswordHash(userIn2.Password)
 			if err != nil {
 				return err
