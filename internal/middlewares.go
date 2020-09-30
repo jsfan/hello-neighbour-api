@@ -19,7 +19,6 @@ const authHeader = "Authorization"
 
 func sendUnauthorizedResponse(w http.ResponseWriter) {
 	endpoints.SendErrorResponse(w, http.StatusUnauthorized, "Unauthenticated")
-
 }
 
 func AuthMiddleware(next http.Handler) http.Handler {
@@ -32,7 +31,11 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		bearerToken, ok := r.Header[authHeader]
 		if !ok {
-			sendUnauthorizedResponse(w)
+			if r.RequestURI == "/v0/user" {
+				next.ServeHTTP(w, r)
+			} else {
+				sendUnauthorizedResponse(w)
+			}
 			return
 		}
 		// validate JWT

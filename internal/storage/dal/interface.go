@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"github.com/jsfan/hello-neighbour/internal/storage/models"
+	"github.com/jsfan/hello-neighbour/pkg"
 )
 
 type Dal struct {
@@ -13,6 +14,7 @@ type Dal struct {
 
 type DalInterface interface {
 	SelectUserByEmail(email string) (user models.UserProfile, errVal error)
+	RegisterUser(userIn *pkg.UserIn) (error)
 }
 
 func GetDal(ctx context.Context, db *sql.DB) (dbAccess *Dal, commit func() error, errVal error) {
