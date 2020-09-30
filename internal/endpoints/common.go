@@ -62,7 +62,7 @@ func DefaultUserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db, err := storage.GetConnection()
+	db, err := storage.GetStore()
 	if err != nil {
 		log.Printf("[ERROR] Could not get db connection: %+v", err.Error())
 		SendErrorResponse(w, http.StatusInternalServerError, err.Error())

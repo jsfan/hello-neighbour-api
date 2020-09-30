@@ -36,11 +36,11 @@ func CheckBasicAuth(r *http.Request) (userSession *session.UserSession, authFail
 	if password == "" {
 		return nil, false
 	}
-	db, err := storage.GetConnection()
+	store, err := storage.GetStore()
 	if err != nil {
 		return nil, false
 	}
-	userProfile, err := db.GetUserByEmail(r.Context(), username)
+	userProfile, err := store.GetUserByEmail(r.Context(), username)
 	if err != nil {
 		// todo: Send a 500 unless this was a "Not found"
 		return nil, true

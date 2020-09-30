@@ -5,7 +5,7 @@ import (
 	"github.com/jsfan/hello-neighbour/pkg"
 )
 
-func (dal *Dal) SelectUserByEmail(email string) (user *models.UserProfile, errVal error) {
+func (dal *DAL) SelectUserByEmail(email string) (user *models.UserProfile, errVal error) {
 	var userProfile models.UserProfile
 	err := dal.tx.QueryRowContext(
 		dal.ctx,
@@ -41,7 +41,7 @@ func (dal *Dal) SelectUserByEmail(email string) (user *models.UserProfile, errVa
 	return &userProfile, nil
 }
 
-func (dal *Dal) RegisterUser(userIn *pkg.UserIn) error {
+func (dal *DAL) RegisterUser(userIn *pkg.UserIn) error {
 	_, err := dal.tx.ExecContext(
 		dal.ctx,
 		`INSERT INTO app_user (church_id, email, password_hash, first_name, last_name, gender, date_of_birth, description, role, active)

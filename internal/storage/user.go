@@ -8,18 +8,14 @@ import (
 	"github.com/jsfan/hello-neighbour/pkg"
 )
 
-func setupContextAndDbConnection(ctx context.Context) (ctext context.Context, cancelCtx context.CancelFunc, db *DBConnection) {
+func setupContext(ctx context.Context) (ctext context.Context, cancelCtx context.CancelFunc) {
 	ctext, cancelCtx = context.WithCancel(ctx)
-	db, err := GetConnection()
-	if err != nil { // panic here as we have checked before
-		panic("Database connection unavailable")
-	}
-	return ctext, cancelCtx, db
+	return ctext, cancelCtx
 }
 
-func (conn *DBConnection) GetUserByEmail(ctx context.Context, email string) (user *models.UserProfile, errVal error) {
-	ctx, cancelCtx, db := setupContextAndDbConnection(ctx)
-	dbAccess, commitFunc, err := dal.GetDal(ctx, db.Db)
+func (store *Store) GetUserByEmail(ctx context.Context, email string) (user *models.UserProfile, errVal error) {
+	ctx, cancelCtx := setupContext(ctx)
+	dbAccess, commitFunc, err := dal.GetDAL(ctx)
 	defer func() {
 		if err := commitFunc(); err != nil && errVal == nil {
 			errVal = err
@@ -39,9 +35,9 @@ func (conn *DBConnection) GetUserByEmail(ctx context.Context, email string) (use
 }
 
 // UserRegister will first insert the user into the database, then query the db and return a UserProfile model
-func (conn *DBConnection) UserRegister(ctx context.Context, userIn *pkg.UserIn) (user *models.UserProfile, errVal error) {
-	ctx, cancelCtx, db := setupContextAndDbConnection(ctx)
-	dbAccess, commitFunc, err := dal.GetDal(ctx, db.Db)
+func (store *Store) UserRegister(ctx context.Context, userIn *pkg.UserIn) (user *models.UserProfile, errVal error) {
+	ctx, cancelCtx := setupContext(ctx)
+	dbAccess, commitFunc, err := dal.GetDAL(ctx)
 	if err != nil {
 		cancelCtx()
 		return nil, err
