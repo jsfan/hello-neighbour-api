@@ -12,43 +12,45 @@ package main
 
 import (
 	"flag"
+	"io/ioutil"
+	"net/http"
 	"github.com/jsfan/hello-neighbour/internal/config"
 	"github.com/jsfan/hello-neighbour/internal/storage"
-	"log"
-	"net/http"
 
 	sw "github.com/jsfan/hello-neighbour/internal"
+
+	"github.com/google/logger"
 )
 
 func main() {
-
 	cfgFileOpt := flag.String("config", "config.yaml", "Configuration YAML file")
 
 	flag.Parse()
 
+	defer logger.Init("Hello Neighbour Logger", true, false, ioutil.Discard).Close()
+
 	cfg, err := config.ReadConfig(*cfgFileOpt)
 	if err != nil {
-		log.Fatalf(`[ERROR] Could not read configuration file "%s": %v`, *cfgFileOpt, err)
+		logger.Fatalf(`Could not read configuration file "%s": %v`, *cfgFileOpt, err)
 	}
 
 	jwtKeys, err := config.ReadKeyPair(&cfg.JwtSignKeys)
 	if err != nil {
-		log.Fatalf(`[ERROR] Could not load key pair: %v`, err)
+		logger.Fatalf(`Could not load key pair: %v`, err)
 	}
 
 	con, err := storage.Connect(&cfg.Database)
 	if err != nil {
-		log.Fatalf("[ERROR] Could not connect to database: %v", err)
+		logger.Fatalf("Could not connect to database: %v", err)
 	}
 
 	if err := con.Migrate(&cfg.Database.DbName); err != nil && err.Error() != "no change" {
-		log.Fatalf("[ERROR] Database migration failed: %v", err)
+		logger.Fatalf("Database migration failed: %v", err)
 	}
-
-	log.Printf("Server started")
+	logger.Info("Server started")
 
 	router := sw.NewRouter(jwtKeys)
 	router.Use(sw.AuthMiddleware)
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	logger.Fatal(http.ListenAndServe(":8080", router))
 }
