@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/jsfan/hello-neighbour/internal/storage/dal"
 	"github.com/jsfan/hello-neighbour/internal/storage/models"
-	"log"
 	"github.com/jsfan/hello-neighbour/pkg"
+	"log"
 )
 
 func setupContext(ctx context.Context) (ctext context.Context, cancelCtx context.CancelFunc) {

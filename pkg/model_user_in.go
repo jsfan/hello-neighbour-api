@@ -12,8 +12,8 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
-	"reflect"
 	"github.com/jsfan/hello-neighbour/internal/utils/crypto"
+	"reflect"
 )
 
 type UserIn struct {
@@ -36,14 +36,14 @@ type UserIn struct {
 	Password string `json:"password"`
 }
 
-// UnmarshalJSON overrides default Unmarshal method to verify JSON fields 
+// UnmarshalJSON overrides default Unmarshal method to verify JSON fields
 func (userIn *UserIn) UnmarshalJSON(data []byte) error {
 	type UserIn2 UserIn
 	var userIn2 UserIn2
 	if err := json.Unmarshal(data, &userIn2); err != nil {
 		return err
 	}
-	
+
 	value := reflect.ValueOf(userIn2)
 	for i := 0; i < value.NumField(); i++ {
 		fieldName := value.Type().Field(i).Name
@@ -58,7 +58,7 @@ func (userIn *UserIn) UnmarshalJSON(data []byte) error {
 			userIn2.Password = string(password)
 		}
 	}
-	
+
 	*userIn = UserIn(userIn2)
 	return nil
 }

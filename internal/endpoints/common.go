@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"github.com/jsfan/hello-neighbour/internal/config"
 	"github.com/jsfan/hello-neighbour/internal/session"
+	"github.com/jsfan/hello-neighbour/internal/storage"
 	"github.com/jsfan/hello-neighbour/pkg"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"io/ioutil"
-	"github.com/jsfan/hello-neighbour/internal/storage"
 )
 
 func SendJsonResponse(w http.ResponseWriter, jsonIn interface{}) {

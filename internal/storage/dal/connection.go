@@ -34,5 +34,5 @@ func GetDAL(ctx context.Context) (conn AccessInterface, commit func() error, err
 			return nil, nil, err
 		}
 	}
-	return dal, func() error { return dal.tx.Commit() },nil
+	return dal, func() error { return dal.tx.Commit() }, nil
 }
