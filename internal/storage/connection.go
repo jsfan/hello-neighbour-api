@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"context"
 	"github.com/jsfan/hello-neighbour/internal/config"
 	"github.com/jsfan/hello-neighbour/internal/storage/dal"
 	"github.com/pkg/errors"
@@ -24,4 +25,12 @@ func GetStore() (conn *Store, errVal error) {
 		return nil, errors.New("No database connection.")
 	}
 	return backend, nil
+}
+
+func (store *Store) GetDAL(ctx context.Context) (dalInstance dal.AccessInterface, commitFunc func() error, errVal error) {
+	commitFunc, err := store.dal.SetupDal(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	return store.dal, commitFunc, nil
 }
