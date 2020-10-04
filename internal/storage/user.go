@@ -2,9 +2,9 @@ package storage
 
 import (
 	"context"
+	"github.com/google/logger"
 	"github.com/jsfan/hello-neighbour/internal/storage/models"
 	"github.com/jsfan/hello-neighbour/pkg"
-	"log"
 )
 
 func setupContext(ctx context.Context) (ctext context.Context, cancelCtx context.CancelFunc) {
@@ -26,7 +26,7 @@ func (store *Store) GetUserByEmail(ctx context.Context, email string) (user *mod
 	}
 	user, err = dbAccess.SelectUserByEmail(email)
 	if err != nil {
-		log.Printf("[ERROR] Database error: +%v", err)
+		logger.Errorf("Database error: +%v", err)
 		cancelCtx()
 		return nil, err
 	}
