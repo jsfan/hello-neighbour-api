@@ -1,4 +1,4 @@
-	package endpoints
+package endpoints
 
 import (
 	"encoding/json"
@@ -64,14 +64,14 @@ func DefaultUserRegister(w http.ResponseWriter, r *http.Request) {
 
 	db, err := storage.GetStore()
 	if err != nil {
-		logger.Errorf("Could not get db connection: %+v", "")
+		logger.Errorf("Could not get db connection: %+v", err)
 		SendErrorResponse(w, http.StatusInternalServerError, "")
 		return
 	}
 
 	user, err := db.UserRegister(r.Context(), userIn)
 	if err != nil {
-		logger.Errorf("Database error: %+v", "")
+		logger.Errorf("Database error: %+v", err)
 		SendErrorResponse(w, http.StatusBadRequest, "")
 		return
 	}
