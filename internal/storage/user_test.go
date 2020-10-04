@@ -31,7 +31,7 @@ func TestStore_GetUserByEmail(t *testing.T) {
 
 	mDAL := store.DAL.(*dal.MockDAL)
 	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL": dal.ResponseSignature{{func() error { return nil }, nil }},
+		"SetupDAL":          dal.ResponseSignature{{func() error { return nil }, nil}},
 		"SelectUserByEmail": dal.ResponseSignature{{expectedUser, nil}},
 	}
 
@@ -54,12 +54,12 @@ func TestStore_UserRegister(t *testing.T) {
 	expectedDob := "1964-01-07"
 	expectedDescription := "A Description"
 	userIn := &pkg.UserIn{
-		Email:        "test@example.com",
-		FirstName:    "Test",
-		LastName:     "User",
-		Gender:       "male",
-		Description:  expectedDescription,
-		Church:       "0dfc7330-2b8d-4391-96a9-059332ef9874",
+		Email:       "test@example.com",
+		FirstName:   "Test",
+		LastName:    "User",
+		Gender:      "male",
+		Description: expectedDescription,
+		Church:      "0dfc7330-2b8d-4391-96a9-059332ef9874",
 		Role:        "member",
 		DateOfBirth: expectedDob,
 		Password:    "NotHashedHere",
@@ -81,8 +81,8 @@ func TestStore_UserRegister(t *testing.T) {
 
 	mDAL := store.DAL.(*dal.MockDAL)
 	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL": dal.ResponseSignature{{func() error { return nil }, nil }},
-		"RegisterUser": dal.ResponseSignature{{nil}},
+		"SetupDAL":          dal.ResponseSignature{{func() error { return nil }, nil}},
+		"RegisterUser":      dal.ResponseSignature{{nil}},
 		"SelectUserByEmail": dal.ResponseSignature{{expectedUser, nil}},
 	}
 

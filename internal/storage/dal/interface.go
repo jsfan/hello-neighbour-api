@@ -8,7 +8,7 @@ import (
 )
 
 type DAL struct {
-	Db *sql.DB
+	Db  *sql.DB
 	ctx context.Context
 	tx  *sql.Tx
 }
@@ -19,4 +19,3 @@ type AccessInterface interface {
 	RegisterUser(userIn *pkg.UserIn) error
 	Migrate(dbName *string) (errVal error)
 }
-

@@ -7,14 +7,13 @@ import (
 type UserSession struct {
 	UserUUID   *uuid.UUID `json:"userUuid"`
 	ChurchUUID *uuid.UUID `json:"churchUuid"`
-	Role       string    `json:"role"`
+	Role       string     `json:"role"`
 }
 
-
-func NewSession() (userSession *UserSession){
-	 return &UserSession{
-		 UserUUID:   nil,
-		 ChurchUUID: nil,
-		 Role:       "",
-	 }
+func NewSession() (userSession *UserSession) {
+	return &UserSession{
+		UserUUID:   nil,
+		ChurchUUID: nil,
+		Role:       "",
+	}
 }
