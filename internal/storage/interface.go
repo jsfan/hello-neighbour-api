@@ -8,7 +8,7 @@ import (
 )
 
 type Store struct {
-	dal dal.AccessInterface
+	DAL dal.AccessInterface
 }
 
 type DataInterface interface {

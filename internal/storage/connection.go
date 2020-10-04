@@ -15,7 +15,7 @@ func Connect(dbConfig *config.DatabaseConfig) (connection DataInterface, errVal 
 		return nil, err
 	}
 	backend = &Store{
-		dal: dalInstance,
+		DAL: dalInstance,
 	}
 	return backend, nil
 }
@@ -28,9 +28,9 @@ func GetStore() (conn *Store, errVal error) {
 }
 
 func (store *Store) GetDAL(ctx context.Context) (dalInstance dal.AccessInterface, commitFunc func() error, errVal error) {
-	commitFunc, err := store.dal.SetupDal(ctx)
+	commitFunc, err := store.DAL.SetupDal(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
-	return store.dal, commitFunc, nil
+	return store.DAL, commitFunc, nil
 }
