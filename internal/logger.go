@@ -10,7 +10,7 @@
 package internal
 
 import (
-	"log"
+	"github.com/google/logger"
 	"net/http"
 	"time"
 )
@@ -21,7 +21,7 @@ func Logger(inner http.Handler, name string) http.Handler {
 
 		inner.ServeHTTP(w, r)
 
-		log.Printf(
+		logger.Infof(
 			"%s %s %s %s",
 			r.Method,
 			r.RequestURI,

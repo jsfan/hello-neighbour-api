@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/jsfan/hello-neighbour/internal/storage/dal"
 	"github.com/jsfan/hello-neighbour/internal/storage/models"
-	"log"
+	"github.com/google/logger"
 	"github.com/jsfan/hello-neighbour/pkg"
 )
 
@@ -27,7 +27,7 @@ func (store *Store) GetUserByEmail(ctx context.Context, email string) (user *mod
 	}
 	user, err = dbAccess.SelectUserByEmail(email)
 	if err != nil {
-		log.Printf("[ERROR] Database error: +%v", err)
+		logger.Errorf("Database error: +%v", err)
 		cancelCtx()
 		return nil, err
 	}
