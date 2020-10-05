@@ -10,8 +10,8 @@
 package internal
 
 import (
-	"net/http"
 	"github.com/jsfan/hello-neighbour/internal/endpoints"
+	"net/http"
 )
 
 func AddUser(w http.ResponseWriter, r *http.Request) {

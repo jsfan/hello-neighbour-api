@@ -8,14 +8,14 @@ import (
 )
 
 type DAL struct {
-	Db *sql.DB
+	Db  *sql.DB
 	ctx context.Context
 	tx  *sql.Tx
 }
 
 type AccessInterface interface {
+	SetupDal(ctx context.Context) (commit func() error, errVal error)
 	SelectUserByEmail(email string) (user *models.UserProfile, errVal error)
 	RegisterUser(userIn *pkg.UserIn) error
 	Migrate(dbName *string) (errVal error)
 }
-

@@ -5,10 +5,10 @@ import (
 	"github.com/jsfan/hello-neighbour/pkg"
 )
 
-func (dal *DAL) SelectUserByEmail(email string) (user *models.UserProfile, errVal error) {
+func (dalInstance *DAL) SelectUserByEmail(email string) (user *models.UserProfile, errVal error) {
 	var userProfile models.UserProfile
-	err := dal.tx.QueryRowContext(
-		dal.ctx,
+	err := dalInstance.tx.QueryRowContext(
+		dalInstance.ctx,
 		`SELECT u.pub_id,
 			u.email,
        		u.password_hash,
@@ -41,15 +41,15 @@ func (dal *DAL) SelectUserByEmail(email string) (user *models.UserProfile, errVa
 	return &userProfile, nil
 }
 
-func (dal *DAL) RegisterUser(userIn *pkg.UserIn) error {
-	_, err := dal.tx.ExecContext(
-		dal.ctx,
+func (dalInstance *DAL) RegisterUser(userIn *pkg.UserIn) error {
+	_, err := dalInstance.tx.ExecContext(
+		dalInstance.ctx,
 		`INSERT INTO app_user (church_id, email, password_hash, first_name, last_name, gender, date_of_birth, description, role, active)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
 		userIn.Church, userIn.Email, userIn.Password, userIn.FirstName, userIn.LastName, userIn.Gender, userIn.DateOfBirth, userIn.Description, userIn.Role, true,
 	)
 	if err != nil {
-		dal.tx.Rollback()
+		dalInstance.tx.Rollback()
 		return err
 	}
 	return nil
