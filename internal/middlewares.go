@@ -5,12 +5,12 @@ package internal
 
 import (
 	"context"
+	"github.com/google/logger"
 	"github.com/jsfan/hello-neighbour/internal/config"
 	"github.com/jsfan/hello-neighbour/internal/endpoints"
 	"github.com/jsfan/hello-neighbour/internal/session"
 	"github.com/jsfan/hello-neighbour/internal/storage"
 	"github.com/jsfan/hello-neighbour/internal/utils"
-	"github.com/google/logger"
 	"net/http"
 	"strings"
 )

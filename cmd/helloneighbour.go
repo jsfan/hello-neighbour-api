@@ -12,10 +12,10 @@ package main
 
 import (
 	"flag"
-	"io/ioutil"
-	"net/http"
 	"github.com/jsfan/hello-neighbour/internal/config"
 	"github.com/jsfan/hello-neighbour/internal/storage"
+	"io/ioutil"
+	"net/http"
 
 	sw "github.com/jsfan/hello-neighbour/internal"
 
