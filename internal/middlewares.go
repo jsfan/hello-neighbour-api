@@ -10,7 +10,7 @@ import (
 	"github.com/jsfan/hello-neighbour/internal/session"
 	"github.com/jsfan/hello-neighbour/internal/storage"
 	"github.com/jsfan/hello-neighbour/internal/utils"
-	"log"
+	"github.com/google/logger"
 	"net/http"
 	"strings"
 )
@@ -25,7 +25,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// check database connection first
 		if _, err := storage.GetStore(); err != nil {
-			log.Printf("[ERROR] Database connection unavailable.")
+			logger.Error("Database connection unavailable.")
 			endpoints.SendErrorResponse(w, http.StatusInternalServerError, "Internal Server Error")
 		}
 
@@ -47,7 +47,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		case "bearer":
 			ourJwt := session.NewJWT()
 			if err := ourJwt.Validate(tokenDetails[1]); err != nil {
-				log.Printf("[INFO] Could not validate JWT: %+v", err)
+				logger.Infof("Could not validate JWT: %+v", err)
 				sendUnauthorizedResponse(w)
 				return
 			}

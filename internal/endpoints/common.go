@@ -2,12 +2,12 @@ package endpoints
 
 import (
 	"encoding/json"
+	"github.com/google/logger"
 	"github.com/jsfan/hello-neighbour/internal/config"
 	"github.com/jsfan/hello-neighbour/internal/session"
 	"github.com/jsfan/hello-neighbour/internal/storage"
 	"github.com/jsfan/hello-neighbour/pkg"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -15,10 +15,10 @@ func SendJsonResponse(w http.ResponseWriter, jsonIn interface{}) {
 	if jsonIn != nil {
 		resp, err := json.Marshal(&jsonIn)
 		if err != nil {
-			log.Printf("[ERROR] Could not marshal JSON response: %+v", err)
+			logger.Errorf("Could not marshal JSON response: %+v", err)
 		}
 		if _, err := w.Write(resp); err != nil {
-			log.Printf("[ERROR] Could not send JSON response: %+v", err)
+			logger.Errorf("Could not send JSON response: %+v", err)
 		}
 	}
 }
@@ -37,7 +37,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	jwtRef := session.NewJWT()
 	err := jwtRef.Build(userSession)
 	if err != nil {
-		log.Printf("[ERROR] Could not build JWT: %+v", err)
+		logger.Errorf("Could not build JWT: %+v", err)
 		SendErrorResponse(w, http.StatusInternalServerError, "Internal server error")
 	}
 	successResp := pkg.Jwt{
@@ -50,29 +50,29 @@ func Login(w http.ResponseWriter, r *http.Request) {
 func DefaultUserRegister(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Printf("[ERROR] Could not read request body: %+v", err)
-		SendErrorResponse(w, http.StatusInternalServerError, err.Error())
+		logger.Errorf("Could not read request body: %+v", err)
+		SendErrorResponse(w, http.StatusInternalServerError, "")
 		return
 	}
 
 	var userIn *pkg.UserIn
 	if err = json.Unmarshal(b, &userIn); err != nil {
-		log.Printf("[ERROR] Problem with unmarshaling JSON: %+v", err)
-		SendErrorResponse(w, http.StatusBadRequest, err.Error())
+		logger.Errorf("Problem with unmarshaling JSON: %+v", err)
+		SendErrorResponse(w, http.StatusBadRequest, "")
 		return
 	}
 
 	db, err := storage.GetStore()
 	if err != nil {
-		log.Printf("[ERROR] Could not get db connection: %+v", err.Error())
-		SendErrorResponse(w, http.StatusInternalServerError, err.Error())
+		logger.Errorf("Could not get db connection: %+v", err)
+		SendErrorResponse(w, http.StatusInternalServerError, "")
 		return
 	}
 
 	user, err := db.UserRegister(r.Context(), userIn)
 	if err != nil {
-		log.Printf("[ERROR] Database error: %+v", err.Error())
-		SendErrorResponse(w, http.StatusBadRequest, err.Error())
+		logger.Errorf("Database error: %+v", err)
+		SendErrorResponse(w, http.StatusBadRequest, "")
 		return
 	}
 	w.WriteHeader(201)

@@ -7,8 +7,8 @@ import (
 )
 
 // Migrates the database schema to the latest schema version
-func (dal *DAL) Migrate(dbName *string) (errVal error) {
-	driver, err := postgres.WithInstance(dal.Db, &postgres.Config{})
+func (dalInstance *DAL) Migrate(dbName *string) (errVal error) {
+	driver, err := postgres.WithInstance(dalInstance.Db, &postgres.Config{})
 	if err != nil {
 		return err
 	}

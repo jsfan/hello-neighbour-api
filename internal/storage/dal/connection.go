@@ -5,10 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/jsfan/hello-neighbour/internal/config"
-	"github.com/pkg/errors"
 )
-
-var dal *DAL
 
 func Connect(dbConfig *config.DatabaseConfig) (connection AccessInterface, errVal error) {
 	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s", dbConfig.Host, dbConfig.Port, dbConfig.User, dbConfig.Password, dbConfig.DbName)
@@ -16,23 +13,20 @@ func Connect(dbConfig *config.DatabaseConfig) (connection AccessInterface, errVa
 	if err != nil {
 		return nil, err
 	}
-	dal = &DAL{
+	dalInstance := &DAL{
 		Db: database,
 	}
-	return dal, nil
+	return dalInstance, nil
 }
 
-func GetDAL(ctx context.Context) (conn AccessInterface, commit func() error, errVal error) {
-	if dal == nil {
-		return nil, nil, errors.New("No database connection.")
-	}
-	dal.ctx = ctx
-	if dal.tx == nil && dal.ctx != nil {
+func (dalInstance *DAL) SetupDal(ctx context.Context) (commit func() error, errVal error) {
+	dalInstance.ctx = ctx
+	if dalInstance.tx == nil && dalInstance.ctx != nil {
 		var err error
-		dal.tx, err = dal.Db.BeginTx(ctx, nil)
+		dalInstance.tx, err = dalInstance.Db.BeginTx(ctx, nil)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 	}
-	return dal, func() error { return dal.tx.Commit() }, nil
+	return func() error { return dalInstance.tx.Commit() }, nil
 }
