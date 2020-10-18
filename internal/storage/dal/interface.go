@@ -3,6 +3,7 @@ package dal
 import (
 	"context"
 	"database/sql"
+	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour/internal/storage/models"
 	"github.com/jsfan/hello-neighbour/pkg"
 )
@@ -16,6 +17,7 @@ type DAL struct {
 type AccessInterface interface {
 	SetupDal(ctx context.Context) (commit func() error, errVal error)
 	SelectUserByEmail(email string) (user *models.UserProfile, errVal error)
-	RegisterUser(userIn *pkg.UserIn) error
+	InsertUser(userIn *pkg.UserIn) error
+	DeleteUserByPubId(userPubId *uuid.UUID) error
 	Migrate(dbName *string) (errVal error)
 }

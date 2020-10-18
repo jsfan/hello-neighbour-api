@@ -82,11 +82,11 @@ func TestStore_UserRegister(t *testing.T) {
 	mDAL := store.DAL.(*dal.MockDAL)
 	mDAL.Responses = dal.ResponseMap{
 		"SetupDAL":          dal.ResponseSignature{{func() error { return nil }, nil}},
-		"RegisterUser":      dal.ResponseSignature{{nil}},
+		"InsertUser":      dal.ResponseSignature{{nil}},
 		"SelectUserByEmail": dal.ResponseSignature{{expectedUser, nil}},
 	}
 
-	user, err := store.UserRegister(ctx, userIn)
+	user, err := store.RegisterUser(ctx, userIn)
 
 	// no error expected
 	if err != nil {

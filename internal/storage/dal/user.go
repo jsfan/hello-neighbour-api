@@ -1,6 +1,7 @@
 package dal
 
 import (
+	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour/internal/storage/models"
 	"github.com/jsfan/hello-neighbour/pkg"
 )
@@ -41,16 +42,21 @@ func (dalInstance *DAL) SelectUserByEmail(email string) (user *models.UserProfil
 	return &userProfile, nil
 }
 
-func (dalInstance *DAL) RegisterUser(userIn *pkg.UserIn) error {
+func (dalInstance *DAL) InsertUser(userIn *pkg.UserIn) error {
 	_, err := dalInstance.tx.ExecContext(
 		dalInstance.ctx,
 		`INSERT INTO app_user (church_id, email, password_hash, first_name, last_name, gender, date_of_birth, description, role, active)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
 		userIn.Church, userIn.Email, userIn.Password, userIn.FirstName, userIn.LastName, userIn.Gender, userIn.DateOfBirth, userIn.Description, userIn.Role, true,
 	)
-	if err != nil {
-		dalInstance.tx.Rollback()
-		return err
-	}
-	return nil
+	return err
+}
+
+func (dalInstance *DAL) DeleteUserByPubId(userPubId *uuid.UUID) error {
+	_, err := dalInstance.tx.ExecContext(
+		dalInstance.ctx,
+		`DELETE FROM app_user WHERE pub_id = $1`,
+		userPubId,
+	)
+	return err
 }

@@ -36,7 +36,7 @@ func DeleteContactMethod(w http.ResponseWriter, r *http.Request) {
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	endpoints.DefaultUserRegister(w, r)
 }
 
 func EditUser(w http.ResponseWriter, r *http.Request) {

@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"github.com/google/logger"
+	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour/internal/storage/models"
 	"github.com/jsfan/hello-neighbour/pkg"
 )
@@ -33,15 +34,15 @@ func (store *Store) GetUserByEmail(ctx context.Context, email string) (user *mod
 	return user, nil
 }
 
-// UserRegister will first insert the user into the database, then query the db and return a UserProfile model
-func (store *Store) UserRegister(ctx context.Context, userIn *pkg.UserIn) (user *models.UserProfile, errVal error) {
+// RegisterUser first inserts the user into the database, then queries the db and returns a UserProfile model
+func (store *Store) RegisterUser(ctx context.Context, userIn *pkg.UserIn) (user *models.UserProfile, errVal error) {
 	ctx, cancelCtx := setupContext(ctx)
 	dbAccess, commitFunc, err := store.GetDAL(ctx)
 	if err != nil {
 		cancelCtx()
 		return nil, err
 	}
-	if err = dbAccess.RegisterUser(userIn); err != nil {
+	if err = dbAccess.InsertUser(userIn); err != nil {
 		cancelCtx()
 		return nil, err
 	}
@@ -54,4 +55,24 @@ func (store *Store) UserRegister(ctx context.Context, userIn *pkg.UserIn) (user 
 		return nil, err
 	}
 	return user, nil
+}
+
+
+// DeleteUser deletes a user by his/her pub_id
+func (store *Store) DeleteUser(ctx context.Context, userPubId *uuid.UUID) error {
+	ctx, cancelCtx := setupContext(ctx)
+	dbAccess, commitFunc, err := store.GetDAL(ctx)
+	if err != nil {
+		cancelCtx()
+		return err
+	}
+	if err = dbAccess.DeleteUserByPubId(userPubId); err != nil {
+		cancelCtx()
+		return err
+	}
+	if err = commitFunc(); err != nil {
+		cancelCtx()
+		return err
+	}
+	return nil
 }

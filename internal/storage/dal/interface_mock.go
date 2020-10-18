@@ -52,9 +52,9 @@ func (mDAL MockDAL) SelectUserByEmail(email string) (user *models.UserProfile, e
 	return response[0].(*models.UserProfile), castError(response[1])
 }
 
-func (mDAL MockDAL) RegisterUser(userIn *pkg.UserIn) error {
-	addCall(mDAL, "RegisterUser", userIn)
-	response := getResponse(mDAL, "RegisterUser")
+func (mDAL MockDAL) InsertUser(userIn *pkg.UserIn) error {
+	addCall(mDAL, "InsertUser", userIn)
+	response := getResponse(mDAL, "InsertUser")
 	return castError(response[0])
 }
 
