@@ -2,6 +2,7 @@ package dal
 
 import (
 	"context"
+	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour/internal/storage/models"
 	"github.com/jsfan/hello-neighbour/pkg"
 )
@@ -55,6 +56,12 @@ func (mDAL MockDAL) SelectUserByEmail(email string) (user *models.UserProfile, e
 func (mDAL MockDAL) InsertUser(userIn *pkg.UserIn) error {
 	addCall(mDAL, "InsertUser", userIn)
 	response := getResponse(mDAL, "InsertUser")
+	return castError(response[0])
+}
+
+func (mDAL MockDAL) DeleteUserByPubId(userPubId *uuid.UUID) error {
+	addCall(mDAL, "DeleteUserByPubId", userPubId)
+	response := getResponse(mDAL, "DeleteUserByPubId")
 	return castError(response[0])
 }
 
