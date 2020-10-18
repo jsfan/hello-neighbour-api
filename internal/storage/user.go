@@ -57,7 +57,6 @@ func (store *Store) RegisterUser(ctx context.Context, userIn *pkg.UserIn) (user 
 	return user, nil
 }
 
-
 // DeleteUser deletes a user by his/her pub_id
 func (store *Store) DeleteUser(ctx context.Context, userPubId *uuid.UUID) error {
 	ctx, cancelCtx := setupContext(ctx)

@@ -63,7 +63,7 @@ func DefaultUserRegister(w http.ResponseWriter, r *http.Request) {
 // DeactivateUser deletes a user and all his/her assets
 func DeleteUserAccount(w http.ResponseWriter, r *http.Request) {
 	userUUIDdStr := mux.Vars(r)["userUuid"]
-	userUUID, err := uuid.Parse(userUUIDdStr);
+	userUUID, err := uuid.Parse(userUUIDdStr)
 	if err != nil {
 		SendErrorResponse(w, http.StatusBadRequest, "Invalid user UUID.")
 	}
