@@ -2,13 +2,13 @@ package utils
 
 import (
 	"fmt"
-	"net/http"
 	"github.com/google/logger"
 	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour/internal/session"
 	"github.com/jsfan/hello-neighbour/internal/storage"
 	"github.com/jsfan/hello-neighbour/internal/storage/models"
 	"github.com/jsfan/hello-neighbour/internal/utils/crypto"
+	"net/http"
 )
 
 func userSessionFromProfile(profile *models.UserProfile) (userSession *session.UserSession) {
