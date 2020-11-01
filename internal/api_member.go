@@ -21,7 +21,7 @@ func AcceptInvite(w http.ResponseWriter, r *http.Request) {
 
 func AddChurch(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	endpoints.NewChurchRequest(w, r)
 }
 
 func AddContactMethod(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +36,7 @@ func DeleteContactMethod(w http.ResponseWriter, r *http.Request) {
 
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	endpoints.DefaultUserRegister(w, r)
+	endpoints.DeleteUserAccount(w, r)
 }
 
 func EditUser(w http.ResponseWriter, r *http.Request) {

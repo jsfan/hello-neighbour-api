@@ -46,7 +46,7 @@ func (jwtWrapper *jwtWrapper) Validate(rawJWT string) error {
 	}
 	ourClaims := UserSession{}
 	if err := tok.Claims(&signingKey.PublicKey, &expectedBase, &ourClaims); err != nil {
-		return errors.Wrap(err, "could not validate claims")
+		return err
 	}
 
 	jwtWrapper.SessionDetails = &ourClaims

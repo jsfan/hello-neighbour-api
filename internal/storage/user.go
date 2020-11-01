@@ -2,16 +2,10 @@ package storage
 
 import (
 	"context"
-	"github.com/google/logger"
 	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour/internal/storage/models"
 	"github.com/jsfan/hello-neighbour/pkg"
 )
-
-func setupContext(ctx context.Context) (ctext context.Context, cancelCtx context.CancelFunc) {
-	ctext, cancelCtx = context.WithCancel(ctx)
-	return ctext, cancelCtx
-}
 
 func (store *Store) GetUserByEmail(ctx context.Context, email string) (user *models.UserProfile, errVal error) {
 	ctx, cancelCtx := setupContext(ctx)
@@ -27,7 +21,6 @@ func (store *Store) GetUserByEmail(ctx context.Context, email string) (user *mod
 	}
 	user, err = dbAccess.SelectUserByEmail(email)
 	if err != nil {
-		logger.Errorf("Database error: +%v", err)
 		cancelCtx()
 		return nil, err
 	}
@@ -74,4 +67,8 @@ func (store *Store) DeleteUser(ctx context.Context, userPubId *uuid.UUID) error 
 		return err
 	}
 	return nil
+}
+
+func (store *Store) MakeLeader(ctx context.Context) {
+
 }

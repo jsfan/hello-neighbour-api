@@ -2,12 +2,13 @@ package utils
 
 import (
 	"fmt"
+	"net/http"
+	"github.com/google/logger"
 	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour/internal/session"
 	"github.com/jsfan/hello-neighbour/internal/storage"
 	"github.com/jsfan/hello-neighbour/internal/storage/models"
 	"github.com/jsfan/hello-neighbour/internal/utils/crypto"
-	"net/http"
 )
 
 func userSessionFromProfile(profile *models.UserProfile) (userSession *session.UserSession) {
@@ -42,7 +43,8 @@ func CheckBasicAuth(r *http.Request) (userSession *session.UserSession, authFail
 	}
 	userProfile, err := store.GetUserByEmail(r.Context(), username)
 	if err != nil {
-		// todo: Send a 500 unless this was a "Not found"
+		// TODO: Send a 500 unless this was a "Not found"
+		logger.Error(err)
 		return nil, true
 	}
 	if ok := crypto.CheckPassword([]byte(userProfile.PasswordHash), []byte(password)); !ok {
