@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func SendJsonResponse(w http.ResponseWriter, jsonIn interface{}) {
+func SendJSONResponse(w http.ResponseWriter, jsonIn interface{}) {
 	if jsonIn != nil {
 		resp, err := json.Marshal(&jsonIn)
 		if err != nil {
@@ -25,5 +25,5 @@ func SendErrorResponse(w http.ResponseWriter, code int32, message string) {
 		Code:    code,
 		Message: message,
 	}
-	SendJsonResponse(w, errResp)
+	SendJSONResponse(w, errResp)
 }

@@ -45,9 +45,29 @@ func (dalInstance *DAL) SelectUserByEmail(email string) (user *models.UserProfil
 func (dalInstance *DAL) InsertUser(userIn *pkg.UserIn) error {
 	_, err := dalInstance.tx.ExecContext(
 		dalInstance.ctx,
-		`INSERT INTO app_user (church_id, email, password_hash, first_name, last_name, gender, date_of_birth, description, role, active)
+		`INSERT INTO app_user (
+			church_id,
+			email,
+			password_hash,
+			first_name,
+			last_name,
+			gender,
+			date_of_birth,
+			description,
+			role,
+			active
+		)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-		userIn.Church, userIn.Email, userIn.Password, userIn.FirstName, userIn.LastName, userIn.Gender, userIn.DateOfBirth, userIn.Description, userIn.Role, true,
+		userIn.Church,
+		userIn.Email,
+		userIn.Password,
+		userIn.FirstName,
+		userIn.LastName,
+		userIn.Gender,
+		userIn.DateOfBirth,
+		userIn.Description,
+		userIn.Role,
+		true,
 	)
 	return err
 }

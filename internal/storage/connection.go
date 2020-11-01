@@ -34,3 +34,8 @@ func (store *Store) GetDAL(ctx context.Context) (dalInstance dal.AccessInterface
 	}
 	return store.DAL, commitFunc, nil
 }
+
+func setupContext(ctx context.Context) (ctext context.Context, cancelCtx context.CancelFunc) {
+	ctext, cancelCtx = context.WithCancel(ctx)
+	return ctext, cancelCtx
+}
