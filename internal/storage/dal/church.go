@@ -3,6 +3,7 @@ package dal
 import (
 	"github.com/jsfan/hello-neighbour/internal/storage/models"
 	"github.com/jsfan/hello-neighbour/pkg"
+	"github.com/google/uuid"
 )
 
 func (dalInstance *DAL) InsertChurch(churchIn *pkg.ChurchIn) error {
@@ -72,4 +73,14 @@ func (dalInstance *DAL) SelectChurchByEmail(email string) (church *models.Church
 		return nil, err
 	}
 	return &churchProfile, nil
+}
+
+func (dalInstance *DAL) UpdateChurchActivationStatus(churchPubId *uuid.UUID, isActive bool) error {
+	_, err := dalInstance.tx.ExecContext(
+		dalInstance.ctx,
+		`UPDATE church active = $1 WHERE pub_id = $2`,
+		isActive,
+		churchPubId,
+	)
+	return err
 }

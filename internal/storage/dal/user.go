@@ -81,10 +81,13 @@ func (dalInstance *DAL) DeleteUserByPubId(userPubId *uuid.UUID) error {
 	return err
 }
 
-func (dalInstance *DAL) MakeLeader(userPubId *uuid.UUID) error {
+func (dalInstance *DAL) MakeLeader(churchPubId *uuid.UUID, userPubId *uuid.UUID) error {
 	_, err := dalInstance.tx.ExecContext(
 		dalInstance.ctx,
-		`UPDATE app_user role = 'leader' WHERE pub_id = $1`,
+		`UPDATE app_user
+		SET church_id = $1 AND role = 'leader'
+		WHERE pub_id = $2`,
+		churchPubId,
 		userPubId,
 	)
 	return err

@@ -22,5 +22,6 @@ type AccessInterface interface {
 	Migrate(dbName *string) (errVal error)
 	InsertChurch(churchIn *pkg.ChurchIn) error
 	SelectChurchByEmail(email string) (church *models.ChurchProfile, errVal error)
-	MakeLeader(userPubId *uuid.UUID) error
+	MakeLeader(churchPubId *uuid.UUID, userPubId *uuid.UUID) error
+	UpdateChurchActivationStatus(churchPubId *uuid.UUID, isActive bool) error
 }

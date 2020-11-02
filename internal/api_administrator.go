@@ -10,6 +10,7 @@
 package internal
 
 import (
+	"github.com/jsfan/hello-neighbour/internal/endpoints"
 	"net/http"
 )
 
@@ -25,5 +26,5 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 
 func UpdateChurchActivate(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	endpoints.ActivateChurch(w, r)
 }

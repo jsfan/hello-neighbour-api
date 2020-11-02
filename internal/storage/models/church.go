@@ -9,7 +9,7 @@ type ChurchProfile struct {
 	Email                 string
 	Phone                 string
 	GroupSize             string
-	SameGender            int64
+	SameGender            bool
 	MinAge                string
 	MemberBasicInfoUpdate bool
 	Active                bool
