@@ -71,7 +71,7 @@ func TestStore_GetUserByEmail(t *testing.T) {
 	}
 }
 
-func TestStore_UserRegister(t *testing.T) {
+func TestStore_RegisterUser(t *testing.T) {
 	// TODO: Add error cases.
 	store := ConnectMock(&config.DatabaseConfig{})
 	ctx := context.Background()
@@ -142,7 +142,7 @@ func TestStore_UserRegister(t *testing.T) {
 		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", userIn, mDAL.Calls[1].Args)
 	}
 
-	// third call should be to GetUserByEmail
+	// third call should be to SelectUserByEmail
 	expectedFunction = "SelectUserByEmail"
 	expectedParams := []string{"test@example.com"}
 	if mDAL.Calls[2].FunctionName != expectedFunction {

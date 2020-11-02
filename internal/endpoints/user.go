@@ -82,7 +82,7 @@ func DeleteUserAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = db.DeleteUser(r.Context(), &userUUID); err != nil {
-		logger.Errorf("Could not delete user %s: +%v", currentUserUUID.String(), err)
+		logger.Errorf("Could not delete user %s: %+v", currentUserUUID.String(), err)
 		SendErrorResponse(w, http.StatusInternalServerError, "")
 		return
 	}
