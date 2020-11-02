@@ -2,9 +2,11 @@ package storage
 
 import (
 	"context"
+
 	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour/internal/storage/models"
 	"github.com/jsfan/hello-neighbour/pkg"
+	"github.com/pkg/errors"
 )
 
 func (store *Store) GetUserByEmail(ctx context.Context, email string) (user *models.UserProfile, errVal error) {
@@ -69,6 +71,21 @@ func (store *Store) DeleteUser(ctx context.Context, userPubId *uuid.UUID) error 
 	return nil
 }
 
-func (store *Store) MakeLeader(ctx context.Context) {
-
+// TODO: reference when accepting request
+func (store *Store) PromoteToLeader(ctx context.Context, userPubId *uuid.UUID) error {
+	ctx, cancelCtx := setupContext(ctx)
+	dbAccess, commitFunc, err := store.GetDAL(ctx)
+	if err != nil {
+		cancelCtx()
+		return err
+	}
+	if err = dbAccess.MakeLeader(userPubId); err != nil {
+		cancelCtx()
+		return err
+	}
+	if err = commitFunc(); err != nil {
+		cancelCtx()
+		return err
+	}
+	return nil
 }
