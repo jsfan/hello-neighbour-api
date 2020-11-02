@@ -2,22 +2,22 @@ package endpoints
 
 import (
 	"encoding/json"
-	"io/ioutil"
-	"net/http"
-	"strconv"  
+	"github.com/google/logger"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
-	"github.com/google/logger"
 	"github.com/jsfan/hello-neighbour/internal/config"
 	"github.com/jsfan/hello-neighbour/internal/session"
 	"github.com/jsfan/hello-neighbour/internal/storage"
 	"github.com/jsfan/hello-neighbour/pkg"
+	"io/ioutil"
+	"net/http"
+	"strconv"
 )
 
 // NewChurchRequest allows users without an existing church affiliation to add a new church and become the leader of it
 func NewChurchRequest(w http.ResponseWriter, r *http.Request) {
 	userSession := r.Context().Value(config.SessionKey).(*session.UserSession)
-	if (userSession.ChurchUUID != nil) {
+	if userSession.ChurchUUID != nil {
 		SendErrorResponse(w, http.StatusBadRequest, "You cannot request a new church if you currently belong to one.")
 		return
 	}
@@ -67,7 +67,7 @@ func NewChurchRequest(w http.ResponseWriter, r *http.Request) {
 
 func ActivateChurch(w http.ResponseWriter, r *http.Request) {
 	userSession := r.Context().Value(config.SessionKey).(*session.UserSession)
-	if (userSession.Role != "admin") {
+	if userSession.Role != "admin" {
 		SendErrorResponse(w, http.StatusForbidden, "You cannot change a church's activation status.")
 	}
 
