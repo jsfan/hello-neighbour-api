@@ -1,9 +1,9 @@
 package dal
 
 import (
+	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour/internal/storage/models"
 	"github.com/jsfan/hello-neighbour/pkg"
-	"github.com/google/uuid"
 )
 
 func (dalInstance *DAL) InsertChurch(churchIn *pkg.ChurchIn) error {
@@ -23,16 +23,16 @@ func (dalInstance *DAL) InsertChurch(churchIn *pkg.ChurchIn) error {
 			active
 		)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
-		churchIn.Name, 
+		churchIn.Name,
 		churchIn.Description,
-		churchIn.Address, 
-		churchIn.Website, 
-		churchIn.Email, 
-		churchIn.Phone, 
+		churchIn.Address,
+		churchIn.Website,
+		churchIn.Email,
+		churchIn.Phone,
 		churchIn.GroupSize,
-		churchIn.SameGender, 
-		churchIn.MinAge, 
-		churchIn.MemberBasicInfoUpdate, 
+		churchIn.SameGender,
+		churchIn.MinAge,
+		churchIn.MemberBasicInfoUpdate,
 		false,
 	)
 	return err

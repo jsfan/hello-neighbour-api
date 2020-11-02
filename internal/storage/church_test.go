@@ -1,13 +1,13 @@
 package storage_test
 
 import (
-	"reflect"
-	"testing"
 	"context"
 	"github.com/jsfan/hello-neighbour/internal/config"
 	"github.com/jsfan/hello-neighbour/internal/storage/dal"
 	"github.com/jsfan/hello-neighbour/internal/storage/models"
 	"github.com/jsfan/hello-neighbour/pkg"
+	"reflect"
+	"testing"
 )
 
 func TestStore_AddChurch(t *testing.T) {
@@ -16,37 +16,37 @@ func TestStore_AddChurch(t *testing.T) {
 	ctx := context.Background()
 
 	churchIn := &pkg.ChurchIn{
-		Name: "Test Church",
-		Description: "description",
-		Address: "Church Avenue",
-		Website: "church.com",
-		Email: "church_email@church.com",
-		Phone: "777-7777",
-		GroupSize: 2,
-		SameGender: true,
-		MinAge:13,
+		Name:                  "Test Church",
+		Description:           "description",
+		Address:               "Church Avenue",
+		Website:               "church.com",
+		Email:                 "church_email@church.com",
+		Phone:                 "777-7777",
+		GroupSize:             2,
+		SameGender:            true,
+		MinAge:                13,
 		MemberBasicInfoUpdate: false,
 	}
 
 	expectedChurch := &models.ChurchProfile{
-		PubId: "3da2eb8d-d9d1-44bf-bdd4-7fb0a83f2f77",
-		Name: "Test Church",
-		Description: "description",
-		Address: "Church Avenue",
-		Website: "church.com",
-		Email: "church_email@church.com",
-		Phone: "777-7777",
-		GroupSize: "2",
-		SameGender: true,
-		MinAge: "13",
+		PubId:                 "3da2eb8d-d9d1-44bf-bdd4-7fb0a83f2f77",
+		Name:                  "Test Church",
+		Description:           "description",
+		Address:               "Church Avenue",
+		Website:               "church.com",
+		Email:                 "church_email@church.com",
+		Phone:                 "777-7777",
+		GroupSize:             "2",
+		SameGender:            true,
+		MinAge:                "13",
 		MemberBasicInfoUpdate: false,
-		Active: false,
+		Active:                false,
 	}
 
 	mDAL := store.DAL.(*dal.MockDAL)
 	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL": dal.ResponseSignature{{func() error { return nil }, nil}},
-		"InsertChurch": dal.ResponseSignature{{nil}},
+		"SetupDAL":            dal.ResponseSignature{{func() error { return nil }, nil}},
+		"InsertChurch":        dal.ResponseSignature{{nil}},
 		"SelectChurchByEmail": dal.ResponseSignature{{expectedChurch, nil}},
 	}
 
@@ -92,6 +92,6 @@ func TestStore_AddChurch(t *testing.T) {
 	}
 }
 
-// func TestStore_ChurchActivation() {
-
-// }
+func TestStore_ChurchActivation(t *testing.T) {
+	// TODO: Implement me
+}
