@@ -19,4 +19,5 @@ type DataInterface interface {
 	RegisterUser(ctx context.Context, userIn *pkg.UserIn) (user *models.UserProfile, errVal error)
 	DeleteUser(ctx context.Context, userPubId *uuid.UUID) error
 	AddChurch(ctx context.Context, churchIn *pkg.ChurchIn) (church *models.ChurchProfile, errVal error)
+	PromoteToLeader(ctx context.Context, userPubId **uuid.UUID) error
 }
