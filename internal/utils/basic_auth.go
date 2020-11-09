@@ -12,19 +12,23 @@ import (
 )
 
 func userSessionFromProfile(profile *models.UserProfile) (userSession *session.UserSession) {
-	var userUUID, churchUUID uuid.UUID
+	var userUUID uuid.UUID
+	var churchUUID *uuid.UUID
 	var err error
 	userUUID, err = uuid.Parse(profile.PubId)
 	if err != nil {
-		panic(fmt.Sprintf("Church's UUID from database could not be parsed: %+v", err))
-	}
-	churchUUID, err = uuid.Parse(profile.ChurchUUID)
-	if err != nil {
 		panic(fmt.Sprintf("User's UUID from database could not be parsed: %+v", err))
+	}
+	if profile.ChurchUUID != "" {
+		tempUUID, err := uuid.Parse(profile.ChurchUUID)
+		if err != nil {
+			panic(fmt.Sprintf("Church's UUID from database could not be parsed: %+v", err))
+		}
+		churchUUID = &tempUUID
 	}
 	return &session.UserSession{
 		UserUUID:   &userUUID,
-		ChurchUUID: &churchUUID,
+		ChurchUUID: churchUUID,
 		Role:       profile.Role,
 	}
 }
