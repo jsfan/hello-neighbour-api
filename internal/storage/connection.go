@@ -32,5 +32,5 @@ func (store *Store) GetDAL(ctx context.Context) (dalInstance dal.AccessInterface
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	return store.DAL, commitFunc, rollbackFunc,nil
+	return store.DAL, commitFunc, rollbackFunc, nil
 }

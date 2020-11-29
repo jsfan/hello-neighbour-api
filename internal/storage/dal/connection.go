@@ -29,14 +29,14 @@ func (dalInstance *DAL) SetupDal(ctx context.Context) (commit func() error, roll
 		}
 	}
 	return func() error {
-		defer func() {
-			dalInstance.tx = nil
-		}()
-		return dalInstance.tx.Commit()
-	}, func() error {
-		defer func() {
-			dalInstance.tx = nil
-		}()
-		return dalInstance.tx.Rollback()
-	},nil
+			defer func() {
+				dalInstance.tx = nil
+			}()
+			return dalInstance.tx.Commit()
+		}, func() error {
+			defer func() {
+				dalInstance.tx = nil
+			}()
+			return dalInstance.tx.Rollback()
+		}, nil
 }
