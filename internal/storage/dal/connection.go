@@ -19,14 +19,24 @@ func Connect(dbConfig *config.DatabaseConfig) (connection AccessInterface, errVa
 	return dalInstance, nil
 }
 
-func (dalInstance *DAL) SetupDal(ctx context.Context) (commit func() error, errVal error) {
+func (dalInstance *DAL) SetupDal(ctx context.Context) (commit func() error, rollback func() error, errVal error) {
 	dalInstance.ctx = ctx
 	if dalInstance.tx == nil && dalInstance.ctx != nil {
 		var err error
 		dalInstance.tx, err = dalInstance.Db.BeginTx(ctx, nil)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
-	return func() error { return dalInstance.tx.Commit() }, nil
+	return func() error {
+		defer func() {
+			dalInstance.tx = nil
+		}()
+		return dalInstance.tx.Commit()
+	}, func() error {
+		defer func() {
+			dalInstance.tx = nil
+		}()
+		return dalInstance.tx.Rollback()
+	},nil
 }

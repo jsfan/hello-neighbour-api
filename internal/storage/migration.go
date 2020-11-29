@@ -2,7 +2,7 @@ package storage
 
 // Migrates the database schema to the latest schema version
 func (store *Store) Migrate(dbName *string) (errVal error) {
-	dalInstance, commitFunc, err := store.GetDAL(nil)
+	dalInstance, commitFunc, rollbackFunc, err := store.GetDAL(nil)
 	if err != nil {
 		return err
 	}
@@ -12,6 +12,7 @@ func (store *Store) Migrate(dbName *string) (errVal error) {
 	}
 	err = commitFunc()
 	if err != nil {
+		rollbackFunc()
 		return err
 	}
 	return nil
