@@ -42,7 +42,7 @@ func (dalInstance *DAL) SelectChurchByEmail(email string) (church *models.Church
 	var churchProfile models.ChurchProfile
 	err := dalInstance.tx.QueryRowContext(
 		dalInstance.ctx,
-		`SELECT c.pub_id,
+		`SELECT pub_id,
 			name,
 			description,
 			address,
@@ -78,7 +78,7 @@ func (dalInstance *DAL) SelectChurchByEmail(email string) (church *models.Church
 func (dalInstance *DAL) UpdateChurchActivationStatus(churchPubId *uuid.UUID, isActive bool) error {
 	_, err := dalInstance.tx.ExecContext(
 		dalInstance.ctx,
-		`UPDATE church active = $1 WHERE pub_id = $2`,
+		`UPDATE church SET active = $1 WHERE pub_id = $2`,
 		isActive,
 		churchPubId,
 	)

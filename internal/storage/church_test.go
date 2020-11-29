@@ -107,8 +107,8 @@ func TestStore_ChurchActivation(t *testing.T) {
 
 	mDAL := store.DAL.(*dal.MockDAL)
 	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL":            dal.ResponseSignature{{func() error { return nil }, nil}},
-		"UpdateChurchActivationStatus":        dal.ResponseSignature{{&churchPubId, isActive}},
+		"SetupDAL":                     dal.ResponseSignature{{func() error { return nil }, nil}},
+		"UpdateChurchActivationStatus": dal.ResponseSignature{{&churchPubId, isActive}},
 	}
 
 	err = store.ChurchActivation(ctx, &churchPubId, isActive)

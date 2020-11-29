@@ -69,6 +69,7 @@ func ActivateChurch(w http.ResponseWriter, r *http.Request) {
 	userSession := r.Context().Value(config.SessionKey).(*session.UserSession)
 	if userSession.Role != "admin" {
 		SendErrorResponse(w, http.StatusForbidden, "You cannot change a church's activation status.")
+		return
 	}
 
 	db, err := storage.GetStore()
@@ -85,7 +86,7 @@ func ActivateChurch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	isActive, err := strconv.ParseBool(mux.Vars(r)["isActive"])
+	isActive, err := strconv.ParseBool(r.URL.Query()["isActive"][0])
 	if err != nil {
 		SendErrorResponse(w, http.StatusBadRequest, "Invalid active status.")
 		return
