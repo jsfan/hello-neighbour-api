@@ -27,10 +27,10 @@ func GetStore() (conn *Store, errVal error) {
 	return backend, nil
 }
 
-func (store *Store) GetDAL(ctx context.Context) (dalInstance dal.AccessInterface, commitFunc func() error, errVal error) {
-	commitFunc, err := store.DAL.SetupDal(ctx)
+func (store *Store) GetDAL(ctx context.Context) (dalInstance dal.AccessInterface, commitFunc func() error, rollbackFunc func() error, errVal error) {
+	commitFunc, rollbackFunc, err := store.DAL.SetupDal(ctx)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-	return store.DAL, commitFunc, nil
+	return store.DAL, commitFunc, rollbackFunc, nil
 }

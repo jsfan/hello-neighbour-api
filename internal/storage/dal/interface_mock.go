@@ -49,10 +49,10 @@ func castError(rawError interface{}) error {
 	return typedError
 }
 
-func (mDAL *MockDAL) SetupDal(ctx context.Context) (commit func() error, errVal error) {
+func (mDAL *MockDAL) SetupDal(ctx context.Context) (commit func() error, rollback func() error, errVal error) {
 	addCall(mDAL, "SetupDal", ctx)
 	response := getResponse(mDAL, "SetupDAL")
-	return response[0].(func() error), castError(response[1])
+	return response[0].(func() error), response[1].(func() error), castError(response[2])
 }
 
 func (mDAL *MockDAL) SelectUserByEmail(email string) (user *models.UserProfile, errVal error) {

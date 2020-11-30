@@ -15,7 +15,7 @@ type DAL struct {
 }
 
 type AccessInterface interface {
-	SetupDal(ctx context.Context) (commit func() error, errVal error)
+	SetupDal(ctx context.Context) (commit func() error, rollback func() error, errVal error)
 	SelectUserByEmail(email string) (user *models.UserProfile, errVal error)
 	InsertUser(userIn *pkg.UserIn) error
 	DeleteUserByPubId(userPubId *uuid.UUID) error

@@ -34,7 +34,7 @@ func TestStore_GetUserByEmail(t *testing.T) {
 
 	mDAL := store.DAL.(*dal.MockDAL)
 	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL":          dal.ResponseSignature{{func() error { return nil }, nil}},
+		"SetupDAL":          dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
 		"SelectUserByEmail": dal.ResponseSignature{{expectedUser, nil}},
 	}
 
@@ -106,7 +106,7 @@ func TestStore_UserRegister(t *testing.T) {
 
 	mDAL := store.DAL.(*dal.MockDAL)
 	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL":          dal.ResponseSignature{{func() error { return nil }, nil}},
+		"SetupDAL":          dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
 		"InsertUser":        dal.ResponseSignature{{nil}},
 		"SelectUserByEmail": dal.ResponseSignature{{expectedUser, nil}},
 	}
@@ -160,7 +160,7 @@ func TestStore_DeleteUser(t *testing.T) {
 
 	mDAL := store.DAL.(*dal.MockDAL)
 	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL":          dal.ResponseSignature{{func() error { return nil }, nil}},
+		"SetupDAL":          dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
 		"DeleteUserByPubId": dal.ResponseSignature{{nil}},
 	}
 
