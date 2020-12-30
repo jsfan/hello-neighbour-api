@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/google/logger"
 	"github.com/google/uuid"
-	"github.com/jsfan/hello-neighbour/internal/storage/models"
-	"github.com/jsfan/hello-neighbour/pkg"
+	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
+	"github.com/jsfan/hello-neighbour-api/pkg"
 )
 
 func setupContext(ctx context.Context) (ctext context.Context, cancelCtx context.CancelFunc) {

@@ -12,12 +12,12 @@ package main
 
 import (
 	"flag"
-	"github.com/jsfan/hello-neighbour/internal/config"
-	"github.com/jsfan/hello-neighbour/internal/storage"
+	"github.com/jsfan/hello-neighbour-api/internal/config"
+	"github.com/jsfan/hello-neighbour-api/internal/storage"
 	"io/ioutil"
 	"net/http"
 
-	sw "github.com/jsfan/hello-neighbour/internal"
+	sw "github.com/jsfan/hello-neighbour-api/internal"
 
 	"github.com/google/logger"
 )

@@ -3,10 +3,10 @@ package storage_test
 import (
 	"context"
 	"github.com/google/uuid"
-	"github.com/jsfan/hello-neighbour/internal/config"
-	"github.com/jsfan/hello-neighbour/internal/storage/dal"
-	"github.com/jsfan/hello-neighbour/internal/storage/models"
-	"github.com/jsfan/hello-neighbour/pkg"
+	"github.com/jsfan/hello-neighbour-api/internal/config"
+	"github.com/jsfan/hello-neighbour-api/internal/storage/dal"
+	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
+	"github.com/jsfan/hello-neighbour-api/pkg"
 	"reflect"
 	"testing"
 )

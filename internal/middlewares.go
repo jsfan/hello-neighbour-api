@@ -6,11 +6,11 @@ package internal
 import (
 	"context"
 	"github.com/google/logger"
-	"github.com/jsfan/hello-neighbour/internal/config"
-	"github.com/jsfan/hello-neighbour/internal/endpoints"
-	"github.com/jsfan/hello-neighbour/internal/session"
-	"github.com/jsfan/hello-neighbour/internal/storage"
-	"github.com/jsfan/hello-neighbour/internal/utils"
+	"github.com/jsfan/hello-neighbour-api/internal/config"
+	"github.com/jsfan/hello-neighbour-api/internal/endpoints"
+	"github.com/jsfan/hello-neighbour-api/internal/session"
+	"github.com/jsfan/hello-neighbour-api/internal/storage"
+	"github.com/jsfan/hello-neighbour-api/internal/utils"
 	"net/http"
 	"strings"
 )
