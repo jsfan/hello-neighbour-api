@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/jsfan/hello-neighbour/internal/storage/models"
-	"github.com/jsfan/hello-neighbour/pkg"
+	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
+	"github.com/jsfan/hello-neighbour-api/pkg"
 )
 
 func (store *Store) GetUserByEmail(ctx context.Context, email string) (user *models.UserProfile, errVal error) {

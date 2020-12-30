@@ -12,7 +12,7 @@ package internal
 import (
 	"crypto/rsa"
 	"fmt"
-	"github.com/jsfan/hello-neighbour/internal/session"
+	"github.com/jsfan/hello-neighbour-api/internal/session"
 	"net/http"
 	"strings"
 

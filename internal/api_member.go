@@ -10,7 +10,7 @@
 package internal
 
 import (
-	"github.com/jsfan/hello-neighbour/internal/endpoints"
+	"github.com/jsfan/hello-neighbour-api/internal/endpoints"
 	"net/http"
 )
 

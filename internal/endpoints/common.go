@@ -3,7 +3,7 @@ package endpoints
 import (
 	"encoding/json"
 	"github.com/google/logger"
-	"github.com/jsfan/hello-neighbour/pkg"
+	"github.com/jsfan/hello-neighbour-api/pkg"
 	"net/http"
 )
 

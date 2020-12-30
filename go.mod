@@ -1,4 +1,4 @@
-module github.com/jsfan/hello-neighbour
+module github.com/jsfan/hello-neighbour-api
 
 go 1.14
 

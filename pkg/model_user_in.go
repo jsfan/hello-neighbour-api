@@ -12,7 +12,7 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/jsfan/hello-neighbour/internal/utils/crypto"
+	"github.com/jsfan/hello-neighbour-api/internal/utils/crypto"
 	"reflect"
 )
 

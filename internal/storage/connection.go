@@ -2,8 +2,8 @@ package storage
 
 import (
 	"context"
-	"github.com/jsfan/hello-neighbour/internal/config"
-	"github.com/jsfan/hello-neighbour/internal/storage/dal"
+	"github.com/jsfan/hello-neighbour-api/internal/config"
+	"github.com/jsfan/hello-neighbour-api/internal/storage/dal"
 	"github.com/pkg/errors"
 )
 
