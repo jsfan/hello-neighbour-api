@@ -3,8 +3,8 @@ package dal
 import (
 	"context"
 	"github.com/google/uuid"
-	"github.com/jsfan/hello-neighbour/internal/storage/models"
-	"github.com/jsfan/hello-neighbour/pkg"
+	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
+	"github.com/jsfan/hello-neighbour-api/pkg"
 )
 
 type CallSignature struct {

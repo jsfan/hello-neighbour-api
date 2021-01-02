@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/jsfan/hello-neighbour/internal/config"
+	"github.com/jsfan/hello-neighbour-api/internal/config"
 )
 
 func Connect(dbConfig *config.DatabaseConfig) (connection AccessInterface, errVal error) {

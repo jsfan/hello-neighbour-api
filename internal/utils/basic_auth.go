@@ -3,10 +3,10 @@ package utils
 import (
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/jsfan/hello-neighbour/internal/session"
-	"github.com/jsfan/hello-neighbour/internal/storage"
-	"github.com/jsfan/hello-neighbour/internal/storage/models"
-	"github.com/jsfan/hello-neighbour/internal/utils/crypto"
+	"github.com/jsfan/hello-neighbour-api/internal/session"
+	"github.com/jsfan/hello-neighbour-api/internal/storage"
+	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
+	"github.com/jsfan/hello-neighbour-api/internal/utils/crypto"
 	"net/http"
 )
 
