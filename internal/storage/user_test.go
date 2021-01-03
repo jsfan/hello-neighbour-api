@@ -164,8 +164,8 @@ func TestStore_DeleteUser(t *testing.T) {
 		"DeleteUserByPubId": dal.ResponseSignature{{nil}},
 	}
 
-	expectedUUID := uuid.New()
-	err := store.DeleteUser(ctx, &expectedUUID)
+	userUUID := uuid.New()
+	err := store.DeleteUser(ctx, &userUUID)
 
 	// no error expected
 	if err != nil {
@@ -186,6 +186,48 @@ func TestStore_DeleteUser(t *testing.T) {
 	// second call should be to DeleteUserByPubId
 	expectedFunction = "DeleteUserByPubId"
 	expectedParams := []interface{}{&uuid.UUID{}}
+	if mDAL.Calls[1].FunctionName != expectedFunction {
+		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedFunction, mDAL.Calls[1].FunctionName)
+	}
+	if reflect.DeepEqual(mDAL.Calls[1].Args, expectedParams) {
+		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedParams, mDAL.Calls[1].Args)
+	}
+}
+
+func TestStore_PromoteToLeader(t *testing.T) {
+	// TODO: add error cases
+	store := ConnectMock(&config.DatabaseConfig{})
+	ctx := context.Background()
+
+	mDAL := store.DAL.(*dal.MockDAL)
+	mDAL.Responses = dal.ResponseMap{
+		"SetupDAL":   dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
+		"MakeLeader": dal.ResponseSignature{{nil}},
+	}
+
+	userUUID := uuid.New()
+	churchUUID := uuid.New()
+	err := store.PromoteToLeader(ctx, &userUUID, &churchUUID)
+
+	// no error expected
+	if err != nil {
+		t.Errorf("Got unexpected error: %+v", err)
+	}
+
+	// there should be two calls
+	if len(mDAL.Calls) != 2 {
+		t.Errorf("Unexpected number of calls to DAL. Expected %d, got %d.", 2, len(mDAL.Calls))
+	}
+
+	// first call should be to SetupDal
+	expectedFunction := "SetupDal"
+	if mDAL.Calls[0].FunctionName != expectedFunction {
+		t.Errorf("Recorded call not as expected. Expected function %s, got %s.", expectedFunction, mDAL.Calls[0].FunctionName)
+	}
+
+	// second call should be to PromoteToLeader
+	expectedFunction = "MakeLeader"
+	expectedParams := []interface{}{&uuid.UUID{}, &uuid.UUID{}}
 	if mDAL.Calls[1].FunctionName != expectedFunction {
 		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedFunction, mDAL.Calls[1].FunctionName)
 	}

@@ -2,19 +2,22 @@ package storage
 
 import (
 	"context"
+
 	"github.com/google/uuid"
-	"github.com/jsfan/hello-neighbour/internal/storage/models"
-	"github.com/jsfan/hello-neighbour/pkg"
+	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
+	"github.com/jsfan/hello-neighbour-api/pkg"
 )
 
 func (store *Store) AddChurch(ctx context.Context, churchIn *pkg.ChurchIn) (church *models.ChurchProfile, errVal error) {
 	ctx, cancelCtx := setupContext(ctx)
-	dbAccess, commitFunc, err := store.GetDAL(ctx)
+	dbAccess, commitFunc, rollbackFunc, err := store.GetDAL(ctx)
 	if err != nil {
+		rollbackFunc()
 		cancelCtx()
 		return nil, err
 	}
 	if err = dbAccess.InsertChurch(churchIn); err != nil {
+		rollbackFunc()
 		cancelCtx()
 		return nil, err
 	}
@@ -23,6 +26,7 @@ func (store *Store) AddChurch(ctx context.Context, churchIn *pkg.ChurchIn) (chur
 		return nil, err
 	}
 	if err = commitFunc(); err != nil {
+		rollbackFunc()
 		cancelCtx()
 		return nil, err
 	}
@@ -31,16 +35,19 @@ func (store *Store) AddChurch(ctx context.Context, churchIn *pkg.ChurchIn) (chur
 
 func (store *Store) ChurchActivation(ctx context.Context, churchPubId *uuid.UUID, isActive bool) error {
 	ctx, cancelCtx := setupContext(ctx)
-	dbAccess, commitFunc, err := store.GetDAL(ctx)
+	dbAccess, commitFunc, rollbackFunc, err := store.GetDAL(ctx)
 	if err != nil {
+		rollbackFunc()
 		cancelCtx()
 		return err
 	}
 	if err = dbAccess.UpdateChurchActivationStatus(churchPubId, isActive); err != nil {
+		rollbackFunc()
 		cancelCtx()
 		return err
 	}
 	if err = commitFunc(); err != nil {
+		rollbackFunc()
 		cancelCtx()
 		return err
 	}

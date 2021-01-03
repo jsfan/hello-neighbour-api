@@ -2,13 +2,14 @@ package storage_test
 
 import (
 	"context"
-	"github.com/google/uuid"
-	"github.com/jsfan/hello-neighbour/internal/config"
-	"github.com/jsfan/hello-neighbour/internal/storage/dal"
-	"github.com/jsfan/hello-neighbour/internal/storage/models"
-	"github.com/jsfan/hello-neighbour/pkg"
 	"reflect"
 	"testing"
+
+	"github.com/google/uuid"
+	"github.com/jsfan/hello-neighbour-api/internal/config"
+	"github.com/jsfan/hello-neighbour-api/internal/storage/dal"
+	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
+	"github.com/jsfan/hello-neighbour-api/pkg"
 )
 
 func TestStore_AddChurch(t *testing.T) {
@@ -46,7 +47,7 @@ func TestStore_AddChurch(t *testing.T) {
 
 	mDAL := store.DAL.(*dal.MockDAL)
 	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL":            dal.ResponseSignature{{func() error { return nil }, nil}},
+		"SetupDAL":            dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
 		"InsertChurch":        dal.ResponseSignature{{nil}},
 		"SelectChurchByEmail": dal.ResponseSignature{{expectedChurch, nil}},
 	}
@@ -107,7 +108,7 @@ func TestStore_ChurchActivation(t *testing.T) {
 
 	mDAL := store.DAL.(*dal.MockDAL)
 	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL":                     dal.ResponseSignature{{func() error { return nil }, nil}},
+		"SetupDAL":                     dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
 		"UpdateChurchActivationStatus": dal.ResponseSignature{{&churchPubId, isActive}},
 	}
 

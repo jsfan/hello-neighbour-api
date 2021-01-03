@@ -98,7 +98,12 @@ func (dalInstance *DAL) MakeLeader(churchPubId *uuid.UUID, userPubId *uuid.UUID)
 	_, err := dalInstance.tx.ExecContext(
 		dalInstance.ctx,
 		`UPDATE app_user
-		SET church_id = $1 AND role = 'leader'
+		SET church_id = (
+				SELECT id
+				FROM church
+				WHERE pub_id = $1
+			),
+			role = 'leader'
 		WHERE pub_id = $2`,
 		churchPubId,
 		userPubId,

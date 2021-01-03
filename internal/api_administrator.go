@@ -10,8 +10,9 @@
 package internal
 
 import (
-	"github.com/jsfan/hello-neighbour/internal/endpoints"
 	"net/http"
+
+	"github.com/jsfan/hello-neighbour-api/internal/endpoints"
 )
 
 func GetQuestions(w http.ResponseWriter, r *http.Request) {

@@ -2,16 +2,17 @@ package endpoints
 
 import (
 	"encoding/json"
-	"github.com/google/logger"
-	"github.com/google/uuid"
-	"github.com/gorilla/mux"
-	"github.com/jsfan/hello-neighbour/internal/config"
-	"github.com/jsfan/hello-neighbour/internal/session"
-	"github.com/jsfan/hello-neighbour/internal/storage"
-	"github.com/jsfan/hello-neighbour/pkg"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+
+	"github.com/google/logger"
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
+	"github.com/jsfan/hello-neighbour-api/internal/config"
+	"github.com/jsfan/hello-neighbour-api/internal/session"
+	"github.com/jsfan/hello-neighbour-api/internal/storage"
+	"github.com/jsfan/hello-neighbour-api/pkg"
 )
 
 // NewChurchRequest allows users without an existing church affiliation to add a new church and become the leader of it
@@ -98,5 +99,5 @@ func ActivateChurch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	logger.Infof("Church %s has their activation status updated.", churchUUID.String())
-	w.WriteHeader(http.StatusNoContent)
+	w.WriteHeader(http.StatusOK)
 }

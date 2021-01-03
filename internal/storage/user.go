@@ -41,6 +41,7 @@ func (store *Store) RegisterUser(ctx context.Context, userIn *pkg.UserIn) (user 
 		return nil, err
 	}
 	if err = dbAccess.InsertUser(userIn); err != nil {
+		rollbackFunc()
 		cancelCtx()
 		return nil, err
 	}
@@ -61,6 +62,7 @@ func (store *Store) DeleteUser(ctx context.Context, userPubId *uuid.UUID) error 
 	ctx, cancelCtx := setupContext(ctx)
 	dbAccess, commitFunc, rollbackFunc, err := store.GetDAL(ctx)
 	if err != nil {
+		rollbackFunc()
 		cancelCtx()
 		return err
 	}
@@ -77,18 +79,22 @@ func (store *Store) DeleteUser(ctx context.Context, userPubId *uuid.UUID) error 
 	return nil
 }
 
+// PromoteToLeader will promote a given member of a church to a leader role
 func (store *Store) PromoteToLeader(ctx context.Context, userPubId *uuid.UUID, churchPubId *uuid.UUID) error {
 	ctx, cancelCtx := setupContext(ctx)
-	dbAccess, commitFunc, err := store.GetDAL(ctx)
+	dbAccess, commitFunc, rollbackFunc, err := store.GetDAL(ctx)
 	if err != nil {
+		rollbackFunc()
 		cancelCtx()
 		return err
 	}
 	if err = dbAccess.MakeLeader(churchPubId, userPubId); err != nil {
+		rollbackFunc()
 		cancelCtx()
 		return err
 	}
 	if err = commitFunc(); err != nil {
+		rollbackFunc()
 		cancelCtx()
 		return err
 	}
