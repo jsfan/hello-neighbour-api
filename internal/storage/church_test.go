@@ -47,9 +47,8 @@ func TestStore_AddChurch(t *testing.T) {
 
 	mDAL := store.DAL.(*dal.MockDAL)
 	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL":            dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
-		"InsertChurch":        dal.ResponseSignature{{nil}},
-		"SelectChurchByEmail": dal.ResponseSignature{{expectedChurch, nil}},
+		"SetupDAL":     dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
+		"InsertChurch": dal.ResponseSignature{{expectedChurch, nil}},
 	}
 
 	church, err := store.AddChurch(ctx, churchIn)
@@ -64,8 +63,8 @@ func TestStore_AddChurch(t *testing.T) {
 	}
 
 	// there should be three calls
-	if len(mDAL.Calls) != 3 {
-		t.Errorf("Unexpected number of calls to DAL. Expected %d, got %d.", 3, len(mDAL.Calls))
+	if len(mDAL.Calls) != 2 {
+		t.Errorf("Unexpected number of calls to DAL. Expected %d, got %d.", 2, len(mDAL.Calls))
 	}
 
 	// first call should be to SetupDal
@@ -81,16 +80,6 @@ func TestStore_AddChurch(t *testing.T) {
 	}
 	if reflect.DeepEqual(mDAL.Calls[1].Args, churchIn) {
 		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", churchIn, mDAL.Calls[1].Args)
-	}
-
-	// third call should be to SelectChurchByEmail
-	expectedFunction = "SelectChurchByEmail"
-	expectedParams := []string{"church_email@church.com"}
-	if mDAL.Calls[2].FunctionName != expectedFunction {
-		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedFunction, mDAL.Calls[2].FunctionName)
-	}
-	if reflect.DeepEqual(mDAL.Calls[2].Args, expectedParams) {
-		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedParams, mDAL.Calls[2].Args)
 	}
 }
 

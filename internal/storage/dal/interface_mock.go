@@ -79,10 +79,10 @@ func (mDAL *MockDAL) Migrate(dbName *string) (errVal error) {
 	return castError(response[0])
 }
 
-func (mDAL *MockDAL) InsertChurch(churchIn *pkg.ChurchIn) error {
+func (mDAL *MockDAL) InsertChurch(churchIn *pkg.ChurchIn) (church *models.ChurchProfile, errVal error) {
 	addCall(mDAL, "InsertChurch", churchIn)
 	response := getResponse(mDAL, "InsertChurch")
-	return castError(response[0])
+	return response[0].(*models.ChurchProfile), castError(response[1])
 }
 
 func (mDAL *MockDAL) SelectChurchByEmail(email string) (church *models.ChurchProfile, errVal error) {

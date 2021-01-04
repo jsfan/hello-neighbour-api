@@ -20,7 +20,7 @@ type AccessInterface interface {
 	InsertUser(userIn *pkg.UserIn) error
 	DeleteUserByPubId(userPubId *uuid.UUID) error
 	Migrate(dbName *string) (errVal error)
-	InsertChurch(churchIn *pkg.ChurchIn) error
+	InsertChurch(churchIn *pkg.ChurchIn) (church *models.ChurchProfile, errVal error)
 	SelectChurchByEmail(email string) (church *models.ChurchProfile, errVal error)
 	MakeLeader(churchPubId *uuid.UUID, userPubId *uuid.UUID) error
 	UpdateChurchActivationStatus(churchPubId *uuid.UUID, isActive bool) error

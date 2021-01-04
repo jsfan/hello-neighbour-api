@@ -16,13 +16,10 @@ func (store *Store) AddChurch(ctx context.Context, churchIn *pkg.ChurchIn) (chur
 		cancelCtx()
 		return nil, err
 	}
-	if err = dbAccess.InsertChurch(churchIn); err != nil {
+	church, err = dbAccess.InsertChurch(churchIn)
+	if err != nil {
 		rollbackFunc()
 		cancelCtx()
-		return nil, err
-	}
-	church, err = dbAccess.SelectChurchByEmail(churchIn.Email)
-	if err != nil {
 		return nil, err
 	}
 	if err = commitFunc(); err != nil {
