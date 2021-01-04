@@ -78,3 +78,27 @@ func (mDAL *MockDAL) Migrate(dbName *string) (errVal error) {
 	response := getResponse(mDAL, "Migrate")
 	return castError(response[0])
 }
+
+func (mDAL *MockDAL) InsertChurch(churchIn *pkg.ChurchIn) (church *models.ChurchProfile, errVal error) {
+	addCall(mDAL, "InsertChurch", churchIn)
+	response := getResponse(mDAL, "InsertChurch")
+	return response[0].(*models.ChurchProfile), castError(response[1])
+}
+
+func (mDAL *MockDAL) SelectChurchByEmail(email string) (church *models.ChurchProfile, errVal error) {
+	addCall(mDAL, "SelectChurchByEmail", email)
+	response := getResponse(mDAL, "SelectChurchByEmail")
+	return response[0].(*models.ChurchProfile), castError(response[1])
+}
+
+func (mDAL *MockDAL) MakeLeader(userPubId *uuid.UUID, churchPubId *uuid.UUID) error {
+	addCall(mDAL, "MakeLeader", userPubId, churchPubId)
+	response := getResponse(mDAL, "MakeLeader")
+	return castError(response[0])
+}
+
+func (mDAL *MockDAL) UpdateChurchActivationStatus(churchPubId *uuid.UUID, isActive bool) error {
+	addCall(mDAL, "UpdateChurchActivationStatus", churchPubId, isActive)
+	response := getResponse(mDAL, "UpdateChurchActivationStatus")
+	return castError(response[0])
+}

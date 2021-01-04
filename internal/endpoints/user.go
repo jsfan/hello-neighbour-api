@@ -24,7 +24,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	successResp := pkg.Jwt{
 		Jwt: jwtRef.GetRaw(),
 	}
-	SendJsonResponse(w, successResp)
+	SendJSONResponse(w, successResp)
 }
 
 // DefaultUserRegister is the default signup when creating a new church
@@ -32,7 +32,7 @@ func DefaultUserRegister(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		logger.Errorf("Could not read request body: %+v", err)
-		SendErrorResponse(w, http.StatusInternalServerError, "")
+		SendErrorResponse(w, http.StatusBadRequest, "")
 		return
 	}
 
@@ -53,19 +53,21 @@ func DefaultUserRegister(w http.ResponseWriter, r *http.Request) {
 	user, err := db.RegisterUser(r.Context(), userIn)
 	if err != nil {
 		logger.Errorf("Database error: %+v", err)
-		SendErrorResponse(w, http.StatusBadRequest, "")
+		SendErrorResponse(w, http.StatusInternalServerError, "")
 		return
 	}
+	logger.Infof("User created: %+v", user.PubId)
 	w.WriteHeader(http.StatusCreated)
-	SendJsonResponse(w, user)
+	SendJSONResponse(w, user)
 }
 
-// DeactivateUser deletes a user and all his/her assets
+// DeleteUserAccount deletes a user and all his/her assets
 func DeleteUserAccount(w http.ResponseWriter, r *http.Request) {
 	userUUIDdStr := mux.Vars(r)["userUuid"]
 	userUUID, err := uuid.Parse(userUUIDdStr)
 	if err != nil {
 		SendErrorResponse(w, http.StatusBadRequest, "Invalid user UUID.")
+		return
 	}
 	userSession := r.Context().Value(config.SessionKey).(*session.UserSession)
 	currentUserUUID := userSession.UserUUID
@@ -80,7 +82,9 @@ func DeleteUserAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = db.DeleteUser(r.Context(), &userUUID); err != nil {
-		logger.Errorf("Could not delete user %s: +%v", currentUserUUID.String(), err)
+		logger.Errorf("Could not delete user %s: %+v", currentUserUUID.String(), err)
+		SendErrorResponse(w, http.StatusInternalServerError, "")
+		return
 	}
 	logger.Infof("User %s was deleted.", currentUserUUID.String())
 	w.WriteHeader(http.StatusNoContent)

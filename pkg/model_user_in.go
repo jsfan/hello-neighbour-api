@@ -48,7 +48,7 @@ func (userIn *UserIn) UnmarshalJSON(data []byte) error {
 	for i := 0; i < value.NumField(); i++ {
 		fieldName := value.Type().Field(i).Name
 		fieldValue := value.Field(i).Interface()
-		if fieldValue == "" {
+		if fieldValue == "" && fieldName != "Church" {
 			return fmt.Errorf("Missing or empty field '%+v' for UserIn", fieldName)
 		} else if fieldName == "Password" {
 			password, err := crypto.GeneratePasswordHash(userIn2.Password)

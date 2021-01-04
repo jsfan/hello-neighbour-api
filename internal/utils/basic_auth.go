@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/google/logger"
 	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour-api/internal/session"
 	"github.com/jsfan/hello-neighbour-api/internal/storage"
@@ -11,19 +12,23 @@ import (
 )
 
 func userSessionFromProfile(profile *models.UserProfile) (userSession *session.UserSession) {
-	var userUUID, churchUUID uuid.UUID
+	var userUUID uuid.UUID
+	var churchUUID *uuid.UUID
 	var err error
 	userUUID, err = uuid.Parse(profile.PubId)
 	if err != nil {
-		panic(fmt.Sprintf("Church's UUID from database could not be parsed: %+v", err))
-	}
-	churchUUID, err = uuid.Parse(profile.ChurchUUID)
-	if err != nil {
 		panic(fmt.Sprintf("User's UUID from database could not be parsed: %+v", err))
+	}
+	if profile.ChurchUUID != "" {
+		tempUUID, err := uuid.Parse(profile.ChurchUUID)
+		if err != nil {
+			panic(fmt.Sprintf("Church's UUID from database could not be parsed: %+v", err))
+		}
+		churchUUID = &tempUUID
 	}
 	return &session.UserSession{
 		UserUUID:   &userUUID,
-		ChurchUUID: &churchUUID,
+		ChurchUUID: churchUUID,
 		Role:       profile.Role,
 	}
 }
@@ -42,7 +47,8 @@ func CheckBasicAuth(r *http.Request) (userSession *session.UserSession, authFail
 	}
 	userProfile, err := store.GetUserByEmail(r.Context(), username)
 	if err != nil {
-		// todo: Send a 500 unless this was a "Not found"
+		// TODO: Send a 500 unless this was a "Not found"
+		logger.Error(err)
 		return nil, true
 	}
 	if ok := crypto.CheckPassword([]byte(userProfile.PasswordHash), []byte(password)); !ok {
