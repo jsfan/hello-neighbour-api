@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour-api/internal/config"
-	"github.com/jsfan/hello-neighbour-api/internal/storage/dal"
+	"github.com/jsfan/hello-neighbour-api/internal/storage/interfaces"
 	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
 	"github.com/jsfan/hello-neighbour-api/pkg"
 	"reflect"
@@ -32,10 +32,9 @@ func TestStore_GetUserByEmail(t *testing.T) {
 		Active:       true,
 	}
 
-	mDAL := store.DAL.(*dal.MockDAL)
-	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL":          dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
-		"SelectUserByEmail": dal.ResponseSignature{{expectedUser, nil}},
+	mDAL := store.DAL.(*interfaces.MockDAL)
+	mDAL.Responses = interfaces.ResponseMap{
+		"SelectUserByEmail": interfaces.ResponseSignature{{expectedUser, nil}},
 	}
 
 	user, err := store.GetUserByEmail(ctx, "test@example.com")
@@ -49,24 +48,19 @@ func TestStore_GetUserByEmail(t *testing.T) {
 		t.Errorf("User record differs from expected record. Expected %+v, got %+v", expectedUser, user)
 	}
 
-	// there should be two calls
-	if len(mDAL.Calls) != 2 {
-		t.Errorf("Unexpected number of calls to DAL. Expected %d, got %d.", 2, len(mDAL.Calls))
+	// there should be one call
+	const expectedCalls = 1
+	if len(mDAL.Calls) != expectedCalls {
+		t.Errorf("Unexpected number of calls to DAL. Expected %d, got %d.", expectedCalls, len(mDAL.Calls))
 	}
 
-	// first call should be to SetupDal
-	expectedFunction := "SetupDal"
-	if mDAL.Calls[0].FunctionName != expectedFunction {
-		t.Errorf("Recorded call not as expected. Expected function %s, got %s.", expectedFunction, mDAL.Calls[0].FunctionName)
-	}
-
-	// second call should be to GetUserByEmail
-	expectedFunction = "SelectUserByEmail"
+	// call should be to GetUserByEmail
+	expectedFunction := "SelectUserByEmail"
 	expectedParams := []string{"test@example.com"}
-	if mDAL.Calls[1].FunctionName != expectedFunction {
+	if mDAL.Calls[0].FunctionName != expectedFunction {
 		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedFunction, mDAL.Calls[1].FunctionName)
 	}
-	if reflect.DeepEqual(mDAL.Calls[1].Args, expectedParams) {
+	if reflect.DeepEqual(mDAL.Calls[0].Args, expectedParams) {
 		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedParams, mDAL.Calls[1].Args)
 	}
 }
@@ -104,11 +98,12 @@ func TestStore_RegisterUser(t *testing.T) {
 		Active:       true,
 	}
 
-	mDAL := store.DAL.(*dal.MockDAL)
-	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL":          dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
-		"InsertUser":        dal.ResponseSignature{{nil}},
-		"SelectUserByEmail": dal.ResponseSignature{{expectedUser, nil}},
+	mDAL := store.DAL.(*interfaces.MockDAL)
+	mDAL.Responses = interfaces.ResponseMap{
+		"BeginTransaction":    interfaces.ResponseSignature{{nil}},
+		"InsertUser":          interfaces.ResponseSignature{{nil}},
+		"SelectUserByEmail":   interfaces.ResponseSignature{{expectedUser, nil}},
+		"CompleteTransaction": interfaces.ResponseSignature{{nil}},
 	}
 
 	user, err := store.RegisterUser(ctx, userIn)
@@ -122,13 +117,14 @@ func TestStore_RegisterUser(t *testing.T) {
 		t.Errorf("User record differs from expected record. Expected %+v, got %+v", expectedUser, user)
 	}
 
-	// there should be three calls
-	if len(mDAL.Calls) != 3 {
-		t.Errorf("Unexpected number of calls to DAL. Expected %d, got %d.", 3, len(mDAL.Calls))
+	// there should be four calls
+	const expectedCalls = 4
+	if len(mDAL.Calls) != expectedCalls {
+		t.Errorf("Unexpected number of calls to DAL. Expected %d, got %d.", expectedCalls, len(mDAL.Calls))
 	}
 
-	// first call should be to SetupDal
-	expectedFunction := "SetupDal"
+	// first call should be to BeginTransaction
+	expectedFunction := "BeginTransaction"
 	if mDAL.Calls[0].FunctionName != expectedFunction {
 		t.Errorf("Recorded call not as expected. Expected function %s, got %s.", expectedFunction, mDAL.Calls[0].FunctionName)
 	}
@@ -151,6 +147,11 @@ func TestStore_RegisterUser(t *testing.T) {
 	if reflect.DeepEqual(mDAL.Calls[2].Args, expectedParams) {
 		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedParams, mDAL.Calls[2].Args)
 	}
+	// fourth call should be to CompleteTransaction
+	expectedFunction = "CompleteTransaction"
+	if mDAL.Calls[3].FunctionName != expectedFunction {
+		t.Errorf("Recorded call not as expected. Expected function %s, got %s.", expectedFunction, mDAL.Calls[3].FunctionName)
+	}
 }
 
 func TestStore_DeleteUser(t *testing.T) {
@@ -158,10 +159,9 @@ func TestStore_DeleteUser(t *testing.T) {
 	store := ConnectMock(&config.DatabaseConfig{})
 	ctx := context.Background()
 
-	mDAL := store.DAL.(*dal.MockDAL)
-	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL":          dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
-		"DeleteUserByPubId": dal.ResponseSignature{{nil}},
+	mDAL := store.DAL.(*interfaces.MockDAL)
+	mDAL.Responses = interfaces.ResponseMap{
+		"DeleteUserByPubId": interfaces.ResponseSignature{{nil}},
 	}
 
 	userUUID := uuid.New()
@@ -172,24 +172,19 @@ func TestStore_DeleteUser(t *testing.T) {
 		t.Errorf("Got unexpected error: %+v", err)
 	}
 
-	// there should be two calls
-	if len(mDAL.Calls) != 2 {
-		t.Errorf("Unexpected number of calls to DAL. Expected %d, got %d.", 2, len(mDAL.Calls))
+	// there should be one call
+	const expectedCalls = 1
+	if len(mDAL.Calls) != expectedCalls {
+		t.Errorf("Unexpected number of calls to DAL. Expected %d, got %d.", expectedCalls, len(mDAL.Calls))
 	}
 
-	// first call should be to SetupDal
-	expectedFunction := "SetupDal"
-	if mDAL.Calls[0].FunctionName != expectedFunction {
-		t.Errorf("Recorded call not as expected. Expected function %s, got %s.", expectedFunction, mDAL.Calls[0].FunctionName)
-	}
-
-	// second call should be to DeleteUserByPubId
-	expectedFunction = "DeleteUserByPubId"
+	// call should be to DeleteUserByPubId
+	expectedFunction := "DeleteUserByPubId"
 	expectedParams := []interface{}{&uuid.UUID{}}
-	if mDAL.Calls[1].FunctionName != expectedFunction {
+	if mDAL.Calls[0].FunctionName != expectedFunction {
 		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedFunction, mDAL.Calls[1].FunctionName)
 	}
-	if reflect.DeepEqual(mDAL.Calls[1].Args, expectedParams) {
+	if reflect.DeepEqual(mDAL.Calls[0].Args, expectedParams) {
 		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedParams, mDAL.Calls[1].Args)
 	}
 }
@@ -199,10 +194,9 @@ func TestStore_PromoteToLeader(t *testing.T) {
 	store := ConnectMock(&config.DatabaseConfig{})
 	ctx := context.Background()
 
-	mDAL := store.DAL.(*dal.MockDAL)
-	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL":   dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
-		"MakeLeader": dal.ResponseSignature{{nil}},
+	mDAL := store.DAL.(*interfaces.MockDAL)
+	mDAL.Responses = interfaces.ResponseMap{
+		"MakeLeader": interfaces.ResponseSignature{{nil}},
 	}
 
 	userUUID := uuid.New()
@@ -214,24 +208,19 @@ func TestStore_PromoteToLeader(t *testing.T) {
 		t.Errorf("Got unexpected error: %+v", err)
 	}
 
-	// there should be two calls
-	if len(mDAL.Calls) != 2 {
-		t.Errorf("Unexpected number of calls to DAL. Expected %d, got %d.", 2, len(mDAL.Calls))
+	// there should be one call
+	const expectedCalls = 1
+	if len(mDAL.Calls) != expectedCalls {
+		t.Errorf("Unexpected number of calls to DAL. Expected %d, got %d.", expectedCalls, len(mDAL.Calls))
 	}
 
-	// first call should be to SetupDal
-	expectedFunction := "SetupDal"
-	if mDAL.Calls[0].FunctionName != expectedFunction {
-		t.Errorf("Recorded call not as expected. Expected function %s, got %s.", expectedFunction, mDAL.Calls[0].FunctionName)
-	}
-
-	// second call should be to PromoteToLeader
-	expectedFunction = "MakeLeader"
+	// call should be to PromoteToLeader
+	expectedFunction := "MakeLeader"
 	expectedParams := []interface{}{&uuid.UUID{}, &uuid.UUID{}}
-	if mDAL.Calls[1].FunctionName != expectedFunction {
+	if mDAL.Calls[0].FunctionName != expectedFunction {
 		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedFunction, mDAL.Calls[1].FunctionName)
 	}
-	if reflect.DeepEqual(mDAL.Calls[1].Args, expectedParams) {
+	if reflect.DeepEqual(mDAL.Calls[0].Args, expectedParams) {
 		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedParams, mDAL.Calls[1].Args)
 	}
 }

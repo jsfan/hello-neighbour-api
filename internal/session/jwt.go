@@ -2,6 +2,7 @@ package session
 
 import (
 	"crypto/rsa"
+	"github.com/jsfan/hello-neighbour-api/internal/config"
 	"github.com/pkg/errors"
 	"gopkg.in/square/go-jose.v2"
 	"gopkg.in/square/go-jose.v2/jwt"
@@ -13,7 +14,7 @@ const subject = "Hello Neighbour API"
 
 type jwtWrapper struct {
 	rawJWT         string
-	SessionDetails *UserSession
+	SessionDetails *config.UserSession
 }
 
 // JWT lifespan (i.e. time until it expires)
@@ -44,7 +45,7 @@ func (jwtWrapper *jwtWrapper) Validate(rawJWT string) error {
 		Subject: subject,
 		Time:    time.Now(),
 	}
-	ourClaims := UserSession{}
+	ourClaims := config.UserSession{}
 	if err := tok.Claims(&signingKey.PublicKey, &expectedBase, &ourClaims); err != nil {
 		return err
 	}
@@ -53,7 +54,7 @@ func (jwtWrapper *jwtWrapper) Validate(rawJWT string) error {
 	return nil
 }
 
-func (jwtWrapper *jwtWrapper) Build(sessionClaims *UserSession) error {
+func (jwtWrapper *jwtWrapper) Build(sessionClaims *config.UserSession) error {
 	if signingKey == nil {
 		return errors.New("no signing key loaded")
 	}

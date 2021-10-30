@@ -1,41 +1,30 @@
 package storage
 
 import (
-	"context"
 	"github.com/jsfan/hello-neighbour-api/internal/config"
+	storeInterface "github.com/jsfan/hello-neighbour-api/internal/interfaces"
 	"github.com/jsfan/hello-neighbour-api/internal/storage/dal"
-	"github.com/pkg/errors"
+	dalInterface "github.com/jsfan/hello-neighbour-api/internal/storage/interfaces"
 )
 
-var backend *Store
+type Store struct {
+	DAL dalInterface.AccessInterface
+}
 
-func Connect(dbConfig *config.DatabaseConfig) (connection DataInterface, errVal error) {
+func ConnectStore(dbConfig *config.DatabaseConfig) (connection storeInterface.DataInterface, errVal error) {
 	dalInstance, err := dal.Connect(dbConfig)
 	if err != nil {
 		return nil, err
 	}
-	backend = &Store{
+	return &Store{
 		DAL: dalInstance,
-	}
-	return backend, nil
+	}, nil
 }
 
-func GetStore() (conn *Store, errVal error) {
-	if backend == nil {
-		return nil, errors.New("No database connection.")
+func (store *Store) Clone() storeInterface.DataInterface {
+	newDAL := store.DAL.Clone()
+	if newDAL == nil {
+		return nil
 	}
-	return backend, nil
-}
-
-func (store *Store) GetDAL(ctx context.Context) (dalInstance dal.AccessInterface, commitFunc func() error, rollbackFunc func() error, errVal error) {
-	commitFunc, rollbackFunc, err := store.DAL.SetupDal(ctx)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	return store.DAL, commitFunc, rollbackFunc, nil
-}
-
-func setupContext(ctx context.Context) (ctext context.Context, cancelCtx context.CancelFunc) {
-	ctext, cancelCtx = context.WithCancel(ctx)
-	return ctext, cancelCtx
+	return &Store{DAL: newDAL}
 }

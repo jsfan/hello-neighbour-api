@@ -6,7 +6,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file" // blank import to register source driver
 )
 
-// Migrates the database schema to the latest schema version
+// Migrate migrates the database schema to the latest schema version
 func (dalInstance *DAL) Migrate(dbName *string) (errVal error) {
 	driver, err := postgres.WithInstance(dalInstance.Db, &postgres.Config{})
 	if err != nil {

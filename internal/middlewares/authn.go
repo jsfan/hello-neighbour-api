@@ -1,7 +1,4 @@
-/*
- * Middlewares for the HTTP server (e.g. authorisation)
- */
-package internal
+package middlewares
 
 import (
 	"context"
@@ -9,7 +6,6 @@ import (
 	"github.com/jsfan/hello-neighbour-api/internal/config"
 	"github.com/jsfan/hello-neighbour-api/internal/endpoints"
 	"github.com/jsfan/hello-neighbour-api/internal/session"
-	"github.com/jsfan/hello-neighbour-api/internal/storage"
 	"github.com/jsfan/hello-neighbour-api/internal/utils"
 	"net/http"
 	"strings"
@@ -21,14 +17,8 @@ func sendUnauthorizedResponse(w http.ResponseWriter) {
 	endpoints.SendErrorResponse(w, http.StatusUnauthorized, "Unauthenticated")
 }
 
-func AuthMiddleware(next http.Handler) http.Handler {
+func AuthnMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// check database connection first
-		if _, err := storage.GetStore(); err != nil {
-			logger.Error("Database connection unavailable.")
-			endpoints.SendErrorResponse(w, http.StatusInternalServerError, "Internal Server Error")
-		}
-
 		bearerToken, ok := r.Header[authHeader]
 		if !ok {
 			if r.RequestURI == "/v0/user" {
@@ -42,7 +32,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 		// TODO: Go through all authorisation headers instead?
 		tokenDetails := strings.SplitN(bearerToken[0], " ", 2)
 		tokenType := strings.ToLower(tokenDetails[0])
-		var userSession *session.UserSession
+		var userSession *config.UserSession
 		switch tokenType {
 		case "bearer":
 			ourJwt := session.NewJWT()

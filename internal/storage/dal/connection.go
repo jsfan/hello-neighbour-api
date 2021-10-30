@@ -1,13 +1,18 @@
 package dal
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"github.com/jsfan/hello-neighbour-api/internal/config"
+	"github.com/jsfan/hello-neighbour-api/internal/storage/interfaces"
 )
 
-func Connect(dbConfig *config.DatabaseConfig) (connection AccessInterface, errVal error) {
+type DAL struct {
+	Db *sql.DB
+	tx *sql.Tx
+}
+
+func Connect(dbConfig *config.DatabaseConfig) (connection interfaces.AccessInterface, errVal error) {
 	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s", dbConfig.Host, dbConfig.Port, dbConfig.User, dbConfig.Password, dbConfig.DbName)
 	database, err := sql.Open("postgres", psqlconn)
 	if err != nil {
@@ -19,24 +24,16 @@ func Connect(dbConfig *config.DatabaseConfig) (connection AccessInterface, errVa
 	return dalInstance, nil
 }
 
-func (dalInstance *DAL) SetupDal(ctx context.Context) (commit func() error, rollback func() error, errVal error) {
-	dalInstance.ctx = ctx
-	if dalInstance.tx == nil && dalInstance.ctx != nil {
-		var err error
-		dalInstance.tx, err = dalInstance.Db.BeginTx(ctx, nil)
-		if err != nil {
-			return nil, nil, err
-		}
+func (dalInstance *DAL) Clone() interfaces.AccessInterface {
+	return &DAL{
+		Db: dalInstance.Db,
+		tx: nil,
 	}
-	return func() error {
-			defer func() {
-				dalInstance.tx = nil
-			}()
-			return dalInstance.tx.Commit()
-		}, func() error {
-			defer func() {
-				dalInstance.tx = nil
-			}()
-			return dalInstance.tx.Rollback()
-		}, nil
+}
+
+func (dalInstance *DAL) db() interfaces.DbInteractionInterface {
+	if dalInstance.tx != nil {
+		return dalInstance.tx
+	}
+	return dalInstance.Db
 }
