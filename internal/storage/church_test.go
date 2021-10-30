@@ -47,7 +47,6 @@ func TestStore_AddChurch(t *testing.T) {
 
 	mDAL := store.DAL.(*interfaces.MockDAL)
 	mDAL.Responses = interfaces.ResponseMap{
-		"SetupDAL":     interfaces.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
 		"InsertChurch": interfaces.ResponseSignature{{expectedChurch, nil}},
 	}
 
@@ -62,23 +61,18 @@ func TestStore_AddChurch(t *testing.T) {
 		t.Errorf("Church record differs from expected record. Expected %+v, got %+v", expectedChurch, church)
 	}
 
-	// there should be three calls
-	if len(mDAL.Calls) != 2 {
-		t.Errorf("Unexpected number of calls to DAL. Expected %d, got %d.", 2, len(mDAL.Calls))
+	// there should be one call
+	const expectedCalls = 1
+	if len(mDAL.Calls) != expectedCalls {
+		t.Errorf("Unexpected number of calls to DAL. Expected %d, got %d.", expectedCalls, len(mDAL.Calls))
 	}
 
-	// first call should be to SetupDal
-	expectedFunction := "SetupDal"
+	// call should be to InsertChurch
+	expectedFunction := "InsertChurch"
 	if mDAL.Calls[0].FunctionName != expectedFunction {
-		t.Errorf("Recorded call not as expected. Expected function %s, got %s.", expectedFunction, mDAL.Calls[0].FunctionName)
-	}
-
-	// second call should be to InsertChurch
-	expectedFunction = "InsertChurch"
-	if mDAL.Calls[1].FunctionName != expectedFunction {
 		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedFunction, mDAL.Calls[1].FunctionName)
 	}
-	if reflect.DeepEqual(mDAL.Calls[1].Args, churchIn) {
+	if reflect.DeepEqual(mDAL.Calls[0].Args, churchIn) {
 		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", churchIn, mDAL.Calls[1].Args)
 	}
 }
@@ -97,7 +91,6 @@ func TestStore_ChurchActivation(t *testing.T) {
 
 	mDAL := store.DAL.(*interfaces.MockDAL)
 	mDAL.Responses = interfaces.ResponseMap{
-		"SetupDAL":                     interfaces.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
 		"UpdateChurchActivationStatus": interfaces.ResponseSignature{{&churchPubId, isActive}},
 	}
 
@@ -106,24 +99,19 @@ func TestStore_ChurchActivation(t *testing.T) {
 		t.Errorf("Got unexpected error: %+v", err)
 	}
 
-	// there should be two calls
-	if len(mDAL.Calls) != 2 {
-		t.Errorf("Unexpected number of calls to DAL. Expected %d, got %d.", 2, len(mDAL.Calls))
+	// there should be one call
+	const expectedCalls = 1
+	if len(mDAL.Calls) != expectedCalls {
+		t.Errorf("Unexpected number of calls to DAL. Expected %d, got %d.", expectedCalls, len(mDAL.Calls))
 	}
 
-	// first call should be to SetupDal
-	expectedFunction := "SetupDal"
-	if mDAL.Calls[0].FunctionName != expectedFunction {
-		t.Errorf("Recorded call not as expected. Expected function %s, got %s.", expectedFunction, mDAL.Calls[0].FunctionName)
-	}
-
-	// second call should be to UpdateChurchActivationStatus
-	expectedFunction = "UpdateChurchActivationStatus"
+	// call should be to UpdateChurchActivationStatus
+	expectedFunction := "UpdateChurchActivationStatus"
 	expectedParams := []interface{}{&churchPubId, isActive}
-	if mDAL.Calls[1].FunctionName != expectedFunction {
+	if mDAL.Calls[0].FunctionName != expectedFunction {
 		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedFunction, mDAL.Calls[1].FunctionName)
 	}
-	if reflect.DeepEqual(mDAL.Calls[1], expectedParams) {
+	if reflect.DeepEqual(mDAL.Calls[0], expectedParams) {
 		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedParams, mDAL.Calls[1].Args)
 	}
 }
