@@ -1,6 +1,7 @@
 package dal
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/google/uuid"
@@ -8,12 +9,12 @@ import (
 	"github.com/jsfan/hello-neighbour-api/pkg"
 )
 
-func (dalInstance *DAL) SelectUserByEmail(email string) (user *models.UserProfile, errVal error) {
+func (dalInstance *DAL) SelectUserByEmail(ctx context.Context, email string) (user *models.UserProfile, errVal error) {
 	var userProfile models.UserProfile
 	var churchPubId sql.NullString
 
-	err := dalInstance.tx.QueryRowContext(
-		dalInstance.ctx,
+	err := dalInstance.db().QueryRowContext(
+		ctx,
 		`SELECT u.pub_id,
 			u.email,
        		u.password_hash,
@@ -50,14 +51,14 @@ func (dalInstance *DAL) SelectUserByEmail(email string) (user *models.UserProfil
 	return &userProfile, nil
 }
 
-func (dalInstance *DAL) InsertUser(userIn *pkg.UserIn) error {
+func (dalInstance *DAL) InsertUser(ctx context.Context, userIn *pkg.UserIn) error {
 	church := &userIn.Church
 	if *church == "" {
 		church = nil
 	}
 
-	_, err := dalInstance.tx.ExecContext(
-		dalInstance.ctx,
+	_, err := dalInstance.db().ExecContext(
+		ctx,
 		`INSERT INTO app_user (
 			church_id,
 			email,
@@ -85,18 +86,18 @@ func (dalInstance *DAL) InsertUser(userIn *pkg.UserIn) error {
 	return err
 }
 
-func (dalInstance *DAL) DeleteUserByPubId(userPubId *uuid.UUID) error {
-	_, err := dalInstance.tx.ExecContext(
-		dalInstance.ctx,
+func (dalInstance *DAL) DeleteUserByPubId(ctx context.Context, userPubId *uuid.UUID) error {
+	_, err := dalInstance.db().ExecContext(
+		ctx,
 		`DELETE FROM app_user WHERE pub_id = $1`,
 		userPubId,
 	)
 	return err
 }
 
-func (dalInstance *DAL) MakeLeader(churchPubId *uuid.UUID, userPubId *uuid.UUID) error {
-	_, err := dalInstance.tx.ExecContext(
-		dalInstance.ctx,
+func (dalInstance *DAL) MakeLeader(ctx context.Context, churchPubId *uuid.UUID, userPubId *uuid.UUID) error {
+	_, err := dalInstance.db().ExecContext(
+		ctx,
 		`UPDATE app_user
 		SET church_id = (
 				SELECT id

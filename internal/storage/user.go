@@ -9,23 +9,8 @@ import (
 )
 
 func (store *Store) GetUserByEmail(ctx context.Context, email string) (user *models.UserProfile, errVal error) {
-	ctx, cancelCtx := setupContext(ctx)
-	dbAccess, commitFunc, rollbackFunc, err := store.GetDAL(ctx)
-	defer func() {
-		if err := commitFunc(); err != nil && errVal == nil {
-			rollbackFunc()
-			errVal = err
-		}
-	}()
+	user, err := store.DAL.SelectUserByEmail(ctx, email)
 	if err != nil {
-		rollbackFunc()
-		cancelCtx()
-		return nil, err
-	}
-	user, err = dbAccess.SelectUserByEmail(email)
-	if err != nil {
-		rollbackFunc()
-		cancelCtx()
 		return nil, err
 	}
 	return user, nil
@@ -33,25 +18,21 @@ func (store *Store) GetUserByEmail(ctx context.Context, email string) (user *mod
 
 // RegisterUser first inserts the user into the database, then queries the db and returns a UserProfile model
 func (store *Store) RegisterUser(ctx context.Context, userIn *pkg.UserIn) (user *models.UserProfile, errVal error) {
-	ctx, cancelCtx := setupContext(ctx)
-	dbAccess, commitFunc, rollbackFunc, err := store.GetDAL(ctx)
+	if err := store.DAL.BeginTransaction(); err != nil {
+		return nil, err
+	}
+	defer func() {
+		if errVal != nil {
+			store.DAL.CancelTransaction()
+		}
+		errVal = store.DAL.CompleteTransaction()
+	}()
+
+	if err := store.DAL.InsertUser(ctx, userIn); err != nil {
+		return nil, err
+	}
+	user, err := store.DAL.SelectUserByEmail(ctx, userIn.Email)
 	if err != nil {
-		rollbackFunc()
-		cancelCtx()
-		return nil, err
-	}
-	if err = dbAccess.InsertUser(userIn); err != nil {
-		rollbackFunc()
-		cancelCtx()
-		return nil, err
-	}
-	user, err = dbAccess.SelectUserByEmail(userIn.Email)
-	if err != nil {
-		return nil, err
-	}
-	if err = commitFunc(); err != nil {
-		rollbackFunc()
-		cancelCtx()
 		return nil, err
 	}
 	return user, nil
@@ -59,44 +40,10 @@ func (store *Store) RegisterUser(ctx context.Context, userIn *pkg.UserIn) (user 
 
 // DeleteUser deletes a user by his/her pub_id
 func (store *Store) DeleteUser(ctx context.Context, userPubId *uuid.UUID) error {
-	ctx, cancelCtx := setupContext(ctx)
-	dbAccess, commitFunc, rollbackFunc, err := store.GetDAL(ctx)
-	if err != nil {
-		rollbackFunc()
-		cancelCtx()
-		return err
-	}
-	if err = dbAccess.DeleteUserByPubId(userPubId); err != nil {
-		rollbackFunc()
-		cancelCtx()
-		return err
-	}
-	if err = commitFunc(); err != nil {
-		rollbackFunc()
-		cancelCtx()
-		return err
-	}
-	return nil
+	return store.DAL.DeleteUserByPubId(ctx, userPubId)
 }
 
 // PromoteToLeader will promote a given member of a church to a leader role
 func (store *Store) PromoteToLeader(ctx context.Context, userPubId *uuid.UUID, churchPubId *uuid.UUID) error {
-	ctx, cancelCtx := setupContext(ctx)
-	dbAccess, commitFunc, rollbackFunc, err := store.GetDAL(ctx)
-	if err != nil {
-		rollbackFunc()
-		cancelCtx()
-		return err
-	}
-	if err = dbAccess.MakeLeader(churchPubId, userPubId); err != nil {
-		rollbackFunc()
-		cancelCtx()
-		return err
-	}
-	if err = commitFunc(); err != nil {
-		rollbackFunc()
-		cancelCtx()
-		return err
-	}
-	return nil
+	return store.DAL.MakeLeader(ctx, churchPubId, userPubId)
 }

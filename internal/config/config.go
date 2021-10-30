@@ -8,8 +8,8 @@ import (
 	"os"
 )
 
-const SessionKey = "session"
-const DatabaseConnection = "storage"
+type sessionKey string
+type masterStore string
 
 type DatabaseConfig struct {
 	Host     string `yaml:"host"`
@@ -28,6 +28,9 @@ type Config struct {
 	Database    DatabaseConfig `yaml:"database"`
 	JwtSignKeys KeyPair        `yaml:"JWTKeys"`
 }
+
+const SessionKey sessionKey = "session"
+const MasterStore masterStore = "store"
 
 func readFile(fileName string) (fileContents []byte, errVal error) {
 	fileHandle, err := os.Open(fileName)

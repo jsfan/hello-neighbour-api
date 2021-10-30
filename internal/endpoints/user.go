@@ -6,15 +6,15 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/jsfan/hello-neighbour-api/internal/config"
+	"github.com/jsfan/hello-neighbour-api/internal/interfaces"
 	"github.com/jsfan/hello-neighbour-api/internal/session"
-	"github.com/jsfan/hello-neighbour-api/internal/storage"
 	"github.com/jsfan/hello-neighbour-api/pkg"
 	"io/ioutil"
 	"net/http"
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	userSession := r.Context().Value(config.SessionKey).(*session.UserSession)
+	userSession := r.Context().Value(config.SessionKey).(*config.UserSession)
 	jwtRef := session.NewJWT()
 	err := jwtRef.Build(userSession)
 	if err != nil {
@@ -43,14 +43,9 @@ func DefaultUserRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db, err := storage.GetStore()
-	if err != nil {
-		logger.Errorf("Could not get db connection: %+v", err)
-		SendErrorResponse(w, http.StatusInternalServerError, "")
-		return
-	}
+	store := r.Context().Value(config.MasterStore).(interfaces.DataInterface)
 
-	user, err := db.RegisterUser(r.Context(), userIn)
+	user, err := store.RegisterUser(r.Context(), userIn)
 	if err != nil {
 		logger.Errorf("Database error: %+v", err)
 		SendErrorResponse(w, http.StatusInternalServerError, "")
@@ -69,19 +64,15 @@ func DeleteUserAccount(w http.ResponseWriter, r *http.Request) {
 		SendErrorResponse(w, http.StatusBadRequest, "Invalid user UUID.")
 		return
 	}
-	userSession := r.Context().Value(config.SessionKey).(*session.UserSession)
+	userSession := r.Context().Value(config.SessionKey).(*config.UserSession)
 	currentUserUUID := userSession.UserUUID
 	if (&userUUID != currentUserUUID) && (userSession.Role != "admin") {
 		SendErrorResponse(w, http.StatusForbidden, "You cannot delete that user.")
 	}
-	db, err := storage.GetStore()
-	if err != nil {
-		logger.Errorf("Could not get db connection: %+v", err)
-		SendErrorResponse(w, http.StatusInternalServerError, "")
-		return
-	}
 
-	if err = db.DeleteUser(r.Context(), &userUUID); err != nil {
+	store := r.Context().Value(config.MasterStore).(interfaces.DataInterface)
+
+	if err = store.DeleteUser(r.Context(), &userUUID); err != nil {
 		logger.Errorf("Could not delete user %s: %+v", currentUserUUID.String(), err)
 		SendErrorResponse(w, http.StatusInternalServerError, "")
 		return

@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"encoding/json"
+	"github.com/jsfan/hello-neighbour-api/internal/interfaces"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -10,14 +11,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/jsfan/hello-neighbour-api/internal/config"
-	"github.com/jsfan/hello-neighbour-api/internal/session"
-	"github.com/jsfan/hello-neighbour-api/internal/storage"
 	"github.com/jsfan/hello-neighbour-api/pkg"
 )
 
 // NewChurchRequest allows users without an existing church affiliation to add a new church and become the leader of it
 func NewChurchRequest(w http.ResponseWriter, r *http.Request) {
-	userSession := r.Context().Value(config.SessionKey).(*session.UserSession)
+	userSession := r.Context().Value(config.SessionKey).(*config.UserSession)
 	if userSession.ChurchUUID != nil {
 		SendErrorResponse(w, http.StatusBadRequest, "You cannot request a new church if you currently belong to one.")
 		return
@@ -37,14 +36,9 @@ func NewChurchRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db, err := storage.GetStore()
-	if err != nil {
-		logger.Errorf("Could not get db connection: %+v", err)
-		SendErrorResponse(w, http.StatusInternalServerError, "")
-		return
-	}
+	store := r.Context().Value(config.MasterStore).(interfaces.DataInterface)
 
-	church, err := db.AddChurch(r.Context(), churchIn)
+	church, err := store.AddChurch(r.Context(), churchIn)
 	if err != nil {
 		logger.Errorf("Database error: %+v", err)
 		SendErrorResponse(w, http.StatusInternalServerError, "")
@@ -56,7 +50,7 @@ func NewChurchRequest(w http.ResponseWriter, r *http.Request) {
 		// this shouldn't happen
 		logger.Errorf("Cannot parse pub ID of church %s: %+v", church.PubId, err)
 	}
-	if err = db.PromoteToLeader(r.Context(), userSession.UserUUID, &churchPubId); err != nil {
+	if err = store.PromoteToLeader(r.Context(), userSession.UserUUID, &churchPubId); err != nil {
 		logger.Errorf("Problem promoting user %s to leader of church %s: %+v.", userSession.UserUUID.String(), churchPubId.String(), err)
 		SendErrorResponse(w, http.StatusInternalServerError, "")
 		return
@@ -67,18 +61,13 @@ func NewChurchRequest(w http.ResponseWriter, r *http.Request) {
 }
 
 func ActivateChurch(w http.ResponseWriter, r *http.Request) {
-	userSession := r.Context().Value(config.SessionKey).(*session.UserSession)
+	userSession := r.Context().Value(config.SessionKey).(*config.UserSession)
 	if userSession.Role != "admin" {
 		SendErrorResponse(w, http.StatusForbidden, "You cannot change a church's activation status.")
 		return
 	}
 
-	db, err := storage.GetStore()
-	if err != nil {
-		logger.Errorf("Could not get db connection: %+v", err)
-		SendErrorResponse(w, http.StatusInternalServerError, "")
-		return
-	}
+	store := r.Context().Value(config.MasterStore).(interfaces.DataInterface)
 
 	churchUUIDStr := mux.Vars(r)["churchUuid"]
 	churchUUID, err := uuid.Parse(churchUUIDStr)
@@ -93,7 +82,7 @@ func ActivateChurch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = db.ChurchActivation(r.Context(), &churchUUID, isActive); err != nil {
+	if err = store.ActivateChurch(r.Context(), &churchUUID, isActive); err != nil {
 		logger.Errorf("Could not change activation status of church %s: %+v", churchUUID.String(), err)
 		SendErrorResponse(w, http.StatusInternalServerError, "")
 		return

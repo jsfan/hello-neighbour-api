@@ -9,44 +9,9 @@ import (
 )
 
 func (store *Store) AddChurch(ctx context.Context, churchIn *pkg.ChurchIn) (church *models.ChurchProfile, errVal error) {
-	ctx, cancelCtx := setupContext(ctx)
-	dbAccess, commitFunc, rollbackFunc, err := store.GetDAL(ctx)
-	if err != nil {
-		rollbackFunc()
-		cancelCtx()
-		return nil, err
-	}
-	church, err = dbAccess.InsertChurch(churchIn)
-	if err != nil {
-		rollbackFunc()
-		cancelCtx()
-		return nil, err
-	}
-	if err = commitFunc(); err != nil {
-		rollbackFunc()
-		cancelCtx()
-		return nil, err
-	}
-	return church, nil
+	return store.DAL.InsertChurch(ctx, churchIn)
 }
 
-func (store *Store) ChurchActivation(ctx context.Context, churchPubId *uuid.UUID, isActive bool) error {
-	ctx, cancelCtx := setupContext(ctx)
-	dbAccess, commitFunc, rollbackFunc, err := store.GetDAL(ctx)
-	if err != nil {
-		rollbackFunc()
-		cancelCtx()
-		return err
-	}
-	if err = dbAccess.UpdateChurchActivationStatus(churchPubId, isActive); err != nil {
-		rollbackFunc()
-		cancelCtx()
-		return err
-	}
-	if err = commitFunc(); err != nil {
-		rollbackFunc()
-		cancelCtx()
-		return err
-	}
-	return nil
+func (store *Store) ActivateChurch(ctx context.Context, churchPubId *uuid.UUID, isActive bool) error {
+	return store.DAL.UpdateChurchActivationStatus(ctx, churchPubId, isActive)
 }

@@ -13,6 +13,7 @@ package main
 import (
 	"flag"
 	"github.com/jsfan/hello-neighbour-api/internal/config"
+	"github.com/jsfan/hello-neighbour-api/internal/middlewares"
 	"github.com/jsfan/hello-neighbour-api/internal/storage"
 	"io/ioutil"
 	"net/http"
@@ -39,18 +40,19 @@ func main() {
 		logger.Fatalf(`Could not load key pair: %v`, err)
 	}
 
-	con, err := storage.Connect(&cfg.Database)
+	masterStore, err := storage.ConnectStore(&cfg.Database)
 	if err != nil {
 		logger.Fatalf("Could not connect to database: %v", err)
 	}
 
-	if err := con.Migrate(&cfg.Database.DbName); err != nil && err.Error() != "no change" {
+	if err := masterStore.Migrate(&cfg.Database.DbName); err != nil && err.Error() != "no change" {
 		logger.Fatalf("Database migration failed: %v", err)
 	}
 	logger.Info("Server started")
 
 	router := sw.NewRouter(jwtKeys)
-	router.Use(sw.AuthMiddleware)
+	router.Use(middlewares.GetStorageMiddleWare(masterStore))
+	router.Use(middlewares.AuthnMiddleware)
 
 	logger.Fatal(http.ListenAndServe(":8080", router))
 }

@@ -1,15 +1,16 @@
 package dal
 
 import (
+	"context"
 	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
 	"github.com/jsfan/hello-neighbour-api/pkg"
 )
 
-func (dalInstance *DAL) InsertChurch(churchIn *pkg.ChurchIn) (church *models.ChurchProfile, errVal error) {
+func (dalInstance *DAL) InsertChurch(ctx context.Context, churchIn *pkg.ChurchIn) (church *models.ChurchProfile, errVal error) {
 	var churchProfile models.ChurchProfile
-	err := dalInstance.tx.QueryRowContext(
-		dalInstance.ctx,
+	err := dalInstance.db().QueryRowContext(
+		ctx,
 		`INSERT INTO church (
 			name, 
 			description, 
@@ -67,10 +68,10 @@ func (dalInstance *DAL) InsertChurch(churchIn *pkg.ChurchIn) (church *models.Chu
 	return &churchProfile, nil
 }
 
-func (dalInstance *DAL) SelectChurchByEmail(email string) (church *models.ChurchProfile, errVal error) {
+func (dalInstance *DAL) SelectChurchByEmail(ctx context.Context, email string) (church *models.ChurchProfile, errVal error) {
 	var churchProfile models.ChurchProfile
-	err := dalInstance.tx.QueryRowContext(
-		dalInstance.ctx,
+	err := dalInstance.db().QueryRowContext(
+		ctx,
 		`SELECT pub_id,
 			name,
 			description,
@@ -104,9 +105,9 @@ func (dalInstance *DAL) SelectChurchByEmail(email string) (church *models.Church
 	return &churchProfile, nil
 }
 
-func (dalInstance *DAL) UpdateChurchActivationStatus(churchPubId *uuid.UUID, isActive bool) error {
-	_, err := dalInstance.tx.ExecContext(
-		dalInstance.ctx,
+func (dalInstance *DAL) UpdateChurchActivationStatus(ctx context.Context, churchPubId *uuid.UUID, isActive bool) error {
+	_, err := dalInstance.db().ExecContext(
+		ctx,
 		`UPDATE church SET active = $1 WHERE pub_id = $2`,
 		isActive,
 		churchPubId,

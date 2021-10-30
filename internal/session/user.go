@@ -1,17 +1,11 @@
 package session
 
 import (
-	"github.com/google/uuid"
+	"github.com/jsfan/hello-neighbour-api/internal/config"
 )
 
-type UserSession struct {
-	UserUUID   *uuid.UUID `json:"userUuid"`
-	ChurchUUID *uuid.UUID `json:"churchUuid"`
-	Role       string     `json:"role"`
-}
-
-func NewSession() (userSession *UserSession) {
-	return &UserSession{
+func NewSession() (userSession *config.UserSession) {
+	return &config.UserSession{
 		UserUUID:   nil,
 		ChurchUUID: nil,
 		Role:       "",

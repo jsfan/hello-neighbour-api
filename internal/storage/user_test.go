@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour-api/internal/config"
-	"github.com/jsfan/hello-neighbour-api/internal/storage/dal"
+	"github.com/jsfan/hello-neighbour-api/internal/storage/interfaces"
 	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
 	"github.com/jsfan/hello-neighbour-api/pkg"
 	"reflect"
@@ -32,10 +32,10 @@ func TestStore_GetUserByEmail(t *testing.T) {
 		Active:       true,
 	}
 
-	mDAL := store.DAL.(*dal.MockDAL)
-	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL":          dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
-		"SelectUserByEmail": dal.ResponseSignature{{expectedUser, nil}},
+	mDAL := store.DAL.(*interfaces.MockDAL)
+	mDAL.Responses = interfaces.ResponseMap{
+		"SetupDAL":          interfaces.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
+		"SelectUserByEmail": interfaces.ResponseSignature{{expectedUser, nil}},
 	}
 
 	user, err := store.GetUserByEmail(ctx, "test@example.com")
@@ -104,11 +104,12 @@ func TestStore_RegisterUser(t *testing.T) {
 		Active:       true,
 	}
 
-	mDAL := store.DAL.(*dal.MockDAL)
-	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL":          dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
-		"InsertUser":        dal.ResponseSignature{{nil}},
-		"SelectUserByEmail": dal.ResponseSignature{{expectedUser, nil}},
+	mDAL := store.DAL.(*interfaces.MockDAL)
+	mDAL.Responses = interfaces.ResponseMap{
+		"BeginTransaction": interfaces.ResponseSignature{{nil}},
+		"InsertUser":        interfaces.ResponseSignature{{nil}},
+		"SelectUserByEmail": interfaces.ResponseSignature{{expectedUser, nil}},
+		"CompleteTransaction": interfaces.ResponseSignature{{nil}},
 	}
 
 	user, err := store.RegisterUser(ctx, userIn)
@@ -128,7 +129,7 @@ func TestStore_RegisterUser(t *testing.T) {
 	}
 
 	// first call should be to SetupDal
-	expectedFunction := "SetupDal"
+	expectedFunction := "BeginTransaction"
 	if mDAL.Calls[0].FunctionName != expectedFunction {
 		t.Errorf("Recorded call not as expected. Expected function %s, got %s.", expectedFunction, mDAL.Calls[0].FunctionName)
 	}
@@ -158,10 +159,9 @@ func TestStore_DeleteUser(t *testing.T) {
 	store := ConnectMock(&config.DatabaseConfig{})
 	ctx := context.Background()
 
-	mDAL := store.DAL.(*dal.MockDAL)
-	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL":          dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
-		"DeleteUserByPubId": dal.ResponseSignature{{nil}},
+	mDAL := store.DAL.(*interfaces.MockDAL)
+	mDAL.Responses = interfaces.ResponseMap{
+		"DeleteUserByPubId": interfaces.ResponseSignature{{nil}},
 	}
 
 	userUUID := uuid.New()
@@ -199,10 +199,9 @@ func TestStore_PromoteToLeader(t *testing.T) {
 	store := ConnectMock(&config.DatabaseConfig{})
 	ctx := context.Background()
 
-	mDAL := store.DAL.(*dal.MockDAL)
-	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL":   dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
-		"MakeLeader": dal.ResponseSignature{{nil}},
+	mDAL := store.DAL.(*interfaces.MockDAL)
+	mDAL.Responses = interfaces.ResponseMap{
+		"MakeLeader": interfaces.ResponseSignature{{nil}},
 	}
 
 	userUUID := uuid.New()

@@ -2,12 +2,12 @@ package storage_test
 
 import (
 	"context"
+	"github.com/jsfan/hello-neighbour-api/internal/storage/interfaces"
 	"reflect"
 	"testing"
 
 	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour-api/internal/config"
-	"github.com/jsfan/hello-neighbour-api/internal/storage/dal"
 	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
 	"github.com/jsfan/hello-neighbour-api/pkg"
 )
@@ -45,10 +45,10 @@ func TestStore_AddChurch(t *testing.T) {
 		Active:                false,
 	}
 
-	mDAL := store.DAL.(*dal.MockDAL)
-	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL":     dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
-		"InsertChurch": dal.ResponseSignature{{expectedChurch, nil}},
+	mDAL := store.DAL.(*interfaces.MockDAL)
+	mDAL.Responses = interfaces.ResponseMap{
+		"SetupDAL":     interfaces.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
+		"InsertChurch": interfaces.ResponseSignature{{expectedChurch, nil}},
 	}
 
 	church, err := store.AddChurch(ctx, churchIn)
@@ -95,13 +95,13 @@ func TestStore_ChurchActivation(t *testing.T) {
 	}
 	isActive := true
 
-	mDAL := store.DAL.(*dal.MockDAL)
-	mDAL.Responses = dal.ResponseMap{
-		"SetupDAL":                     dal.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
-		"UpdateChurchActivationStatus": dal.ResponseSignature{{&churchPubId, isActive}},
+	mDAL := store.DAL.(*interfaces.MockDAL)
+	mDAL.Responses = interfaces.ResponseMap{
+		"SetupDAL":                     interfaces.ResponseSignature{{func() error { return nil }, func() error { return nil }, nil}},
+		"UpdateChurchActivationStatus": interfaces.ResponseSignature{{&churchPubId, isActive}},
 	}
 
-	err = store.ChurchActivation(ctx, &churchPubId, isActive)
+	err = store.ActivateChurch(ctx, &churchPubId, isActive)
 	if err != nil {
 		t.Errorf("Got unexpected error: %+v", err)
 	}
