@@ -1,4 +1,5 @@
 package interfaces
+//go:generate go run github.com/vektra/mockery/v2 --name DataInterface --structname Store --case underscore
 
 import (
 	"context"

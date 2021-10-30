@@ -107,6 +107,10 @@ config.yaml
 # Keys
 *.pem
 
+# Generated mocks
+internal/interfaces/mocks/
+internal/storage/interfaces/mocks/
+
 # JetBrains IDEs
 .idea/
 .vscode/settings.json

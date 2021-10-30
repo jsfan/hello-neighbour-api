@@ -1,5 +1,7 @@
 package interfaces
 
+//go:generate go run github.com/vektra/mockery/v2 --name AccessInterface --structname DAL --case underscore
+
 import (
 	"context"
 	"database/sql"
