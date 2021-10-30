@@ -2,21 +2,20 @@ package storage_test
 
 import (
 	"context"
-	"github.com/jsfan/hello-neighbour-api/internal/storage/interfaces"
-	"reflect"
+	"github.com/jsfan/hello-neighbour-api/internal/storage"
+	"github.com/jsfan/hello-neighbour-api/internal/storage/interfaces/mocks"
+	"github.com/magiconair/properties/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/jsfan/hello-neighbour-api/internal/config"
 	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
 	"github.com/jsfan/hello-neighbour-api/pkg"
 )
 
 func TestStore_AddChurch(t *testing.T) {
 	// TODO: Add error cases
-	store := ConnectMock(&config.DatabaseConfig{})
-	ctx := context.Background()
-
 	churchIn := &pkg.ChurchIn{
 		Name:                  "Test Church",
 		Description:           "description",
@@ -45,73 +44,58 @@ func TestStore_AddChurch(t *testing.T) {
 		Active:                false,
 	}
 
-	mDAL := store.DAL.(*interfaces.MockDAL)
-	mDAL.Responses = interfaces.ResponseMap{
-		"InsertChurch": interfaces.ResponseSignature{{expectedChurch, nil}},
+	ctx := context.Background()
+
+	// prepare DAL mock
+	dalMock := &mocks.DAL{}
+	dalMock.
+		On("InsertChurch", ctx, churchIn).
+		Return(expectedChurch, nil).
+		Run(func(args mock.Arguments) {
+			ctxRcv := args.Get(0).(context.Context)
+			churchInRv := args.Get(1).(*pkg.ChurchIn)
+			assert.Equal(t, ctxRcv, ctx)
+			assert.Equal(t, churchInRv, churchIn)
+	})
+
+	store := &storage.Store{
+		DAL: dalMock,
 	}
 
 	church, err := store.AddChurch(ctx, churchIn)
 
-	// no error expected
-	if err != nil {
-		t.Errorf("Got unexpected error: %+v", err)
-	}
+	require.Equal(t, expectedChurch, church)
+	require.Nil(t, err)
 
-	if church != expectedChurch {
-		t.Errorf("Church record differs from expected record. Expected %+v, got %+v", expectedChurch, church)
-	}
-
-	// there should be one call
-	const expectedCalls = 1
-	if len(mDAL.Calls) != expectedCalls {
-		t.Errorf("Unexpected number of calls to DAL. Expected %d, got %d.", expectedCalls, len(mDAL.Calls))
-	}
-
-	// call should be to InsertChurch
-	expectedFunction := "InsertChurch"
-	if mDAL.Calls[0].FunctionName != expectedFunction {
-		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedFunction, mDAL.Calls[1].FunctionName)
-	}
-	if reflect.DeepEqual(mDAL.Calls[0].Args, churchIn) {
-		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", churchIn, mDAL.Calls[1].Args)
-	}
+	dalMock.AssertExpectations(t)
 }
 
-func TestStore_ChurchActivation(t *testing.T) {
+func TestStore_ActivateChurch(t *testing.T) {
 	// TODO: add error cases
-	store := ConnectMock(&config.DatabaseConfig{})
 	ctx := context.Background()
+	churchPubId := uuid.New()
+	const isActiveFlag = true
 
-	churchPubId, err := uuid.Parse("3da2eb8d-d9d1-44bf-bdd4-7fb0a83f2f77")
-	// no error expected
-	if err != nil {
-		t.Errorf("Got unexpected error: %+v", err)
-	}
-	isActive := true
+	// prepare DAL mock
+	dalMock := &mocks.DAL{}
+	dalMock.
+		On("UpdateChurchActivationStatus", ctx, &churchPubId, isActiveFlag).
+		Return(nil).
+		Run(func(args mock.Arguments) {
+			ctxRcv := args.Get(0).(context.Context)
+			churchPubIdRcv := args.Get(1).(*uuid.UUID)
+			isActiveRcv := args.Get(2).(bool)
+			assert.Equal(t, ctxRcv, ctx)
+			assert.Equal(t, *churchPubIdRcv, churchPubId)
+			assert.Equal(t, isActiveRcv, isActiveFlag)
+	})
 
-	mDAL := store.DAL.(*interfaces.MockDAL)
-	mDAL.Responses = interfaces.ResponseMap{
-		"UpdateChurchActivationStatus": interfaces.ResponseSignature{{&churchPubId, isActive}},
-	}
-
-	err = store.ActivateChurch(ctx, &churchPubId, isActive)
-	if err != nil {
-		t.Errorf("Got unexpected error: %+v", err)
-	}
-
-	// there should be one call
-	const expectedCalls = 1
-	if len(mDAL.Calls) != expectedCalls {
-		t.Errorf("Unexpected number of calls to DAL. Expected %d, got %d.", expectedCalls, len(mDAL.Calls))
+	store := &storage.Store{
+		DAL: dalMock,
 	}
 
-	// call should be to UpdateChurchActivationStatus
-	expectedFunction := "UpdateChurchActivationStatus"
-	expectedParams := []interface{}{&churchPubId, isActive}
-	if mDAL.Calls[0].FunctionName != expectedFunction {
-		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedFunction, mDAL.Calls[1].FunctionName)
-	}
-	if reflect.DeepEqual(mDAL.Calls[0], expectedParams) {
-		t.Errorf("Recorded call not as expected. Expected function %+v, got %+v.", expectedParams, mDAL.Calls[1].Args)
-	}
+	err := store.ActivateChurch(ctx, &churchPubId, true)
+
+	require.Nil(t, err)
+	dalMock.AssertExpectations(t)
 }
