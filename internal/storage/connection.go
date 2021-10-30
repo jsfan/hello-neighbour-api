@@ -28,4 +28,3 @@ func (store *Store) Clone() storeInterface.DataInterface {
 	}
 	return &Store{DAL: newDAL}
 }
-

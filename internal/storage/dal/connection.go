@@ -7,12 +7,10 @@ import (
 	"github.com/jsfan/hello-neighbour-api/internal/storage/interfaces"
 )
 
-
 type DAL struct {
-	Db  *sql.DB
-	tx  *sql.Tx
+	Db *sql.DB
+	tx *sql.Tx
 }
-
 
 func Connect(dbConfig *config.DatabaseConfig) (connection interfaces.AccessInterface, errVal error) {
 	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s", dbConfig.Host, dbConfig.Port, dbConfig.User, dbConfig.Password, dbConfig.DbName)
@@ -28,8 +26,8 @@ func Connect(dbConfig *config.DatabaseConfig) (connection interfaces.AccessInter
 
 func (dalInstance *DAL) Clone() interfaces.AccessInterface {
 	return &DAL{
-		Db:  dalInstance.Db,
-		tx:  nil,
+		Db: dalInstance.Db,
+		tx: nil,
 	}
 }
 

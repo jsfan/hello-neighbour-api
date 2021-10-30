@@ -19,7 +19,7 @@ type ResponseMap map[string]ResponseSignature
 type MockDAL struct {
 	Calls     []*CallSignature
 	Responses ResponseMap
-	txOn bool
+	txOn      bool
 }
 
 func addCall(mDAL *MockDAL, functionName string, args ...interface{}) {

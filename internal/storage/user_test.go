@@ -100,9 +100,9 @@ func TestStore_RegisterUser(t *testing.T) {
 
 	mDAL := store.DAL.(*interfaces.MockDAL)
 	mDAL.Responses = interfaces.ResponseMap{
-		"BeginTransaction": interfaces.ResponseSignature{{nil}},
-		"InsertUser":        interfaces.ResponseSignature{{nil}},
-		"SelectUserByEmail": interfaces.ResponseSignature{{expectedUser, nil}},
+		"BeginTransaction":    interfaces.ResponseSignature{{nil}},
+		"InsertUser":          interfaces.ResponseSignature{{nil}},
+		"SelectUserByEmail":   interfaces.ResponseSignature{{expectedUser, nil}},
 		"CompleteTransaction": interfaces.ResponseSignature{{nil}},
 	}
 

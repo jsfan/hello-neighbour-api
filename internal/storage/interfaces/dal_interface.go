@@ -31,7 +31,7 @@ type AccessInterface interface {
 	InsertUser(ctx context.Context, userIn *pkg.UserIn) error
 	MakeLeader(ctx context.Context, churchPubId *uuid.UUID, userPubId *uuid.UUID) error
 	Migrate(dbName *string) (errVal error)
-	SelectChurchByEmail(tx context.Context,email string) (church *models.ChurchProfile, errVal error)
-	SelectUserByEmail(tx context.Context,email string) (user *models.UserProfile, errVal error)
+	SelectChurchByEmail(tx context.Context, email string) (church *models.ChurchProfile, errVal error)
+	SelectUserByEmail(tx context.Context, email string) (user *models.UserProfile, errVal error)
 	UpdateChurchActivationStatus(tx context.Context, churchPubId *uuid.UUID, isActive bool) error
 }

@@ -7,4 +7,3 @@ type UserSession struct {
 	ChurchUUID *uuid.UUID `json:"churchUuid"`
 	Role       string     `json:"role"`
 }
-
