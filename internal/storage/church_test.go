@@ -56,7 +56,7 @@ func TestStore_AddChurch(t *testing.T) {
 			churchInRv := args.Get(1).(*pkg.ChurchIn)
 			assert.Equal(t, ctxRcv, ctx)
 			assert.Equal(t, churchInRv, churchIn)
-	})
+		})
 
 	store := &storage.Store{
 		DAL: dalMock,
@@ -88,7 +88,7 @@ func TestStore_ActivateChurch(t *testing.T) {
 			assert.Equal(t, ctxRcv, ctx)
 			assert.Equal(t, *churchPubIdRcv, churchPubId)
 			assert.Equal(t, isActiveRcv, isActiveFlag)
-	})
+		})
 
 	store := &storage.Store{
 		DAL: dalMock,

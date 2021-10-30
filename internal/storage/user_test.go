@@ -44,7 +44,7 @@ func TestStore_GetUserByEmail(t *testing.T) {
 			emailRcv := args.Get(1).(string)
 			assert.Equal(t, ctxRcv, ctx)
 			assert.Equal(t, emailRcv, expectedUser.Email)
-	})
+		})
 
 	store := &storage.Store{
 		DAL: dalMock,
@@ -104,7 +104,7 @@ func TestStore_RegisterUser(t *testing.T) {
 			userRcv := args.Get(1).(*pkg.UserIn)
 			assert.Equal(t, ctxRcv, ctx)
 			assert.Equal(t, userRcv, userIn)
-	})
+		})
 	dalMock.
 		On("SelectUserByEmail", ctx, expectedUser.Email).
 		Return(expectedUser, nil).
@@ -113,7 +113,7 @@ func TestStore_RegisterUser(t *testing.T) {
 			emailRcv := args.Get(1).(string)
 			assert.Equal(t, ctxRcv, ctx)
 			assert.Equal(t, emailRcv, expectedUser.Email)
-	})
+		})
 	dalMock.
 		On("CompleteTransaction").
 		Return(nil)
