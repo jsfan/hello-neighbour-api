@@ -9,14 +9,18 @@ func (dalInstance *DAL) BeginTransaction() error {
 	if dalInstance.tx != nil {
 		return errors.New("already in transaction")
 	}
-	return nil
+	var err error
+	dalInstance.tx, err = dalInstance.Db.Begin()
+	return err
 }
 
 func (dalInstance *DAL) CancelTransaction() error {
 	if dalInstance.tx == nil {
 		return errors.New("not in transaction")
 	}
-	return dalInstance.tx.Rollback()
+	err := dalInstance.tx.Rollback()
+	dalInstance.tx = nil
+	return err
 }
 
 func (dalInstance *DAL) CompleteTransaction() error {
@@ -33,5 +37,6 @@ func (dalInstance *DAL) CompleteTransaction() error {
 		}
 		return err
 	}
+	dalInstance.tx = nil
 	return nil
 }

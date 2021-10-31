@@ -24,6 +24,7 @@ func (store *Store) RegisterUser(ctx context.Context, userIn *pkg.UserIn) (user 
 	defer func() {
 		if errVal != nil {
 			store.DAL.CancelTransaction()
+			return
 		}
 		errVal = store.DAL.CompleteTransaction()
 	}()
