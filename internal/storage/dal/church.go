@@ -37,6 +37,20 @@ func (dalInstance *DAL) InsertChurch(ctx context.Context, churchIn *pkg.ChurchIn
 			churchIn.MemberBasicInfoUpdate,
 			false,
 		).
+		Suffix(`RETURNING
+			pub_id,
+			name,
+			description,
+			address,
+			website,
+			email,
+			phone,
+			group_size,
+			same_gender,
+			min_age,
+			member_basic_info_update,
+			active
+		`).
 		PlaceholderFormat(sq.Dollar).
 		RunWith(dalInstance.db()).
 		QueryRowContext(ctx).
