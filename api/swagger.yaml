@@ -5,7 +5,7 @@ info:
     COVID-19 Global Church Hack
   license:
     name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
   version: 0.0.3
 servers:
   - url: https://api.hello-neighbour.org/v0
@@ -83,7 +83,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       x-codegen-request-body-name: body
-  /church/{churchUuid}:
+  /church/{churchUUID}:
     get:
       tags:
         - leader
@@ -91,14 +91,14 @@ paths:
       description: Retrieve church details.
       operationId: getChurch
       parameters:
-        - name: churchUuid
+        - name: churchUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: ChurchUuid
-          x-exportParamName: ChurchUuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
       responses:
         200:
           description: Church details
@@ -139,14 +139,14 @@ paths:
       description: Update church details.
       operationId: editChurch
       parameters:
-        - name: churchUuid
+        - name: churchUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: ChurchUuid
-          x-exportParamName: ChurchUuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
       requestBody:
         description: New church details
         content:
@@ -191,14 +191,14 @@ paths:
       description: Delete a church from the system, disassociating member accounts.
       operationId: deleteChurch
       parameters:
-        - name: churchUuid
+        - name: churchUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: ChurchUuid
-          x-exportParamName: ChurchUuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
       responses:
         204:
           description: Church deleted
@@ -229,7 +229,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /church/{churchUuid}/activate:
+  /church/{churchUUID}/activate:
     patch:
       tags:
         - administrator
@@ -238,14 +238,14 @@ paths:
         request.
       operationId: updateChurchActivate
       parameters:
-        - name: churchUuid
+        - name: churchUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: ChurchUuid
-          x-exportParamName: ChurchUuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
       requestBody:
         description: Active flag - T/F
         content:
@@ -290,7 +290,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       x-codegen-request-body-name: isActive
-  /church/{churchUuid}/invite:
+  /church/{churchUUID}/invite:
     post:
       tags:
         - leader
@@ -298,14 +298,14 @@ paths:
       description: Send an email invite to add new church members
       operationId: sendInvite
       parameters:
-        - name: churchUuid
+        - name: churchUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: ChurchUuid
-          x-exportParamName: ChurchUuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
       requestBody:
         content:
           application/json:
@@ -351,7 +351,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       x-codegen-request-body-name: email
-  /church/{churchUuid}/user:
+  /church/{churchUUID}/user:
     get:
       tags:
         - leader
@@ -359,14 +359,14 @@ paths:
       description: Retrieve all members associated with a specific church.
       operationId: getChurchMembers
       parameters:
-        - name: churchUuid
+        - name: churchUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: ChurchUuid
-          x-exportParamName: ChurchUuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
       responses:
         200:
           description: Member list
@@ -402,7 +402,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /church/{churchUuid}/user/{userUuid}:
+  /church/{churchUUID}/user/{userUUID}:
     delete:
       tags:
         - leader
@@ -411,22 +411,22 @@ paths:
         exist.
       operationId: deleteChurchMember
       parameters:
-        - name: churchUuid
+        - name: churchUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: ChurchUuid
-          x-exportParamName: ChurchUuid
-        - name: userUuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
+        - name: userUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: UserUuid
-          x-exportParamName: UserUuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
       responses:
         204:
           description: Church member removed
@@ -457,7 +457,7 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /church/{churchUuid}/question:
+  /church/{churchUUID}/question:
     get:
       tags:
         - leader
@@ -465,14 +465,14 @@ paths:
       description: Retrieve questions of a specific church.
       operationId: getChurchQuestions
       parameters:
-        - name: churchUuid
+        - name: churchUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: ChurchUuid
-          x-exportParamName: ChurchUuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
       responses:
         200:
           description: Question list
@@ -515,14 +515,14 @@ paths:
       description: Add a question to the system.
       operationId: addQuestion
       parameters:
-        - name: churchUuid
+        - name: churchUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: ChurchUuid
-          x-exportParamName: ChurchUuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
       requestBody:
         description: Question for the church
         content:
@@ -570,7 +570,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       x-codegen-request-body-name: body
-  /church/{churchUuid}/matchgroup:
+  /church/{churchUUID}/matchgroup:
     get:
       tags:
         - leader
@@ -578,14 +578,14 @@ paths:
       description: Retrieve all current match groups for a specific church.
       operationId: getMatchGroups
       parameters:
-        - name: churchUuid
+        - name: churchUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: ChurchUuid
-          x-exportParamName: ChurchUuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
       responses:
         200:
           description: Match group list
@@ -688,7 +688,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       x-codegen-request-body-name: body
-  /user/{userUuid}:
+  /user/{userUUID}:
     get:
       tags:
         - member
@@ -696,14 +696,14 @@ paths:
       description: Retrieve all user information.
       operationId: getUser
       parameters:
-        - name: userUuid
+        - name: userUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: UserUuid
-          x-exportParamName: UserUuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
       responses:
         200:
           description: User details
@@ -744,14 +744,14 @@ paths:
       description: Update user information.
       operationId: editUser
       parameters:
-        - name: userUuid
+        - name: userUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: UserUuid
-          x-exportParamName: UserUuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
       requestBody:
         description: User details
         content:
@@ -806,14 +806,14 @@ paths:
       description: Delete user.
       operationId: deleteUser
       parameters:
-        - name: userUuid
+        - name: userUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: UserUuid
-          x-exportParamName: UserUuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
       responses:
         204:
           description: User deleted
@@ -844,7 +844,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /user/{userUuid}/matchGroup:
+  /user/{userUUID}/matchGroup:
     get:
       tags:
         - member
@@ -852,14 +852,14 @@ paths:
       description: Retrieve current match group for a user.
       operationId: getMatchGroup
       parameters:
-        - name: userUuid
+        - name: userUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: UserUuid
-          x-exportParamName: UserUuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
       responses:
         200:
           description: Match group
@@ -899,7 +899,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /user/{userUuid}/matchgroup/{groupUuid}/bulletin:
+  /user/{userUUID}/matchgroup/{groupUUID}/bulletin:
     get:
       tags:
         - member
@@ -907,22 +907,22 @@ paths:
       description: Retrieve messages posted on a group's bulletin.
       operationId: getMessages
       parameters:
-        - name: userUuid
+        - name: userUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: UserUuid
-          x-exportParamName: UserUuid
-        - name: groupUuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
+        - name: groupUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: GroupUuid
-          x-exportParamName: GroupUuid
+            x-exportParamName: GroupUUID
+          x-exportParamName: GroupUUID
       responses:
         200:
           description: Messages on a group's bulletin.
@@ -965,22 +965,22 @@ paths:
       description: Post a message to the group's bulletin.
       operationId: sendMessage
       parameters:
-        - name: userUuid
+        - name: userUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: UserUuid
-          x-exportParamName: UserUuid
-        - name: groupUuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
+        - name: groupUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: GroupUuid
-          x-exportParamName: GroupUuid
+            x-exportParamName: GroupUUID
+          x-exportParamName: GroupUUID
       requestBody:
         description: Message to send to group
         content:
@@ -1028,7 +1028,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       x-codegen-request-body-name: body
-  /user/{userUuid}/contactmethod:
+  /user/{userUUID}/contactmethod:
     post:
       tags:
         - member
@@ -1036,14 +1036,14 @@ paths:
       description: Add a new contact method to an existing user profile.
       operationId: addContactMethod
       parameters:
-        - name: userUuid
+        - name: userUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: UserUuid
-          x-exportParamName: UserUuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
       requestBody:
         description: Details of new contact method
         content:
@@ -1085,7 +1085,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       x-codegen-request-body-name: body
-  /user/{userUuid}/contactmethod/{methodUuid}:
+  /user/{userUUID}/contactmethod/{methodUUID}:
     put:
       tags:
         - member
@@ -1093,23 +1093,23 @@ paths:
       description: Update a contact method for a user profile.
       operationId: updateContactMethod
       parameters:
-        - name: userUuid
+        - name: userUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: UserUuid
-          x-exportParamName: UserUuid
-        - name: methodUuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
+        - name: methodUUID
           in: path
           description: Contact method's UUID
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: MethodUuid
-          x-exportParamName: MethodUuid
+            x-exportParamName: MethodUUID
+          x-exportParamName: MethodUUID
       requestBody:
         description: New details of contact method
         content:
@@ -1164,23 +1164,23 @@ paths:
       description: Delete a contact method from a user profile.
       operationId: deleteContactMethod
       parameters:
-        - name: userUuid
+        - name: userUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: UserUuid
-          x-exportParamName: UserUuid
-        - name: methodUuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
+        - name: methodUUID
           in: path
           description: Contact method's UUID
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: MethodUuid
-          x-exportParamName: MethodUuid
+            x-exportParamName: MethodUUID
+          x-exportParamName: MethodUUID
       responses:
         204:
           description: Contact method deleted
@@ -1257,7 +1257,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /question/{questionUuid}:
+  /question/{questionUUID}:
     get:
       tags:
         - leader
@@ -1265,14 +1265,14 @@ paths:
       description: Retrieve a question by UUID (restricted to logged in user's church).
       operationId: getQuestion
       parameters:
-        - name: questionUuid
+        - name: questionUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: QuestionUuid
-          x-exportParamName: QuestionUuid
+            x-exportParamName: QuestionUUID
+          x-exportParamName: QuestionUUID
       responses:
         200:
           description: Church question
@@ -1313,14 +1313,14 @@ paths:
       description: Update a question that's already in the system.
       operationId: modifyQuestion
       parameters:
-        - name: questionUuid
+        - name: questionUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: QuestionUuid
-          x-exportParamName: QuestionUuid
+            x-exportParamName: QuestionUUID
+          x-exportParamName: QuestionUUID
       requestBody:
         description: Question for the church
         content:
@@ -1375,14 +1375,14 @@ paths:
       description: Delete a question from the system.
       operationId: deleteQuestion
       parameters:
-        - name: questionUuid
+        - name: questionUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: QuestionUuid
-          x-exportParamName: QuestionUuid
+            x-exportParamName: QuestionUUID
+          x-exportParamName: QuestionUUID
       responses:
         204:
           description: Question deleted
@@ -1413,7 +1413,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /register/{userUuid}:
+  /register/{userUUID}:
     patch:
       tags:
         - member
@@ -1421,14 +1421,14 @@ paths:
       description: Accept member invite and fill in remainder of user details.
       operationId: acceptInvite
       parameters:
-        - name: userUuid
+        - name: userUUID
           in: path
           required: true
           schema:
             type: string
             format: uuid
-            x-exportParamName: UserUuid
-          x-exportParamName: UserUuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
       requestBody:
         description: User details for new member account
         content:
