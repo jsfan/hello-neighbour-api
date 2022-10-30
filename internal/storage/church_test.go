@@ -2,17 +2,16 @@ package storage_test
 
 import (
 	"context"
-	"github.com/jsfan/hello-neighbour-api/internal/storage"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour-api/internal/rest/model"
+	"github.com/jsfan/hello-neighbour-api/internal/storage"
 	"github.com/jsfan/hello-neighbour-api/internal/storage/interfaces/mocks"
+	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
 	"github.com/magiconair/properties/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-
-	"github.com/google/uuid"
-	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
 )
 
 func TestStore_AddChurch(t *testing.T) {
