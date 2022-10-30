@@ -1,1567 +1,1852 @@
----
-swagger: "2.0"
+openapi: 3.0.1
 info:
-  description: "This is the API for the 'Hello Neighbour' project inspired from the\
-    \ COVID-19 Global Church Hack"
-  version: "0.0.2"
-  title: "Hello Neighbour"
+  title: Hello Neighbour
+  description: This is the API for the 'Hello Neighbour' project inspired from the
+    COVID-19 Global Church Hack
   license:
-    name: "Apache 2.0"
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "api.hello-neighbour.org"
-basePath: "/v0"
-tags:
-- name: "administrator"
-  description: "Actions only a system administrator can take"
-- name: "leader"
-  description: "Everything that relates to church leaders interacting with the system"
-- name: "member"
-  description: "Everything relating to church members interacting with the system"
-schemes:
-- "https"
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.0.3
+servers:
+  - url: https://api.hello-neighbour.org/v0
 security:
-- jwtAuth: []
+  - jwtAuth: []
+tags:
+  - name: administrator
+    description: Actions only a system administrator can take
+  - name: leader
+    description: Everything that relates to church leaders interacting with the system
+  - name: member
+    description: Everything relating to church members interacting with the system
 paths:
   /church:
     get:
       tags:
-      - "member"
-      summary: "Retrieve all signed up churches"
-      description: "Retrieve church details."
-      operationId: "getChurches"
-      parameters: []
+        - member
+      summary: Retrieve all signed up churches
+      description: Retrieve church details.
+      operationId: getChurches
       responses:
-        "200":
-          description: "Church details"
-          schema:
-            $ref: "#/definitions/ChurchPublic"
-        "401":
-          description: "JWT is missing or invalid"
+        200:
+          description: Church details
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ChurchPublic'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Church not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+              schema:
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Church not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       tags:
-      - "member"
-      summary: "Request new church"
-      description: "Request for adding new church to the system to invite members\
-        \ to"
-      operationId: "addChurch"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Church details for new account"
+        - member
+      summary: Request new church
+      description: Request for adding new church to the system to invite members to
+      operationId: addChurch
+      requestBody:
+        description: Church details for new account
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChurchIn'
         required: true
-        schema:
-          $ref: "#/definitions/ChurchIn"
-        x-exportParamName: "Body"
       responses:
-        "204":
-          description: "Church request sent"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "401":
-          description: "JWT is missing or invalid"
+        204:
+          description: Church request sent
+          content: {}
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /church/{churchUuid}:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-codegen-request-body-name: body
+  /church/{churchUUID}:
     get:
       tags:
-      - "leader"
-      summary: "Retrieve details of a specific church"
-      description: "Retrieve church details."
-      operationId: "getChurch"
-      produces:
-      - "application/json"
+        - leader
+      summary: Retrieve details of a specific church
+      description: Retrieve church details.
+      operationId: getChurch
       parameters:
-      - name: "churchUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "ChurchUuid"
+        - name: churchUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
       responses:
-        "200":
-          description: "Church details"
-          schema:
-            $ref: "#/definitions/Church"
-        "401":
-          description: "JWT is missing or invalid"
+        200:
+          description: Church details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Church'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Church not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Church not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     put:
       tags:
-      - "leader"
-      summary: "Update church details"
-      description: "Update church details."
-      operationId: "editChurch"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+        - leader
+      summary: Update church details
+      description: Update church details.
+      operationId: editChurch
       parameters:
-      - name: "churchUuid"
-        in: "path"
+        - name: churchUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
+      requestBody:
+        description: New church details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChurchIn'
         required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "ChurchUuid"
-      - in: "body"
-        name: "body"
-        description: "New church details"
-        required: true
-        schema:
-          $ref: "#/definitions/ChurchIn"
-        x-exportParamName: "Body"
       responses:
-        "200":
-          description: "Church profile modified"
-          schema:
-            $ref: "#/definitions/ChurchIn"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "401":
-          description: "JWT is missing or invalid"
+        200:
+          description: Church profile modified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChurchIn'
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Church not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Church not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-codegen-request-body-name: body
     delete:
       tags:
-      - "leader"
-      summary: "Delete church"
-      description: "Delete a church from the system, disassociating member accounts."
-      operationId: "deleteChurch"
-      produces:
-      - "application/json"
+        - leader
+      summary: Delete church
+      description: Delete a church from the system, disassociating member accounts.
+      operationId: deleteChurch
       parameters:
-      - name: "churchUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "ChurchUuid"
+        - name: churchUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
       responses:
-        "204":
-          description: "Church deleted"
-        "401":
-          description: "JWT is missing or invalid"
+        204:
+          description: Church deleted
+          content: {}
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Church not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /church/{churchUuid}/activate:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Church not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /church/{churchUUID}/activate:
     patch:
       tags:
-      - "administrator"
-      summary: "Activate or deactivate church"
-      description: "Activate or deactivate a church, such as for accepting a new church\
-        \ request."
-      operationId: "updateChurchActivate"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+        - administrator
+      summary: Activate or deactivate church
+      description: Activate or deactivate a church, such as for accepting a new church
+        request.
+      operationId: updateChurchActivate
       parameters:
-      - name: "churchUuid"
-        in: "path"
+        - name: churchUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
+      requestBody:
+        description: Active flag - T/F
+        content:
+          application/json:
+            schema:
+              type: boolean
         required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "ChurchUuid"
-      - in: "body"
-        name: "isActive"
-        description: "Active flag - T/F"
-        required: true
-        schema:
-          type: "boolean"
-        x-exportParamName: "IsActive"
       responses:
-        "204":
-          description: "Activation status changed"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "401":
-          description: "JWT is missing or invalid"
+        204:
+          description: Activation status changed
+          content: {}
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Church not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /church/{churchUuid}/invite:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Church not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-codegen-request-body-name: isActive
+  /church/{churchUUID}/invite:
     post:
       tags:
-      - "leader"
-      summary: "Send invite"
-      description: "Send an email invite to add new church members"
-      operationId: "sendInvite"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+        - leader
+      summary: Send invite
+      description: Send an email invite to add new church members
+      operationId: sendInvite
       parameters:
-      - name: "churchUuid"
-        in: "path"
+        - name: churchUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/MemberInvite'
         required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "ChurchUuid"
-      - in: "body"
-        name: "email"
-        required: true
-        schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/MemberInvite"
-        x-exportParamName: "Email"
       responses:
-        "204":
-          description: "Invites sent"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "401":
-          description: "JWT is missing or invalid"
+        204:
+          description: Invites sent
+          content: {}
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Church not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /church/{churchUuid}/user:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Church not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-codegen-request-body-name: email
+  /church/{churchUUID}/user:
     get:
       tags:
-      - "leader"
-      summary: "Retrieve church members"
-      description: "Retrieve all members associated with a specific church."
-      operationId: "getChurchMembers"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+        - leader
+      summary: Retrieve church members
+      description: Retrieve all members associated with a specific church.
+      operationId: getChurchMembers
       parameters:
-      - name: "churchUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "ChurchUuid"
+        - name: churchUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
       responses:
-        "200":
-          description: "Member list"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/UserPublic"
-        "401":
-          description: "JWT is missing or invalid"
+        200:
+          description: Member list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserPublic'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Church not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /church/{churchUuid}/user/{userUuid}:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Church not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /church/{churchUUID}/user/{userUUID}:
     delete:
       tags:
-      - "leader"
-      summary: "Remove member from church"
-      description: "Disassociates member from church system. User account will still\
-        \ exist."
-      operationId: "deleteChurchMember"
+        - leader
+      summary: Remove member from church
+      description: Disassociates member from church system. User account will still
+        exist.
+      operationId: deleteChurchMember
       parameters:
-      - name: "churchUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "ChurchUuid"
-      - name: "userUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "UserUuid"
+        - name: churchUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
+        - name: userUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
       responses:
-        "204":
-          description: "Church member removed"
-        "401":
-          description: "JWT is missing or invalid"
+        204:
+          description: Church member removed
+          content: {}
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Church/user not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /church/{churchUuid}/question:
+              schema:
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Church/user not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /church/{churchUUID}/question:
     get:
       tags:
-      - "leader"
-      summary: "Retrieve list of all questions"
-      description: "Retrieve questions of a specific church."
-      operationId: "getChurchQuestions"
-      produces:
-      - "application/json"
+        - leader
+      summary: Retrieve list of all questions
+      description: Retrieve questions of a specific church.
+      operationId: getChurchQuestions
       parameters:
-      - name: "churchUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "ChurchUuid"
+        - name: churchUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
       responses:
-        "200":
-          description: "Question list"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Question"
-        "401":
-          description: "JWT is missing or invalid"
+        200:
+          description: Question list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Question'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Church not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Church not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       tags:
-      - "leader"
-      summary: "Add question"
-      description: "Add a question to the system."
-      operationId: "addQuestion"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+        - leader
+      summary: Add question
+      description: Add a question to the system.
+      operationId: addQuestion
       parameters:
-      - name: "churchUuid"
-        in: "path"
+        - name: churchUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
+      requestBody:
+        description: Question for the church
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionIn'
         required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "ChurchUuid"
-      - in: "body"
-        name: "body"
-        description: "Question for the church"
-        required: true
-        schema:
-          $ref: "#/definitions/QuestionIn"
-        x-exportParamName: "Body"
       responses:
-        "201":
-          description: "Question added"
-          schema:
-            $ref: "#/definitions/Question"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "401":
-          description: "JWT is missing or invalid"
+        201:
+          description: Question added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Church not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /church/{churchUuid}/matchgroup:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Church not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-codegen-request-body-name: body
+  /church/{churchUUID}/matchgroup:
     get:
       tags:
-      - "leader"
-      summary: "Retrieve list of current match groups"
-      description: "Retrieve all current match groups for a specific church."
-      operationId: "getMatchGroups"
-      produces:
-      - "application/json"
+        - leader
+      summary: Retrieve list of current match groups
+      description: Retrieve all current match groups for a specific church.
+      operationId: getMatchGroups
       parameters:
-      - name: "churchUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "ChurchUuid"
+        - name: churchUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: ChurchUUID
+          x-exportParamName: ChurchUUID
       responses:
-        "200":
-          description: "Match group list"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Group"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "401":
-          description: "JWT is missing or invalid"
+        200:
+          description: Match group list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Church not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Church not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /user:
     get:
       tags:
-      - "administrator"
-      summary: "Retrieve all users"
-      description: "Retrieve all users in the system."
-      operationId: "getUsers"
-      parameters: []
+        - administrator
+      summary: Retrieve all users
+      description: Retrieve all users in the system.
+      operationId: getUsers
       responses:
-        "200":
-          description: "User list"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/User"
-        "401":
-          description: "JWT is missing or invalid"
+        200:
+          description: User list
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+              schema:
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
-      summary: "Create new user"
-      description: "Add a new user to the system."
-      operationId: "addUser"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "User details"
+      summary: Create new user
+      description: Add a new user to the system.
+      operationId: addUser
+      requestBody:
+        description: User details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserIn'
         required: true
-        schema:
-          $ref: "#/definitions/UserIn"
-        x-exportParamName: "Body"
       responses:
-        "201":
-          description: "User created"
-          schema:
-            $ref: "#/definitions/User"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-      security: []
-  /user/{userUuid}:
+        201:
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-codegen-request-body-name: body
+  /user/{userUUID}:
     get:
       tags:
-      - "member"
-      summary: "Retrieve user details"
-      description: "Retrieve all user information."
-      operationId: "getUser"
+        - member
+      summary: Retrieve user details
+      description: Retrieve all user information.
+      operationId: getUser
       parameters:
-      - name: "userUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "UserUuid"
+        - name: userUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
       responses:
-        "200":
-          description: "User details"
-          schema:
-            $ref: "#/definitions/User"
-        "401":
-          description: "JWT is missing or invalid"
+        200:
+          description: User details
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/User'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "User not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+              schema:
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: User not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     put:
       tags:
-      - "member"
-      summary: "Update user"
-      description: "Update user information."
-      operationId: "editUser"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+        - member
+      summary: Update user
+      description: Update user information.
+      operationId: editUser
       parameters:
-      - name: "userUuid"
-        in: "path"
+        - name: userUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
+      requestBody:
+        description: User details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserIn'
         required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "UserUuid"
-      - in: "body"
-        name: "body"
-        description: "User details"
-        required: true
-        schema:
-          $ref: "#/definitions/UserIn"
-        x-exportParamName: "Body"
       responses:
-        "200":
-          description: "User account updated"
-          schema:
-            $ref: "#/definitions/User"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "401":
-          description: "JWT is missing or invalid"
+        200:
+          description: User account updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "User not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-codegen-request-body-name: body
     delete:
       tags:
-      - "member"
-      summary: "Delete user"
-      description: "Delete user."
-      operationId: "deleteUser"
-      produces:
-      - "application/json"
+        - member
+      summary: Delete user
+      description: Delete user.
+      operationId: deleteUser
       parameters:
-      - name: "userUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "UserUuid"
+        - name: userUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
       responses:
-        "204":
-          description: "User deleted"
-        "401":
-          description: "JWT is missing or invalid"
+        204:
+          description: User deleted
+          content: {}
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "User not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /user/{userUuid}/matchGroup:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /user/{userUUID}/matchGroup:
     get:
       tags:
-      - "member"
-      summary: "Retrieve current match group"
-      description: "Retrieve current match group for a user."
-      operationId: "getMatchGroup"
-      produces:
-      - "application/json"
+        - member
+      summary: Retrieve current match group
+      description: Retrieve current match group for a user.
+      operationId: getMatchGroup
       parameters:
-      - name: "userUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "UserUuid"
+        - name: userUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
       responses:
-        "200":
-          description: "Match group"
-          schema:
-            $ref: "#/definitions/Group"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "401":
-          description: "JWT is missing or invalid"
+        200:
+          description: Match group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "User not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /user/{userUuid}/matchgroup/{groupUuid}/bulletin:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /user/{userUUID}/matchgroup/{groupUUID}/bulletin:
     get:
       tags:
-      - "member"
-      summary: "Retrieve all messages"
-      description: "Retrieve messages posted on a group's bulletin."
-      operationId: "getMessages"
+        - member
+      summary: Retrieve all messages
+      description: Retrieve messages posted on a group's bulletin.
+      operationId: getMessages
       parameters:
-      - name: "userUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "UserUuid"
-      - name: "groupUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "GroupUuid"
+        - name: userUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
+        - name: groupUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: GroupUUID
+          x-exportParamName: GroupUUID
       responses:
-        "200":
-          description: "Messages on a group's bulletin."
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Message"
-        "401":
-          description: "JWT is missing or invalid"
+        200:
+          description: Messages on a group's bulletin.
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Church/group not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+              schema:
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Church/group not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     post:
       tags:
-      - "member"
-      summary: "Send message"
-      description: "Post a message to the group's bulletin."
-      operationId: "sendMessage"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+        - member
+      summary: Send message
+      description: Post a message to the group's bulletin.
+      operationId: sendMessage
       parameters:
-      - name: "userUuid"
-        in: "path"
+        - name: userUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
+        - name: groupUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: GroupUUID
+          x-exportParamName: GroupUUID
+      requestBody:
+        description: Message to send to group
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageIn'
         required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "UserUuid"
-      - name: "groupUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "GroupUuid"
-      - in: "body"
-        name: "body"
-        description: "Message to send to group"
-        required: true
-        schema:
-          $ref: "#/definitions/MessageIn"
-        x-exportParamName: "Body"
       responses:
-        "201":
-          description: "Message sent"
-          schema:
-            $ref: "#/definitions/MessageIn"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "401":
-          description: "JWT is missing or invalid"
+        201:
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageIn'
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Church/group not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /user/{userUuid}/contactmethod:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Church/group not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-codegen-request-body-name: body
+  /user/{userUUID}/contactmethod:
     post:
       tags:
-      - "member"
-      summary: "Add a contact method to a user profile"
-      description: "Add a new contact method to an existing user profile."
-      operationId: "addContactMethod"
-      produces:
-      - "application/json"
+        - member
+      summary: Add a contact method to a user profile
+      description: Add a new contact method to an existing user profile.
+      operationId: addContactMethod
       parameters:
-      - name: "userUuid"
-        in: "path"
+        - name: userUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
+      requestBody:
+        description: Details of new contact method
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/ContactMethodIn'
         required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "UserUuid"
-      - in: "body"
-        name: "body"
-        description: "Details of new contact method"
-        required: true
-        schema:
-          $ref: "#/definitions/ContactMethodIn"
-        x-exportParamName: "Body"
       responses:
-        "201":
-          description: "Contact method created"
-          schema:
-            $ref: "#/definitions/ContactMethod"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "401":
-          description: "JWT is missing or invalid"
+        201:
+          description: Contact method created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactMethod'
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /user/{userUuid}/contactmethod/{methodUuid}:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-codegen-request-body-name: body
+  /user/{userUUID}/contactmethod/{methodUUID}:
     put:
       tags:
-      - "member"
-      summary: "Update a contact method for a user"
-      description: "Update a contact method for a user profile."
-      operationId: "updateContactMethod"
-      produces:
-      - "application/json"
+        - member
+      summary: Update a contact method for a user
+      description: Update a contact method for a user profile.
+      operationId: updateContactMethod
       parameters:
-      - name: "userUuid"
-        in: "path"
+        - name: userUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
+        - name: methodUUID
+          in: path
+          description: Contact method's UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: MethodUUID
+          x-exportParamName: MethodUUID
+      requestBody:
+        description: New details of contact method
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/ContactMethodIn'
         required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "UserUuid"
-      - name: "methodUuid"
-        in: "path"
-        description: "Contact method's UUID"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "MethodUuid"
-      - in: "body"
-        name: "body"
-        description: "New details of contact method"
-        required: true
-        schema:
-          $ref: "#/definitions/ContactMethodIn"
-        x-exportParamName: "Body"
       responses:
-        "200":
-          description: "Contact method updated"
-          schema:
-            $ref: "#/definitions/ContactMethod"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "401":
-          description: "JWT is missing or invalid"
+        200:
+          description: Contact method updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactMethod'
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Contact method or user not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Contact method or user not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-codegen-request-body-name: body
     delete:
       tags:
-      - "member"
-      summary: "Delete a contact method from a user profile"
-      description: "Delete a contact method from a user profile."
-      operationId: "deleteContactMethod"
-      produces:
-      - "application/json"
+        - member
+      summary: Delete a contact method from a user profile
+      description: Delete a contact method from a user profile.
+      operationId: deleteContactMethod
       parameters:
-      - name: "userUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "UserUuid"
-      - name: "methodUuid"
-        in: "path"
-        description: "Contact method's UUID"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "MethodUuid"
+        - name: userUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
+        - name: methodUUID
+          in: path
+          description: Contact method's UUID
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: MethodUUID
+          x-exportParamName: MethodUUID
       responses:
-        "204":
-          description: "Contact method deleted"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "401":
-          description: "JWT is missing or invalid"
+        204:
+          description: Contact method deleted
+          content: {}
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Contact method or user not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Contact method or user not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /question:
     get:
       tags:
-      - "administrator"
-      summary: "Retrieve all questions"
-      description: "Retrieve all questions in the system."
-      operationId: "getQuestions"
-      produces:
-      - "application/json"
-      parameters: []
+        - administrator
+      summary: Retrieve all questions
+      description: Retrieve all questions in the system.
+      operationId: getQuestions
       responses:
-        "200":
-          description: "All questions"
-          schema:
-            $ref: "#/definitions/Question"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "401":
-          description: "JWT is missing or invalid"
+        200:
+          description: All questions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /question/{questionUuid}:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /question/{questionUUID}:
     get:
       tags:
-      - "leader"
-      summary: "Retrieve question"
-      description: "Retrieve a question by UUID (restricted to logged in user's church)."
-      operationId: "getQuestion"
+        - leader
+      summary: Retrieve question
+      description: Retrieve a question by UUID (restricted to logged in user's church).
+      operationId: getQuestion
       parameters:
-      - name: "questionUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "QuestionUuid"
+        - name: questionUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: QuestionUUID
+          x-exportParamName: QuestionUUID
       responses:
-        "200":
-          description: "Church question"
-          schema:
-            $ref: "#/definitions/Question"
-        "401":
-          description: "JWT is missing or invalid"
+        200:
+          description: Church question
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Question'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Question not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+              schema:
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Question not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     put:
       tags:
-      - "leader"
-      summary: "Update question"
-      description: "Update a question that's already in the system."
-      operationId: "modifyQuestion"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+        - leader
+      summary: Update question
+      description: Update a question that's already in the system.
+      operationId: modifyQuestion
       parameters:
-      - name: "questionUuid"
-        in: "path"
+        - name: questionUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: QuestionUUID
+          x-exportParamName: QuestionUUID
+      requestBody:
+        description: Question for the church
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuestionIn'
         required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "QuestionUuid"
-      - in: "body"
-        name: "body"
-        description: "Question for the church"
-        required: true
-        schema:
-          $ref: "#/definitions/QuestionIn"
-        x-exportParamName: "Body"
       responses:
-        "200":
-          description: "Question updated"
-          schema:
-            $ref: "#/definitions/Question"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "401":
-          description: "JWT is missing or invalid"
+        200:
+          description: Question updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Question'
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Question not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Question not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-codegen-request-body-name: body
     delete:
       tags:
-      - "leader"
-      summary: "Delete question"
-      description: "Delete a question from the system."
-      operationId: "deleteQuestion"
-      produces:
-      - "application/json"
+        - leader
+      summary: Delete question
+      description: Delete a question from the system.
+      operationId: deleteQuestion
       parameters:
-      - name: "questionUuid"
-        in: "path"
-        required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "QuestionUuid"
+        - name: questionUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: QuestionUUID
+          x-exportParamName: QuestionUUID
       responses:
-        "204":
-          description: "Question deleted"
-        "401":
-          description: "JWT is missing or invalid"
+        204:
+          description: Question deleted
+          content: {}
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "403":
-          description: "User is not authorized to access"
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        403:
+          description: User is not authorized to access
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "Question not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-  /register/{userUuid}:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Question not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /register/{userUUID}:
     patch:
       tags:
-      - "member"
-      summary: "Accept invite"
-      description: "Accept member invite and fill in remainder of user details."
-      operationId: "acceptInvite"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
+        - member
+      summary: Accept invite
+      description: Accept member invite and fill in remainder of user details.
+      operationId: acceptInvite
       parameters:
-      - name: "userUuid"
-        in: "path"
+        - name: userUUID
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            x-exportParamName: UserUUID
+          x-exportParamName: UserUUID
+      requestBody:
+        description: User details for new member account
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserIn'
         required: true
-        type: "string"
-        format: "uuid"
-        x-exportParamName: "UserUuid"
-      - in: "body"
-        name: "body"
-        description: "User details for new member account"
-        required: true
-        schema:
-          $ref: "#/definitions/UserIn"
-        x-exportParamName: "Body"
       responses:
-        "200":
-          description: "Member account registered"
-          schema:
-            $ref: "#/definitions/User"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "404":
-          description: "User not found"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-      security: []
+        200:
+          description: Member account registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-codegen-request-body-name: body
   /login:
     get:
       tags:
-      - "member"
-      summary: "Login user"
-      description: "Login to a user account with the specified credentials. Issues\
-        \ a JWT on success."
-      operationId: "loginUser"
-      parameters: []
+        - member
+      summary: Login user
+      description: Login to a user account with the specified credentials. Issues
+        a JWT on success.
+      operationId: loginUser
       responses:
-        "200":
-          description: "User successfully logged in."
-          schema:
-            $ref: "#/definitions/JWT"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "401":
-          description: "Invalid credentials"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+        200:
+          description: User successfully logged in.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/JWT'
+        400:
+          description: Invalid input
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: Invalid credentials
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
-      - basicAuth: []
+        - basicAuth: []
   /profile:
     get:
       tags:
-      - "member"
-      summary: "Logged in user's UUID and church UUID"
-      description: "Returns the church and user UUID for the logged in user."
-      operationId: "userProfile"
-      parameters: []
+        - member
+      summary: Logged in user's UUID and church UUID
+      description: Returns the church and user UUID for the logged in user.
+      operationId: userProfile
       responses:
-        "200":
-          description: "User details."
-          schema:
-            $ref: "#/definitions/UserProfile"
-        "400":
-          description: "Invalid input"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-        "401":
-          description: "JWT is missing or invalid"
+        200:
+          description: User details.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        400:
+          description: Invalid input
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          description: JWT is missing or invalid
           headers:
             WWW_Authenticate:
-              type: "string"
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+              schema:
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       security:
-      - basicAuth: []
-securityDefinitions:
-  jwtAuth:
-    type: "apiKey"
-    name: "Authorization"
-    in: "header"
-    x-token-type: "Bearer"
-  basicAuth:
-    type: "basic"
-definitions:
-  JWT:
-    type: "object"
-    required:
-    - "jwt"
-    properties:
-      jwt:
-        type: "string"
-    example:
-      jwt: "jwt"
-  MemberInvite:
-    type: "object"
-    required:
-    - "email"
-    properties:
-      email:
-        type: "string"
-        format: "email"
-      first_name:
-        type: "string"
-      last_name:
-        type: "string"
-      date_of_birth:
-        type: "string"
-        format: "date"
-  UserBase:
-    type: "object"
-    required:
-    - "email"
-    - "first_name"
-    - "last_name"
-    properties:
-      email:
-        type: "string"
-        format: "email"
-      first_name:
-        type: "string"
-      last_name:
-        type: "string"
-      gender:
-        type: "string"
-        enum:
-        - "male"
-        - "female"
-      description:
-        type: "string"
-      church:
-        type: "string"
-        format: "uuid"
-      role:
-        type: "string"
-        enum:
-        - "leader"
-        - "member"
-        - "admin"
-  UserPublic:
-    allOf:
-    - $ref: "#/definitions/UserBase"
-    - type: "object"
+        - basicAuth: []
+components:
+  schemas:
+    JWT:
       required:
-      - "uuid"
+        - jwt
+      type: object
       properties:
-        uuid:
-          type: "string"
-          format: "uuid"
-        contact:
-          type: "array"
-          items:
-            $ref: "#/definitions/ContactMethod"
-  UserIn:
-    allOf:
-    - $ref: "#/definitions/UserBase"
-    - type: "object"
+        jwt:
+          type: string
+      example:
+        jwt: jwt
+    MemberInvite:
       required:
-      - "date_of_birth"
-      - "password"
+        - email
+      type: object
       properties:
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        last_name:
+          type: string
         date_of_birth:
-          type: "string"
-          format: "date"
-        password:
-          type: "string"
-  User:
-    allOf:
-    - $ref: "#/definitions/UserIn"
-    - type: "object"
+          type: string
+          format: date
+    UserBase:
       required:
-      - "uuid"
+        - email
+        - first_name
+        - last_name
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        last_name:
+          type: string
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+        description:
+          type: string
+        church:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum:
+            - leader
+            - member
+            - admin
+    UserPublic:
+      allOf:
+        - $ref: '#/components/schemas/UserBase'
+        - required:
+            - uuid
+          type: object
+          properties:
+            uuid:
+              type: string
+              format: uuid
+            contact:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContactMethod'
+    UserIn:
+      allOf:
+        - $ref: '#/components/schemas/UserBase'
+        - required:
+            - date_of_birth
+            - password
+          type: object
+          properties:
+            date_of_birth:
+              type: string
+              format: date
+            password:
+              type: string
+    User:
+      allOf:
+        - $ref: '#/components/schemas/UserIn'
+        - required:
+            - uuid
+          type: object
+          properties:
+            uuid:
+              type: string
+              format: uuid
+            contact:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContactMethod'
+    UserProfile:
+      required:
+        - church_uuid
+        - user_uuid
+      type: object
+      properties:
+        user_uuid:
+          type: string
+          format: uuid
+        church_uuid:
+          type: string
+          format: uuid
+      example:
+        user_uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        church_uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+    ChurchBase:
+      required:
+        - address
+        - description
+        - name
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        address:
+          type: string
+        website:
+          type: string
+          format: url
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+    ChurchPublic:
+      allOf:
+        - $ref: '#/components/schemas/ChurchBase'
+        - required:
+            - uuid
+          type: object
+          properties:
+            uuid:
+              type: string
+              format: uuid
+    ChurchIn:
+      allOf:
+        - $ref: '#/components/schemas/ChurchBase'
+        - required:
+            - group_size
+            - member_basic_info_update
+            - min_age
+            - same_gender
+          type: object
+          properties:
+            group_size:
+              multipleOf: 2
+              maximum: 1E+1
+              minimum: 2
+              type: integer
+            same_gender:
+              type: boolean
+            min_age:
+              type: integer
+            member_basic_info_update:
+              type: boolean
+    Church:
+      allOf:
+        - $ref: '#/components/schemas/ChurchIn'
+        - required:
+            - uuid
+          type: object
+          properties:
+            uuid:
+              type: string
+              format: uuid
+    ContactMethodIn:
+      required:
+        - contact_detail
+        - label
+        - user
+      type: object
+      properties:
+        label:
+          type: string
+        contact_detail:
+          type: string
+        user:
+          type: string
+          format: uuid
+    ContactMethod:
+      allOf:
+        - $ref: '#/components/schemas/ContactMethodIn'
+        - required:
+            - uuid
+          type: object
+          properties:
+            uuid:
+              type: string
+              format: uuid
+    QuestionIn:
+      required:
+        - church
+        - question
+      type: object
+      properties:
+        question:
+          type: string
+        church:
+          type: string
+          format: uuid
+      example:
+        question: question
+        church: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+    Question:
+      allOf:
+        - $ref: '#/components/schemas/QuestionIn'
+        - required:
+            - uuid
+          type: object
+          properties:
+            uuid:
+              type: string
+              format: uuid
+    Group:
+      required:
+        - created
+        - users
+        - uuid
+      type: object
       properties:
         uuid:
-          type: "string"
-          format: "uuid"
-        contact:
-          type: "array"
+          type: string
+          format: uuid
+        created:
+          type: string
+          format: date
+        users:
+          type: array
           items:
-            $ref: "#/definitions/ContactMethod"
-  UserProfile:
-    type: "object"
-    required:
-    - "church_uuid"
-    - "user_uuid"
-    properties:
-      user_uuid:
-        type: "string"
-        format: "uuid"
-      church_uuid:
-        type: "string"
-        format: "uuid"
-    example:
-      user_uuid: "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
-      church_uuid: "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
-  ChurchBase:
-    type: "object"
-    required:
-    - "address"
-    - "description"
-    - "name"
-    properties:
-      name:
-        type: "string"
-      description:
-        type: "string"
-      address:
-        type: "string"
-      website:
-        type: "string"
-        format: "url"
-      email:
-        type: "string"
-        format: "email"
-      phone:
-        type: "string"
-  ChurchPublic:
-    allOf:
-    - $ref: "#/definitions/ChurchBase"
-    - type: "object"
+            $ref: '#/components/schemas/UserPublic'
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Question'
+      example:
+        created: 2000-01-23
+        questions:
+          - ""
+          - ""
+        uuid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        users:
+          - ""
+          - ""
+    MessageIn:
       required:
-      - "uuid"
+        - group
+        - message
+        - sent
+        - user
+      type: object
       properties:
-        uuid:
-          type: "string"
-          format: "uuid"
-  ChurchIn:
-    allOf:
-    - $ref: "#/definitions/ChurchBase"
-    - type: "object"
+        group:
+          type: string
+          format: uuid
+        user:
+          type: string
+          format: uuid
+        sent:
+          type: string
+          format: datetime
+        message:
+          type: string
+      example:
+        message: message
+        user: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        sent: sent
+        group: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+    Message:
+      allOf:
+        - $ref: '#/components/schemas/MessageIn'
+        - required:
+            - uuid
+          type: object
+          properties:
+            uuid:
+              type: string
+              format: uuid
+    ErrorResponse:
       required:
-      - "group_size"
-      - "member_basic_info_update"
-      - "min_age"
-      - "same_gender"
+        - code
+        - message
+      type: object
       properties:
-        group_size:
-          type: "integer"
-          minimum: 2
-          maximum: 10
-          multipleOf: 2
-        same_gender:
-          type: "boolean"
-        min_age:
-          type: "integer"
-        member_basic_info_update:
-          type: "boolean"
-  Church:
-    allOf:
-    - $ref: "#/definitions/ChurchIn"
-    - type: "object"
-      required:
-      - "uuid"
-      properties:
-        uuid:
-          type: "string"
-          format: "uuid"
-  ContactMethodIn:
-    type: "object"
-    required:
-    - "contact_detail"
-    - "label"
-    - "user"
-    properties:
-      label:
-        type: "string"
-      contact_detail:
-        type: "string"
-      user:
-        type: "string"
-        format: "uuid"
-  ContactMethod:
-    allOf:
-    - $ref: "#/definitions/ContactMethodIn"
-    - type: "object"
-      required:
-      - "uuid"
-      properties:
-        uuid:
-          type: "string"
-          format: "uuid"
-  QuestionIn:
-    type: "object"
-    required:
-    - "church"
-    - "question"
-    properties:
-      question:
-        type: "string"
-      church:
-        type: "string"
-        format: "uuid"
-    example:
-      question: "question"
-      church: "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
-  Question:
-    allOf:
-    - $ref: "#/definitions/QuestionIn"
-    - type: "object"
-      required:
-      - "uuid"
-      properties:
-        uuid:
-          type: "string"
-          format: "uuid"
-  Group:
-    type: "object"
-    required:
-    - "created"
-    - "users"
-    - "uuid"
-    properties:
-      uuid:
-        type: "string"
-        format: "uuid"
-      created:
-        type: "string"
-        format: "date"
-      users:
-        type: "array"
-        items:
-          $ref: "#/definitions/UserPublic"
-      questions:
-        type: "array"
-        items:
-          $ref: "#/definitions/Question"
-    example:
-      created: "2000-01-23"
-      questions:
-      - ""
-      - ""
-      uuid: "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
-      users:
-      - ""
-      - ""
-  MessageIn:
-    type: "object"
-    required:
-    - "group"
-    - "message"
-    - "sent"
-    - "user"
-    properties:
-      group:
-        type: "string"
-        format: "uuid"
-      user:
-        type: "string"
-        format: "uuid"
-      sent:
-        type: "string"
-        format: "datetime"
-      message:
-        type: "string"
-    example:
-      message: "message"
-      user: "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
-      sent: "sent"
-      group: "046b6c7f-0b8a-43b9-b35d-6489e6daee91"
-  Message:
-    allOf:
-    - $ref: "#/definitions/MessageIn"
-    - type: "object"
-      required:
-      - "uuid"
-      properties:
-        uuid:
-          type: "string"
-          format: "uuid"
-  ErrorResponse:
-    type: "object"
-    required:
-    - "code"
-    - "message"
-    properties:
-      code:
-        type: "integer"
-        format: "int32"
-      message:
-        type: "string"
-responses:
-  ClientError:
-    description: "Invalid input"
-    schema:
-      $ref: "#/definitions/ErrorResponse"
-  Unauthenticated:
-    description: "JWT is missing or invalid"
-    headers:
-      WWW_Authenticate:
-        type: "string"
-    schema:
-      $ref: "#/definitions/ErrorResponse"
-  Unauthorized:
-    description: "User is not authorized to access"
-    headers:
-      WWW_Authenticate:
-        type: "string"
-    schema:
-      $ref: "#/definitions/ErrorResponse"
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+  responses:
+    ClientError:
+      description: Invalid input
+      content:
+        '*/*':
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthenticated:
+      description: JWT is missing or invalid
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: string
+      content:
+        '*/*':
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: User is not authorized to access
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: string
+      content:
+        '*/*':
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  securitySchemes:
+    jwtAuth:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-token-type: Bearer
+    basicAuth:
+      type: http
+      scheme: basic
