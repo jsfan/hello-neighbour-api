@@ -1,0 +1,24 @@
+{{>partial_header}}
+package main
+
+import (
+	"log"
+	"net/http"
+
+	{{packageName}} "{{gitHost}}/{{gitUserId}}/{{gitRepoId}}/{{sourceFolder}}"
+)
+
+func main() {
+	log.Printf("Server started")
+
+    var jwtKeys interface{}
+    // TODO: Set your JWT keys here
+
+{{#apiInfo}}{{#apis}}
+	{{classname}}Service := {{packageName}}.New{{classname}}Service()
+	{{classname}}Controller := {{packageName}}.New{{classname}}Controller({{classname}}Service)
+{{/apis}}{{/apiInfo}}
+	router := {{packageName}}.NewRouter(jwtKeys, {{#apiInfo}}{{#apis}}{{classname}}Controller{{^-last}}, {{/-last}}{{/apis}}{{/apiInfo}})
+
+	log.Fatal(http.ListenAndServe(":{{serverPort}}", router))
+}
