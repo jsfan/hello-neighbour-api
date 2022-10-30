@@ -10,7 +10,6 @@
 package rest
 
 type UserProfile struct {
-
 	UserUuid string `json:"user_uuid"`
 
 	ChurchUuid string `json:"church_uuid"`
@@ -19,7 +18,7 @@ type UserProfile struct {
 // AssertUserProfileRequired checks if the required fields are not zero-ed
 func AssertUserProfileRequired(obj UserProfile) error {
 	elements := map[string]interface{}{
-		"user_uuid": obj.UserUuid,
+		"user_uuid":   obj.UserUuid,
 		"church_uuid": obj.ChurchUuid,
 	}
 	for name, el := range elements {

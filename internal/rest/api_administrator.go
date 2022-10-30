@@ -19,7 +19,7 @@ import (
 
 // AdministratorApiController binds http requests to an api service and writes the service results to the http response
 type AdministratorApiController struct {
-	service AdministratorApiServicer
+	service      AdministratorApiServicer
 	errorHandler ErrorHandler
 }
 
@@ -49,27 +49,27 @@ func NewAdministratorApiController(s AdministratorApiServicer, opts ...Administr
 
 // Routes returns all the api routes for the AdministratorApiController
 func (c *AdministratorApiController) Routes() Routes {
-	return Routes{ 
+	return Routes{
 		{
 			"GetQuestions",
 			strings.ToUpper("Get"),
 			"/v0/question",
 			c.GetQuestions,
-            true,
+			true,
 		},
 		{
 			"GetUsers",
 			strings.ToUpper("Get"),
 			"/v0/user",
 			c.GetUsers,
-            true,
+			true,
 		},
 		{
 			"UpdateChurchActivate",
 			strings.ToUpper("Patch"),
 			"/v0/church/{churchUUID}/activate",
 			c.UpdateChurchActivate,
-            true,
+			true,
 		},
 	}
 }
@@ -104,7 +104,7 @@ func (c *AdministratorApiController) GetUsers(w http.ResponseWriter, r *http.Req
 func (c *AdministratorApiController) UpdateChurchActivate(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	churchUUIDParam := params["churchUUID"]
-	
+
 	isActiveParam := InlineObject{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()

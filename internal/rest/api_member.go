@@ -19,7 +19,7 @@ import (
 
 // MemberApiController binds http requests to an api service and writes the service results to the http response
 type MemberApiController struct {
-	service MemberApiServicer
+	service      MemberApiServicer
 	errorHandler ErrorHandler
 }
 
@@ -49,104 +49,104 @@ func NewMemberApiController(s MemberApiServicer, opts ...MemberApiOption) Router
 
 // Routes returns all the api routes for the MemberApiController
 func (c *MemberApiController) Routes() Routes {
-	return Routes{ 
+	return Routes{
 		{
 			"AcceptInvite",
 			strings.ToUpper("Patch"),
 			"/v0/register/{userUUID}",
 			c.AcceptInvite,
-            true,
+			true,
 		},
 		{
 			"AddChurch",
 			strings.ToUpper("Post"),
 			"/v0/church",
 			c.AddChurch,
-            true,
+			true,
 		},
 		{
 			"AddContactMethod",
 			strings.ToUpper("Post"),
 			"/v0/user/{userUUID}/contactmethod",
 			c.AddContactMethod,
-            true,
+			true,
 		},
 		{
 			"DeleteContactMethod",
 			strings.ToUpper("Delete"),
 			"/v0/user/{userUUID}/contactmethod/{methodUUID}",
 			c.DeleteContactMethod,
-            true,
+			true,
 		},
 		{
 			"DeleteUser",
 			strings.ToUpper("Delete"),
 			"/v0/user/{userUUID}",
 			c.DeleteUser,
-            true,
+			true,
 		},
 		{
 			"EditUser",
 			strings.ToUpper("Put"),
 			"/v0/user/{userUUID}",
 			c.EditUser,
-            true,
+			true,
 		},
 		{
 			"GetChurches",
 			strings.ToUpper("Get"),
 			"/v0/church",
 			c.GetChurches,
-            true,
+			true,
 		},
 		{
 			"GetMatchGroup",
 			strings.ToUpper("Get"),
 			"/v0/user/{userUUID}/matchGroup",
 			c.GetMatchGroup,
-            true,
+			true,
 		},
 		{
 			"GetMessages",
 			strings.ToUpper("Get"),
 			"/v0/user/{userUUID}/matchgroup/{groupUUID}/bulletin",
 			c.GetMessages,
-            true,
+			true,
 		},
 		{
 			"GetUser",
 			strings.ToUpper("Get"),
 			"/v0/user/{userUUID}",
 			c.GetUser,
-            true,
+			true,
 		},
 		{
 			"LoginUser",
 			strings.ToUpper("Get"),
 			"/v0/login",
 			c.LoginUser,
-            true,
+			true,
 		},
 		{
 			"SendMessage",
 			strings.ToUpper("Post"),
 			"/v0/user/{userUUID}/matchgroup/{groupUUID}/bulletin",
 			c.SendMessage,
-            true,
+			true,
 		},
 		{
 			"UpdateContactMethod",
 			strings.ToUpper("Put"),
 			"/v0/user/{userUUID}/contactmethod/{methodUUID}",
 			c.UpdateContactMethod,
-            true,
+			true,
 		},
 		{
 			"UserProfile",
 			strings.ToUpper("Get"),
 			"/v0/profile",
 			c.UserProfile,
-            true,
+			true,
 		},
 	}
 }
@@ -155,7 +155,7 @@ func (c *MemberApiController) Routes() Routes {
 func (c *MemberApiController) AcceptInvite(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	userUUIDParam := params["userUUID"]
-	
+
 	bodyParam := UserIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -206,7 +206,7 @@ func (c *MemberApiController) AddChurch(w http.ResponseWriter, r *http.Request) 
 func (c *MemberApiController) AddContactMethod(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	userUUIDParam := params["userUUID"]
-	
+
 	bodyParam := ContactMethodIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -233,9 +233,9 @@ func (c *MemberApiController) AddContactMethod(w http.ResponseWriter, r *http.Re
 func (c *MemberApiController) DeleteContactMethod(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	userUUIDParam := params["userUUID"]
-	
+
 	methodUUIDParam := params["methodUUID"]
-	
+
 	result, err := c.service.DeleteContactMethod(r.Context(), userUUIDParam, methodUUIDParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -251,7 +251,7 @@ func (c *MemberApiController) DeleteContactMethod(w http.ResponseWriter, r *http
 func (c *MemberApiController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	userUUIDParam := params["userUUID"]
-	
+
 	result, err := c.service.DeleteUser(r.Context(), userUUIDParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -267,7 +267,7 @@ func (c *MemberApiController) DeleteUser(w http.ResponseWriter, r *http.Request)
 func (c *MemberApiController) EditUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	userUUIDParam := params["userUUID"]
-	
+
 	bodyParam := UserIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -307,7 +307,7 @@ func (c *MemberApiController) GetChurches(w http.ResponseWriter, r *http.Request
 func (c *MemberApiController) GetMatchGroup(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	userUUIDParam := params["userUUID"]
-	
+
 	result, err := c.service.GetMatchGroup(r.Context(), userUUIDParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -323,9 +323,9 @@ func (c *MemberApiController) GetMatchGroup(w http.ResponseWriter, r *http.Reque
 func (c *MemberApiController) GetMessages(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	userUUIDParam := params["userUUID"]
-	
+
 	groupUUIDParam := params["groupUUID"]
-	
+
 	result, err := c.service.GetMessages(r.Context(), userUUIDParam, groupUUIDParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -341,7 +341,7 @@ func (c *MemberApiController) GetMessages(w http.ResponseWriter, r *http.Request
 func (c *MemberApiController) GetUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	userUUIDParam := params["userUUID"]
-	
+
 	result, err := c.service.GetUser(r.Context(), userUUIDParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -370,9 +370,9 @@ func (c *MemberApiController) LoginUser(w http.ResponseWriter, r *http.Request) 
 func (c *MemberApiController) SendMessage(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	userUUIDParam := params["userUUID"]
-	
+
 	groupUUIDParam := params["groupUUID"]
-	
+
 	bodyParam := MessageIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -399,9 +399,9 @@ func (c *MemberApiController) SendMessage(w http.ResponseWriter, r *http.Request
 func (c *MemberApiController) UpdateContactMethod(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	userUUIDParam := params["userUUID"]
-	
+
 	methodUUIDParam := params["methodUUID"]
-	
+
 	bodyParam := ContactMethodIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()

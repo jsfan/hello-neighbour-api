@@ -10,7 +10,6 @@
 package rest
 
 type Church struct {
-
 	Name string `json:"name"`
 
 	Description string `json:"description"`
@@ -37,14 +36,14 @@ type Church struct {
 // AssertChurchRequired checks if the required fields are not zero-ed
 func AssertChurchRequired(obj Church) error {
 	elements := map[string]interface{}{
-		"name": obj.Name,
-		"description": obj.Description,
-		"address": obj.Address,
-		"group_size": obj.GroupSize,
-		"same_gender": obj.SameGender,
-		"min_age": obj.MinAge,
+		"name":                     obj.Name,
+		"description":              obj.Description,
+		"address":                  obj.Address,
+		"group_size":               obj.GroupSize,
+		"same_gender":              obj.SameGender,
+		"min_age":                  obj.MinAge,
 		"member_basic_info_update": obj.MemberBasicInfoUpdate,
-		"uuid": obj.Uuid,
+		"uuid":                     obj.Uuid,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {

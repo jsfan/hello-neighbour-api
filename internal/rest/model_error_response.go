@@ -10,7 +10,6 @@
 package rest
 
 type ErrorResponse struct {
-
 	Code int32 `json:"code"`
 
 	Message string `json:"message"`
@@ -19,7 +18,7 @@ type ErrorResponse struct {
 // AssertErrorResponseRequired checks if the required fields are not zero-ed
 func AssertErrorResponseRequired(obj ErrorResponse) error {
 	elements := map[string]interface{}{
-		"code": obj.Code,
+		"code":    obj.Code,
 		"message": obj.Message,
 	}
 	for name, el := range elements {

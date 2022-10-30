@@ -10,7 +10,6 @@
 package rest
 
 type Question struct {
-
 	Question string `json:"question"`
 
 	Church string `json:"church"`
@@ -22,8 +21,8 @@ type Question struct {
 func AssertQuestionRequired(obj Question) error {
 	elements := map[string]interface{}{
 		"question": obj.Question,
-		"church": obj.Church,
-		"uuid": obj.Uuid,
+		"church":   obj.Church,
+		"uuid":     obj.Uuid,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {

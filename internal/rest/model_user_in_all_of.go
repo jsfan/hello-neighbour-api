@@ -10,7 +10,6 @@
 package rest
 
 type UserInAllOf struct {
-
 	DateOfBirth string `json:"date_of_birth"`
 
 	Password string `json:"password"`
@@ -20,7 +19,7 @@ type UserInAllOf struct {
 func AssertUserInAllOfRequired(obj UserInAllOf) error {
 	elements := map[string]interface{}{
 		"date_of_birth": obj.DateOfBirth,
-		"password": obj.Password,
+		"password":      obj.Password,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {

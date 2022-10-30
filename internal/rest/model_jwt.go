@@ -10,7 +10,6 @@
 package rest
 
 type Jwt struct {
-
 	Jwt string `json:"jwt"`
 }
 

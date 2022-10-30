@@ -10,7 +10,6 @@
 package rest
 
 type Message struct {
-
 	Group string `json:"group"`
 
 	User string `json:"user"`
@@ -25,11 +24,11 @@ type Message struct {
 // AssertMessageRequired checks if the required fields are not zero-ed
 func AssertMessageRequired(obj Message) error {
 	elements := map[string]interface{}{
-		"group": obj.Group,
-		"user": obj.User,
-		"sent": obj.Sent,
+		"group":   obj.Group,
+		"user":    obj.User,
+		"sent":    obj.Sent,
 		"message": obj.Message,
-		"uuid": obj.Uuid,
+		"uuid":    obj.Uuid,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {

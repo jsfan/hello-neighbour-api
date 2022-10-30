@@ -10,7 +10,6 @@
 package rest
 
 type ChurchPublicAllOf struct {
-
 	Uuid string `json:"uuid"`
 }
 

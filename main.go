@@ -19,9 +19,8 @@ import (
 func main() {
 	log.Printf("Server started")
 
-    var jwtKeys interface{}
-    // TODO: Set your JWT keys here
-
+	var jwtKeys interface{}
+	// TODO: Set your JWT keys here
 
 	AdministratorApiService := rest.NewAdministratorApiService()
 	AdministratorApiController := rest.NewAdministratorApiController(AdministratorApiService)

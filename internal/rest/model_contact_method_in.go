@@ -10,7 +10,6 @@
 package rest
 
 type ContactMethodIn struct {
-
 	Label string `json:"label"`
 
 	ContactDetail string `json:"contact_detail"`
@@ -21,9 +20,9 @@ type ContactMethodIn struct {
 // AssertContactMethodInRequired checks if the required fields are not zero-ed
 func AssertContactMethodInRequired(obj ContactMethodIn) error {
 	elements := map[string]interface{}{
-		"label": obj.Label,
+		"label":          obj.Label,
 		"contact_detail": obj.ContactDetail,
-		"user": obj.User,
+		"user":           obj.User,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {

@@ -15,19 +15,19 @@ import (
 
 // Response return a ImplResponse struct filled
 func Response(code int, body interface{}) ImplResponse {
-	return ImplResponse {
-		Code: code,
+	return ImplResponse{
+		Code:    code,
 		Headers: nil,
-		Body: body,
+		Body:    body,
 	}
 }
 
 // ResponseWithHeaders return a ImplResponse struct filled, including headers
 func ResponseWithHeaders(code int, headers map[string][]string, body interface{}) ImplResponse {
-	return ImplResponse {
-		Code: code,
+	return ImplResponse{
+		Code:    code,
 		Headers: headers,
-		Body: body,
+		Body:    body,
 	}
 }
 

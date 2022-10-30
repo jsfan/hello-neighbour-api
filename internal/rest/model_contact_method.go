@@ -10,7 +10,6 @@
 package rest
 
 type ContactMethod struct {
-
 	Label string `json:"label"`
 
 	ContactDetail string `json:"contact_detail"`
@@ -23,10 +22,10 @@ type ContactMethod struct {
 // AssertContactMethodRequired checks if the required fields are not zero-ed
 func AssertContactMethodRequired(obj ContactMethod) error {
 	elements := map[string]interface{}{
-		"label": obj.Label,
+		"label":          obj.Label,
 		"contact_detail": obj.ContactDetail,
-		"user": obj.User,
-		"uuid": obj.Uuid,
+		"user":           obj.User,
+		"uuid":           obj.Uuid,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {

@@ -10,7 +10,6 @@
 package rest
 
 type ChurchInAllOf struct {
-
 	GroupSize int32 `json:"group_size"`
 
 	SameGender bool `json:"same_gender"`
@@ -23,9 +22,9 @@ type ChurchInAllOf struct {
 // AssertChurchInAllOfRequired checks if the required fields are not zero-ed
 func AssertChurchInAllOfRequired(obj ChurchInAllOf) error {
 	elements := map[string]interface{}{
-		"group_size": obj.GroupSize,
-		"same_gender": obj.SameGender,
-		"min_age": obj.MinAge,
+		"group_size":               obj.GroupSize,
+		"same_gender":              obj.SameGender,
+		"min_age":                  obj.MinAge,
 		"member_basic_info_update": obj.MemberBasicInfoUpdate,
 	}
 	for name, el := range elements {

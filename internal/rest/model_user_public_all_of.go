@@ -10,7 +10,6 @@
 package rest
 
 type UserPublicAllOf struct {
-
 	Uuid string `json:"uuid"`
 
 	Contact []ContactMethod `json:"contact,omitempty"`

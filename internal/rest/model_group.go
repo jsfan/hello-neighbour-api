@@ -10,7 +10,6 @@
 package rest
 
 type Group struct {
-
 	Uuid string `json:"uuid"`
 
 	Created string `json:"created"`
@@ -23,9 +22,9 @@ type Group struct {
 // AssertGroupRequired checks if the required fields are not zero-ed
 func AssertGroupRequired(obj Group) error {
 	elements := map[string]interface{}{
-		"uuid": obj.Uuid,
+		"uuid":    obj.Uuid,
 		"created": obj.Created,
-		"users": obj.Users,
+		"users":   obj.Users,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {

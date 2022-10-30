@@ -10,7 +10,6 @@
 package rest
 
 type InlineObject struct {
-
 	IsActive bool `json:"isActive,omitempty"`
 }
 

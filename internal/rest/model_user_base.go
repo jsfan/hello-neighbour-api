@@ -10,7 +10,6 @@
 package rest
 
 type UserBase struct {
-
 	Email string `json:"email"`
 
 	FirstName string `json:"first_name"`
@@ -29,9 +28,9 @@ type UserBase struct {
 // AssertUserBaseRequired checks if the required fields are not zero-ed
 func AssertUserBaseRequired(obj UserBase) error {
 	elements := map[string]interface{}{
-		"email": obj.Email,
+		"email":      obj.Email,
 		"first_name": obj.FirstName,
-		"last_name": obj.LastName,
+		"last_name":  obj.LastName,
 	}
 	for name, el := range elements {
 		if isZero := IsZeroValue(el); isZero {

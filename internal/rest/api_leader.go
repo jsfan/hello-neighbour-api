@@ -19,7 +19,7 @@ import (
 
 // LeaderApiController binds http requests to an api service and writes the service results to the http response
 type LeaderApiController struct {
-	service LeaderApiServicer
+	service      LeaderApiServicer
 	errorHandler ErrorHandler
 }
 
@@ -49,90 +49,90 @@ func NewLeaderApiController(s LeaderApiServicer, opts ...LeaderApiOption) Router
 
 // Routes returns all the api routes for the LeaderApiController
 func (c *LeaderApiController) Routes() Routes {
-	return Routes{ 
+	return Routes{
 		{
 			"AddQuestion",
 			strings.ToUpper("Post"),
 			"/v0/church/{churchUUID}/question",
 			c.AddQuestion,
-            true,
+			true,
 		},
 		{
 			"DeleteChurch",
 			strings.ToUpper("Delete"),
 			"/v0/church/{churchUUID}",
 			c.DeleteChurch,
-            true,
+			true,
 		},
 		{
 			"DeleteChurchMember",
 			strings.ToUpper("Delete"),
 			"/v0/church/{churchUUID}/user/{userUUID}",
 			c.DeleteChurchMember,
-            true,
+			true,
 		},
 		{
 			"DeleteQuestion",
 			strings.ToUpper("Delete"),
 			"/v0/question/{questionUUID}",
 			c.DeleteQuestion,
-            true,
+			true,
 		},
 		{
 			"EditChurch",
 			strings.ToUpper("Put"),
 			"/v0/church/{churchUUID}",
 			c.EditChurch,
-            true,
+			true,
 		},
 		{
 			"GetChurch",
 			strings.ToUpper("Get"),
 			"/v0/church/{churchUUID}",
 			c.GetChurch,
-            true,
+			true,
 		},
 		{
 			"GetChurchMembers",
 			strings.ToUpper("Get"),
 			"/v0/church/{churchUUID}/user",
 			c.GetChurchMembers,
-            true,
+			true,
 		},
 		{
 			"GetChurchQuestions",
 			strings.ToUpper("Get"),
 			"/v0/church/{churchUUID}/question",
 			c.GetChurchQuestions,
-            true,
+			true,
 		},
 		{
 			"GetMatchGroups",
 			strings.ToUpper("Get"),
 			"/v0/church/{churchUUID}/matchgroup",
 			c.GetMatchGroups,
-            true,
+			true,
 		},
 		{
 			"GetQuestion",
 			strings.ToUpper("Get"),
 			"/v0/question/{questionUUID}",
 			c.GetQuestion,
-            true,
+			true,
 		},
 		{
 			"ModifyQuestion",
 			strings.ToUpper("Put"),
 			"/v0/question/{questionUUID}",
 			c.ModifyQuestion,
-            true,
+			true,
 		},
 		{
 			"SendInvite",
 			strings.ToUpper("Post"),
 			"/v0/church/{churchUUID}/invite",
 			c.SendInvite,
-            true,
+			true,
 		},
 	}
 }
@@ -141,7 +141,7 @@ func (c *LeaderApiController) Routes() Routes {
 func (c *LeaderApiController) AddQuestion(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	churchUUIDParam := params["churchUUID"]
-	
+
 	bodyParam := QuestionIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -168,7 +168,7 @@ func (c *LeaderApiController) AddQuestion(w http.ResponseWriter, r *http.Request
 func (c *LeaderApiController) DeleteChurch(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	churchUUIDParam := params["churchUUID"]
-	
+
 	result, err := c.service.DeleteChurch(r.Context(), churchUUIDParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -184,9 +184,9 @@ func (c *LeaderApiController) DeleteChurch(w http.ResponseWriter, r *http.Reques
 func (c *LeaderApiController) DeleteChurchMember(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	churchUUIDParam := params["churchUUID"]
-	
+
 	userUUIDParam := params["userUUID"]
-	
+
 	result, err := c.service.DeleteChurchMember(r.Context(), churchUUIDParam, userUUIDParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -202,7 +202,7 @@ func (c *LeaderApiController) DeleteChurchMember(w http.ResponseWriter, r *http.
 func (c *LeaderApiController) DeleteQuestion(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	questionUUIDParam := params["questionUUID"]
-	
+
 	result, err := c.service.DeleteQuestion(r.Context(), questionUUIDParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -218,7 +218,7 @@ func (c *LeaderApiController) DeleteQuestion(w http.ResponseWriter, r *http.Requ
 func (c *LeaderApiController) EditChurch(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	churchUUIDParam := params["churchUUID"]
-	
+
 	bodyParam := ChurchIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -245,7 +245,7 @@ func (c *LeaderApiController) EditChurch(w http.ResponseWriter, r *http.Request)
 func (c *LeaderApiController) GetChurch(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	churchUUIDParam := params["churchUUID"]
-	
+
 	result, err := c.service.GetChurch(r.Context(), churchUUIDParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -261,7 +261,7 @@ func (c *LeaderApiController) GetChurch(w http.ResponseWriter, r *http.Request) 
 func (c *LeaderApiController) GetChurchMembers(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	churchUUIDParam := params["churchUUID"]
-	
+
 	result, err := c.service.GetChurchMembers(r.Context(), churchUUIDParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -277,7 +277,7 @@ func (c *LeaderApiController) GetChurchMembers(w http.ResponseWriter, r *http.Re
 func (c *LeaderApiController) GetChurchQuestions(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	churchUUIDParam := params["churchUUID"]
-	
+
 	result, err := c.service.GetChurchQuestions(r.Context(), churchUUIDParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -293,7 +293,7 @@ func (c *LeaderApiController) GetChurchQuestions(w http.ResponseWriter, r *http.
 func (c *LeaderApiController) GetMatchGroups(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	churchUUIDParam := params["churchUUID"]
-	
+
 	result, err := c.service.GetMatchGroups(r.Context(), churchUUIDParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -309,7 +309,7 @@ func (c *LeaderApiController) GetMatchGroups(w http.ResponseWriter, r *http.Requ
 func (c *LeaderApiController) GetQuestion(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	questionUUIDParam := params["questionUUID"]
-	
+
 	result, err := c.service.GetQuestion(r.Context(), questionUUIDParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -325,7 +325,7 @@ func (c *LeaderApiController) GetQuestion(w http.ResponseWriter, r *http.Request
 func (c *LeaderApiController) ModifyQuestion(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	questionUUIDParam := params["questionUUID"]
-	
+
 	bodyParam := QuestionIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -352,7 +352,7 @@ func (c *LeaderApiController) ModifyQuestion(w http.ResponseWriter, r *http.Requ
 func (c *LeaderApiController) SendInvite(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	churchUUIDParam := params["churchUUID"]
-	
+
 	emailParam := []MemberInvite{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()

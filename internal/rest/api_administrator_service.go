@@ -11,8 +11,8 @@ package rest
 
 import (
 	"context"
-	"net/http"
 	"errors"
+	"net/http"
 )
 
 // AdministratorApiService is a service that implements the logic for the AdministratorApiServicer

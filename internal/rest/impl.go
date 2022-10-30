@@ -11,7 +11,7 @@ package rest
 
 // ImplResponse response defines an error code with the associated body
 type ImplResponse struct {
-	Code int
+	Code    int
 	Headers map[string][]string
-	Body interface{}
+	Body    interface{}
 }

@@ -12,22 +12,23 @@ package rest
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gorilla/mux"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 // A Route defines the parameters for an api endpoint
 type Route struct {
-	Name		    string
-	Method	        string
-	Pattern	        string
-	HandlerFunc     http.HandlerFunc
-    AuthnRequired   bool
+	Name          string
+	Method        string
+	Pattern       string
+	HandlerFunc   http.HandlerFunc
+	AuthnRequired bool
 }
 
 // Routes are a collection of defined api endpoints
@@ -47,7 +48,7 @@ func NewRouter(jwtKeys interface{}, routers ...Router) *mux.Router {
 		for _, route := range api.Routes() {
 			var handler http.Handler
 			handler = route.HandlerFunc
-            handler = AuthnMiddleware(handler, jwtKeys, route.AuthnRequired)
+			handler = AuthnMiddleware(handler, jwtKeys, route.AuthnRequired)
 			handler = Logger(handler, route.Name)
 
 			router.

@@ -14,26 +14,26 @@ import (
 	"net/http"
 )
 
-
-
 // AdministratorApiRouter defines the required methods for binding the api requests to a responses for the AdministratorApi
 // The AdministratorApiRouter implementation should parse necessary information from the http request,
 // pass the data to a AdministratorApiServicer to perform the required actions, then write the service results to the http response.
-type AdministratorApiRouter interface { 
+type AdministratorApiRouter interface {
 	GetQuestions(http.ResponseWriter, *http.Request)
 	GetUsers(http.ResponseWriter, *http.Request)
 	UpdateChurchActivate(http.ResponseWriter, *http.Request)
 }
+
 // DefaultApiRouter defines the required methods for binding the api requests to a responses for the DefaultApi
 // The DefaultApiRouter implementation should parse necessary information from the http request,
 // pass the data to a DefaultApiServicer to perform the required actions, then write the service results to the http response.
-type DefaultApiRouter interface { 
+type DefaultApiRouter interface {
 	AddUser(http.ResponseWriter, *http.Request)
 }
+
 // LeaderApiRouter defines the required methods for binding the api requests to a responses for the LeaderApi
 // The LeaderApiRouter implementation should parse necessary information from the http request,
 // pass the data to a LeaderApiServicer to perform the required actions, then write the service results to the http response.
-type LeaderApiRouter interface { 
+type LeaderApiRouter interface {
 	AddQuestion(http.ResponseWriter, *http.Request)
 	DeleteChurch(http.ResponseWriter, *http.Request)
 	DeleteChurchMember(http.ResponseWriter, *http.Request)
@@ -47,10 +47,11 @@ type LeaderApiRouter interface {
 	ModifyQuestion(http.ResponseWriter, *http.Request)
 	SendInvite(http.ResponseWriter, *http.Request)
 }
+
 // MemberApiRouter defines the required methods for binding the api requests to a responses for the MemberApi
 // The MemberApiRouter implementation should parse necessary information from the http request,
 // pass the data to a MemberApiServicer to perform the required actions, then write the service results to the http response.
-type MemberApiRouter interface { 
+type MemberApiRouter interface {
 	AcceptInvite(http.ResponseWriter, *http.Request)
 	AddChurch(http.ResponseWriter, *http.Request)
 	AddContactMethod(http.ResponseWriter, *http.Request)
@@ -67,32 +68,29 @@ type MemberApiRouter interface {
 	UserProfile(http.ResponseWriter, *http.Request)
 }
 
-
 // AdministratorApiServicer defines the api actions for the AdministratorApi service
 // This interface intended to stay up to date with the openapi yaml used to generate it,
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
-type AdministratorApiServicer interface { 
+type AdministratorApiServicer interface {
 	GetQuestions(context.Context) (ImplResponse, error)
 	GetUsers(context.Context) (ImplResponse, error)
 	UpdateChurchActivate(context.Context, string, InlineObject) (ImplResponse, error)
 }
 
-
 // DefaultApiServicer defines the api actions for the DefaultApi service
 // This interface intended to stay up to date with the openapi yaml used to generate it,
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
-type DefaultApiServicer interface { 
+type DefaultApiServicer interface {
 	AddUser(context.Context, UserIn) (ImplResponse, error)
 }
-
 
 // LeaderApiServicer defines the api actions for the LeaderApi service
 // This interface intended to stay up to date with the openapi yaml used to generate it,
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
-type LeaderApiServicer interface { 
+type LeaderApiServicer interface {
 	AddQuestion(context.Context, string, QuestionIn) (ImplResponse, error)
 	DeleteChurch(context.Context, string) (ImplResponse, error)
 	DeleteChurchMember(context.Context, string, string) (ImplResponse, error)
@@ -107,12 +105,11 @@ type LeaderApiServicer interface {
 	SendInvite(context.Context, string, []MemberInvite) (ImplResponse, error)
 }
 
-
 // MemberApiServicer defines the api actions for the MemberApi service
 // This interface intended to stay up to date with the openapi yaml used to generate it,
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
-type MemberApiServicer interface { 
+type MemberApiServicer interface {
 	AcceptInvite(context.Context, string, UserIn) (ImplResponse, error)
 	AddChurch(context.Context, ChurchIn) (ImplResponse, error)
 	AddContactMethod(context.Context, string, ContactMethodIn) (ImplResponse, error)
