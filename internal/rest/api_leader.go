@@ -14,30 +14,33 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/jsfan/hello-neighbour-api/internal/rest/common"
+	"github.com/jsfan/hello-neighbour-api/internal/rest/model"
+
 	"github.com/gorilla/mux"
 )
 
 // LeaderApiController binds http requests to an api service and writes the service results to the http response
 type LeaderApiController struct {
 	service      LeaderApiServicer
-	errorHandler ErrorHandler
+	errorHandler common.ErrorHandler
 }
 
 // LeaderApiOption for how the controller is set up.
 type LeaderApiOption func(*LeaderApiController)
 
 // WithLeaderApiErrorHandler inject ErrorHandler into controller
-func WithLeaderApiErrorHandler(h ErrorHandler) LeaderApiOption {
+func WithLeaderApiErrorHandler(h common.ErrorHandler) LeaderApiOption {
 	return func(c *LeaderApiController) {
 		c.errorHandler = h
 	}
 }
 
 // NewLeaderApiController creates a default api controller
-func NewLeaderApiController(s LeaderApiServicer, opts ...LeaderApiOption) Router {
+func NewLeaderApiController(s LeaderApiServicer, opts ...LeaderApiOption) common.Router {
 	controller := &LeaderApiController{
 		service:      s,
-		errorHandler: DefaultErrorHandler,
+		errorHandler: common.DefaultErrorHandler,
 	}
 
 	for _, opt := range opts {
@@ -48,8 +51,8 @@ func NewLeaderApiController(s LeaderApiServicer, opts ...LeaderApiOption) Router
 }
 
 // Routes returns all the api routes for the LeaderApiController
-func (c *LeaderApiController) Routes() Routes {
-	return Routes{
+func (c *LeaderApiController) Routes() common.Routes {
+	return common.Routes{
 		{
 			"AddQuestion",
 			strings.ToUpper("Post"),
@@ -142,14 +145,14 @@ func (c *LeaderApiController) AddQuestion(w http.ResponseWriter, r *http.Request
 	params := mux.Vars(r)
 	churchUUIDParam := params["churchUUID"]
 
-	bodyParam := QuestionIn{}
+	bodyParam := model.QuestionIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&bodyParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &common.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertQuestionInRequired(bodyParam); err != nil {
+	if err := model.AssertQuestionInRequired(bodyParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
@@ -160,7 +163,7 @@ func (c *LeaderApiController) AddQuestion(w http.ResponseWriter, r *http.Request
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -176,7 +179,7 @@ func (c *LeaderApiController) DeleteChurch(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -194,7 +197,7 @@ func (c *LeaderApiController) DeleteChurchMember(w http.ResponseWriter, r *http.
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -210,7 +213,7 @@ func (c *LeaderApiController) DeleteQuestion(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -219,14 +222,14 @@ func (c *LeaderApiController) EditChurch(w http.ResponseWriter, r *http.Request)
 	params := mux.Vars(r)
 	churchUUIDParam := params["churchUUID"]
 
-	bodyParam := ChurchIn{}
+	bodyParam := model.ChurchIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&bodyParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &common.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertChurchInRequired(bodyParam); err != nil {
+	if err := model.AssertChurchInRequired(bodyParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
@@ -237,7 +240,7 @@ func (c *LeaderApiController) EditChurch(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -253,7 +256,7 @@ func (c *LeaderApiController) GetChurch(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -269,7 +272,7 @@ func (c *LeaderApiController) GetChurchMembers(w http.ResponseWriter, r *http.Re
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -285,7 +288,7 @@ func (c *LeaderApiController) GetChurchQuestions(w http.ResponseWriter, r *http.
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -301,7 +304,7 @@ func (c *LeaderApiController) GetMatchGroups(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -317,7 +320,7 @@ func (c *LeaderApiController) GetQuestion(w http.ResponseWriter, r *http.Request
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -326,14 +329,14 @@ func (c *LeaderApiController) ModifyQuestion(w http.ResponseWriter, r *http.Requ
 	params := mux.Vars(r)
 	questionUUIDParam := params["questionUUID"]
 
-	bodyParam := QuestionIn{}
+	bodyParam := model.QuestionIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&bodyParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &common.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertQuestionInRequired(bodyParam); err != nil {
+	if err := model.AssertQuestionInRequired(bodyParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
@@ -344,7 +347,7 @@ func (c *LeaderApiController) ModifyQuestion(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -353,15 +356,15 @@ func (c *LeaderApiController) SendInvite(w http.ResponseWriter, r *http.Request)
 	params := mux.Vars(r)
 	churchUUIDParam := params["churchUUID"]
 
-	emailParam := []MemberInvite{}
+	emailParam := []model.MemberInvite{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&emailParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &common.ParsingError{Err: err}, nil)
 		return
 	}
 	for _, el := range emailParam {
-		if err := AssertMemberInviteRequired(el); err != nil {
+		if err := model.AssertMemberInviteRequired(el); err != nil {
 			c.errorHandler(w, r, err, nil)
 			return
 		}
@@ -373,6 +376,6 @@ func (c *LeaderApiController) SendInvite(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }

@@ -14,30 +14,33 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/jsfan/hello-neighbour-api/internal/rest/common"
+	"github.com/jsfan/hello-neighbour-api/internal/rest/model"
+
 	"github.com/gorilla/mux"
 )
 
 // MemberApiController binds http requests to an api service and writes the service results to the http response
 type MemberApiController struct {
 	service      MemberApiServicer
-	errorHandler ErrorHandler
+	errorHandler common.ErrorHandler
 }
 
 // MemberApiOption for how the controller is set up.
 type MemberApiOption func(*MemberApiController)
 
 // WithMemberApiErrorHandler inject ErrorHandler into controller
-func WithMemberApiErrorHandler(h ErrorHandler) MemberApiOption {
+func WithMemberApiErrorHandler(h common.ErrorHandler) MemberApiOption {
 	return func(c *MemberApiController) {
 		c.errorHandler = h
 	}
 }
 
 // NewMemberApiController creates a default api controller
-func NewMemberApiController(s MemberApiServicer, opts ...MemberApiOption) Router {
+func NewMemberApiController(s MemberApiServicer, opts ...MemberApiOption) common.Router {
 	controller := &MemberApiController{
 		service:      s,
-		errorHandler: DefaultErrorHandler,
+		errorHandler: common.DefaultErrorHandler,
 	}
 
 	for _, opt := range opts {
@@ -48,8 +51,8 @@ func NewMemberApiController(s MemberApiServicer, opts ...MemberApiOption) Router
 }
 
 // Routes returns all the api routes for the MemberApiController
-func (c *MemberApiController) Routes() Routes {
-	return Routes{
+func (c *MemberApiController) Routes() common.Routes {
+	return common.Routes{
 		{
 			"AcceptInvite",
 			strings.ToUpper("Patch"),
@@ -156,14 +159,14 @@ func (c *MemberApiController) AcceptInvite(w http.ResponseWriter, r *http.Reques
 	params := mux.Vars(r)
 	userUUIDParam := params["userUUID"]
 
-	bodyParam := UserIn{}
+	bodyParam := model.UserIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&bodyParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &common.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertUserInRequired(bodyParam); err != nil {
+	if err := model.AssertUserInRequired(bodyParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
@@ -174,20 +177,20 @@ func (c *MemberApiController) AcceptInvite(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
 // AddChurch - Request new church
 func (c *MemberApiController) AddChurch(w http.ResponseWriter, r *http.Request) {
-	bodyParam := ChurchIn{}
+	bodyParam := model.ChurchIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&bodyParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &common.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertChurchInRequired(bodyParam); err != nil {
+	if err := model.AssertChurchInRequired(bodyParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
@@ -198,7 +201,7 @@ func (c *MemberApiController) AddChurch(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -207,14 +210,14 @@ func (c *MemberApiController) AddContactMethod(w http.ResponseWriter, r *http.Re
 	params := mux.Vars(r)
 	userUUIDParam := params["userUUID"]
 
-	bodyParam := ContactMethodIn{}
+	bodyParam := model.ContactMethodIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&bodyParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &common.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertContactMethodInRequired(bodyParam); err != nil {
+	if err := model.AssertContactMethodInRequired(bodyParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
@@ -225,7 +228,7 @@ func (c *MemberApiController) AddContactMethod(w http.ResponseWriter, r *http.Re
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -243,7 +246,7 @@ func (c *MemberApiController) DeleteContactMethod(w http.ResponseWriter, r *http
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -259,7 +262,7 @@ func (c *MemberApiController) DeleteUser(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -268,14 +271,14 @@ func (c *MemberApiController) EditUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	userUUIDParam := params["userUUID"]
 
-	bodyParam := UserIn{}
+	bodyParam := model.UserIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&bodyParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &common.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertUserInRequired(bodyParam); err != nil {
+	if err := model.AssertUserInRequired(bodyParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
@@ -286,7 +289,7 @@ func (c *MemberApiController) EditUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -299,7 +302,7 @@ func (c *MemberApiController) GetChurches(w http.ResponseWriter, r *http.Request
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -315,7 +318,7 @@ func (c *MemberApiController) GetMatchGroup(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -333,7 +336,7 @@ func (c *MemberApiController) GetMessages(w http.ResponseWriter, r *http.Request
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -349,7 +352,7 @@ func (c *MemberApiController) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -362,7 +365,7 @@ func (c *MemberApiController) LoginUser(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -373,14 +376,14 @@ func (c *MemberApiController) SendMessage(w http.ResponseWriter, r *http.Request
 
 	groupUUIDParam := params["groupUUID"]
 
-	bodyParam := MessageIn{}
+	bodyParam := model.MessageIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&bodyParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &common.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertMessageInRequired(bodyParam); err != nil {
+	if err := model.AssertMessageInRequired(bodyParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
@@ -391,7 +394,7 @@ func (c *MemberApiController) SendMessage(w http.ResponseWriter, r *http.Request
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -402,14 +405,14 @@ func (c *MemberApiController) UpdateContactMethod(w http.ResponseWriter, r *http
 
 	methodUUIDParam := params["methodUUID"]
 
-	bodyParam := ContactMethodIn{}
+	bodyParam := model.ContactMethodIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&bodyParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &common.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertContactMethodInRequired(bodyParam); err != nil {
+	if err := model.AssertContactMethodInRequired(bodyParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
@@ -420,7 +423,7 @@ func (c *MemberApiController) UpdateContactMethod(w http.ResponseWriter, r *http
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -433,6 +436,6 @@ func (c *MemberApiController) UserProfile(w http.ResponseWriter, r *http.Request
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }

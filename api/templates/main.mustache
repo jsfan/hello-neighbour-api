@@ -2,14 +2,16 @@
 package main
 
 import (
-	"log"
+    "flag"
+    "github.com/golang/glog"
 	"net/http"
 
 	{{packageName}} "{{gitHost}}/{{gitUserId}}/{{gitRepoId}}/{{sourceFolder}}"
 )
 
 func main() {
-	log.Printf("Server started")
+    flag.Parse()
+	glog.Infof("Server started")
 
     var jwtKeys interface{}
     // TODO: Set your JWT keys here
@@ -20,5 +22,5 @@ func main() {
 {{/apis}}{{/apiInfo}}
 	router := {{packageName}}.NewRouter(jwtKeys, {{#apiInfo}}{{#apis}}{{classname}}Controller{{^-last}}, {{/-last}}{{/apis}}{{/apiInfo}})
 
-	log.Fatal(http.ListenAndServe(":{{serverPort}}", router))
+	glog.Fatal(http.ListenAndServe(":{{serverPort}}", router))
 }

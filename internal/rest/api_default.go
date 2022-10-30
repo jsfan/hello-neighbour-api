@@ -13,29 +13,32 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+
+	"github.com/jsfan/hello-neighbour-api/internal/rest/common"
+	"github.com/jsfan/hello-neighbour-api/internal/rest/model"
 )
 
 // DefaultApiController binds http requests to an api service and writes the service results to the http response
 type DefaultApiController struct {
 	service      DefaultApiServicer
-	errorHandler ErrorHandler
+	errorHandler common.ErrorHandler
 }
 
 // DefaultApiOption for how the controller is set up.
 type DefaultApiOption func(*DefaultApiController)
 
 // WithDefaultApiErrorHandler inject ErrorHandler into controller
-func WithDefaultApiErrorHandler(h ErrorHandler) DefaultApiOption {
+func WithDefaultApiErrorHandler(h common.ErrorHandler) DefaultApiOption {
 	return func(c *DefaultApiController) {
 		c.errorHandler = h
 	}
 }
 
 // NewDefaultApiController creates a default api controller
-func NewDefaultApiController(s DefaultApiServicer, opts ...DefaultApiOption) Router {
+func NewDefaultApiController(s DefaultApiServicer, opts ...DefaultApiOption) common.Router {
 	controller := &DefaultApiController{
 		service:      s,
-		errorHandler: DefaultErrorHandler,
+		errorHandler: common.DefaultErrorHandler,
 	}
 
 	for _, opt := range opts {
@@ -46,8 +49,8 @@ func NewDefaultApiController(s DefaultApiServicer, opts ...DefaultApiOption) Rou
 }
 
 // Routes returns all the api routes for the DefaultApiController
-func (c *DefaultApiController) Routes() Routes {
-	return Routes{
+func (c *DefaultApiController) Routes() common.Routes {
+	return common.Routes{
 		{
 			"AddUser",
 			strings.ToUpper("Post"),
@@ -60,14 +63,14 @@ func (c *DefaultApiController) Routes() Routes {
 
 // AddUser - Create new user
 func (c *DefaultApiController) AddUser(w http.ResponseWriter, r *http.Request) {
-	bodyParam := UserIn{}
+	bodyParam := model.UserIn{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&bodyParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &common.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertUserInRequired(bodyParam); err != nil {
+	if err := model.AssertUserInRequired(bodyParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
@@ -78,6 +81,6 @@ func (c *DefaultApiController) AddUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }

@@ -14,30 +14,33 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/jsfan/hello-neighbour-api/internal/rest/common"
+	"github.com/jsfan/hello-neighbour-api/internal/rest/model"
+
 	"github.com/gorilla/mux"
 )
 
 // AdministratorApiController binds http requests to an api service and writes the service results to the http response
 type AdministratorApiController struct {
 	service      AdministratorApiServicer
-	errorHandler ErrorHandler
+	errorHandler common.ErrorHandler
 }
 
 // AdministratorApiOption for how the controller is set up.
 type AdministratorApiOption func(*AdministratorApiController)
 
 // WithAdministratorApiErrorHandler inject ErrorHandler into controller
-func WithAdministratorApiErrorHandler(h ErrorHandler) AdministratorApiOption {
+func WithAdministratorApiErrorHandler(h common.ErrorHandler) AdministratorApiOption {
 	return func(c *AdministratorApiController) {
 		c.errorHandler = h
 	}
 }
 
 // NewAdministratorApiController creates a default api controller
-func NewAdministratorApiController(s AdministratorApiServicer, opts ...AdministratorApiOption) Router {
+func NewAdministratorApiController(s AdministratorApiServicer, opts ...AdministratorApiOption) common.Router {
 	controller := &AdministratorApiController{
 		service:      s,
-		errorHandler: DefaultErrorHandler,
+		errorHandler: common.DefaultErrorHandler,
 	}
 
 	for _, opt := range opts {
@@ -48,8 +51,8 @@ func NewAdministratorApiController(s AdministratorApiServicer, opts ...Administr
 }
 
 // Routes returns all the api routes for the AdministratorApiController
-func (c *AdministratorApiController) Routes() Routes {
-	return Routes{
+func (c *AdministratorApiController) Routes() common.Routes {
+	return common.Routes{
 		{
 			"GetQuestions",
 			strings.ToUpper("Get"),
@@ -83,7 +86,7 @@ func (c *AdministratorApiController) GetQuestions(w http.ResponseWriter, r *http
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -96,7 +99,7 @@ func (c *AdministratorApiController) GetUsers(w http.ResponseWriter, r *http.Req
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }
 
@@ -105,14 +108,14 @@ func (c *AdministratorApiController) UpdateChurchActivate(w http.ResponseWriter,
 	params := mux.Vars(r)
 	churchUUIDParam := params["churchUUID"]
 
-	isActiveParam := InlineObject{}
+	isActiveParam := model.InlineObject{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	if err := d.Decode(&isActiveParam); err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		c.errorHandler(w, r, &common.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertInlineObjectRequired(isActiveParam); err != nil {
+	if err := model.AssertInlineObjectRequired(isActiveParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
@@ -123,6 +126,6 @@ func (c *AdministratorApiController) UpdateChurchActivate(w http.ResponseWriter,
 		return
 	}
 	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
+	common.EncodeJSONResponse(result.Body, &result.Code, result.Headers, w)
 
 }

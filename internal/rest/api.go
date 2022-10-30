@@ -12,6 +12,9 @@ package rest
 import (
 	"context"
 	"net/http"
+
+	"github.com/jsfan/hello-neighbour-api/internal/rest/common"
+	"github.com/jsfan/hello-neighbour-api/internal/rest/model"
 )
 
 // AdministratorApiRouter defines the required methods for binding the api requests to a responses for the AdministratorApi
@@ -73,9 +76,9 @@ type MemberApiRouter interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type AdministratorApiServicer interface {
-	GetQuestions(context.Context) (ImplResponse, error)
-	GetUsers(context.Context) (ImplResponse, error)
-	UpdateChurchActivate(context.Context, string, InlineObject) (ImplResponse, error)
+	GetQuestions(context.Context) (common.ImplResponse, error)
+	GetUsers(context.Context) (common.ImplResponse, error)
+	UpdateChurchActivate(context.Context, string, model.InlineObject) (common.ImplResponse, error)
 }
 
 // DefaultApiServicer defines the api actions for the DefaultApi service
@@ -83,7 +86,7 @@ type AdministratorApiServicer interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type DefaultApiServicer interface {
-	AddUser(context.Context, UserIn) (ImplResponse, error)
+	AddUser(context.Context, model.UserIn) (common.ImplResponse, error)
 }
 
 // LeaderApiServicer defines the api actions for the LeaderApi service
@@ -91,18 +94,18 @@ type DefaultApiServicer interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type LeaderApiServicer interface {
-	AddQuestion(context.Context, string, QuestionIn) (ImplResponse, error)
-	DeleteChurch(context.Context, string) (ImplResponse, error)
-	DeleteChurchMember(context.Context, string, string) (ImplResponse, error)
-	DeleteQuestion(context.Context, string) (ImplResponse, error)
-	EditChurch(context.Context, string, ChurchIn) (ImplResponse, error)
-	GetChurch(context.Context, string) (ImplResponse, error)
-	GetChurchMembers(context.Context, string) (ImplResponse, error)
-	GetChurchQuestions(context.Context, string) (ImplResponse, error)
-	GetMatchGroups(context.Context, string) (ImplResponse, error)
-	GetQuestion(context.Context, string) (ImplResponse, error)
-	ModifyQuestion(context.Context, string, QuestionIn) (ImplResponse, error)
-	SendInvite(context.Context, string, []MemberInvite) (ImplResponse, error)
+	AddQuestion(context.Context, string, model.QuestionIn) (common.ImplResponse, error)
+	DeleteChurch(context.Context, string) (common.ImplResponse, error)
+	DeleteChurchMember(context.Context, string, string) (common.ImplResponse, error)
+	DeleteQuestion(context.Context, string) (common.ImplResponse, error)
+	EditChurch(context.Context, string, model.ChurchIn) (common.ImplResponse, error)
+	GetChurch(context.Context, string) (common.ImplResponse, error)
+	GetChurchMembers(context.Context, string) (common.ImplResponse, error)
+	GetChurchQuestions(context.Context, string) (common.ImplResponse, error)
+	GetMatchGroups(context.Context, string) (common.ImplResponse, error)
+	GetQuestion(context.Context, string) (common.ImplResponse, error)
+	ModifyQuestion(context.Context, string, model.QuestionIn) (common.ImplResponse, error)
+	SendInvite(context.Context, string, []model.MemberInvite) (common.ImplResponse, error)
 }
 
 // MemberApiServicer defines the api actions for the MemberApi service
@@ -110,18 +113,18 @@ type LeaderApiServicer interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type MemberApiServicer interface {
-	AcceptInvite(context.Context, string, UserIn) (ImplResponse, error)
-	AddChurch(context.Context, ChurchIn) (ImplResponse, error)
-	AddContactMethod(context.Context, string, ContactMethodIn) (ImplResponse, error)
-	DeleteContactMethod(context.Context, string, string) (ImplResponse, error)
-	DeleteUser(context.Context, string) (ImplResponse, error)
-	EditUser(context.Context, string, UserIn) (ImplResponse, error)
-	GetChurches(context.Context) (ImplResponse, error)
-	GetMatchGroup(context.Context, string) (ImplResponse, error)
-	GetMessages(context.Context, string, string) (ImplResponse, error)
-	GetUser(context.Context, string) (ImplResponse, error)
-	LoginUser(context.Context) (ImplResponse, error)
-	SendMessage(context.Context, string, string, MessageIn) (ImplResponse, error)
-	UpdateContactMethod(context.Context, string, string, ContactMethodIn) (ImplResponse, error)
-	UserProfile(context.Context) (ImplResponse, error)
+	AcceptInvite(context.Context, string, model.UserIn) (common.ImplResponse, error)
+	AddChurch(context.Context, model.ChurchIn) (common.ImplResponse, error)
+	AddContactMethod(context.Context, string, model.ContactMethodIn) (common.ImplResponse, error)
+	DeleteContactMethod(context.Context, string, string) (common.ImplResponse, error)
+	DeleteUser(context.Context, string) (common.ImplResponse, error)
+	EditUser(context.Context, string, model.UserIn) (common.ImplResponse, error)
+	GetChurches(context.Context) (common.ImplResponse, error)
+	GetMatchGroup(context.Context, string) (common.ImplResponse, error)
+	GetMessages(context.Context, string, string) (common.ImplResponse, error)
+	GetUser(context.Context, string) (common.ImplResponse, error)
+	LoginUser(context.Context) (common.ImplResponse, error)
+	SendMessage(context.Context, string, string, model.MessageIn) (common.ImplResponse, error)
+	UpdateContactMethod(context.Context, string, string, model.ContactMethodIn) (common.ImplResponse, error)
+	UserProfile(context.Context) (common.ImplResponse, error)
 }

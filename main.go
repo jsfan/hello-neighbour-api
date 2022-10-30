@@ -10,31 +10,61 @@
 package main
 
 import (
-	"log"
+	"flag"
 	"net/http"
+
+	"github.com/jsfan/hello-neighbour-api/internal/config"
+	"github.com/jsfan/hello-neighbour-api/internal/middlewares"
+	"github.com/jsfan/hello-neighbour-api/internal/storage"
+
+	"github.com/jsfan/hello-neighbour-api/internal/rest/common"
+	"github.com/jsfan/hello-neighbour-api/internal/rest/service"
+
+	"github.com/golang/glog"
 
 	rest "github.com/jsfan/hello-neighbour-api/internal/rest"
 )
 
 func main() {
-	log.Printf("Server started")
+	cfgFileOpt := flag.String("config", "config.yaml", "Configuration YAML file")
+	flag.Parse()
 
-	var jwtKeys interface{}
-	// TODO: Set your JWT keys here
+	cfg, err := config.ReadConfig(*cfgFileOpt)
+	if err != nil {
+		glog.Fatalf(`Could not read configuration file "%s": %v`, *cfgFileOpt, err)
+	}
 
-	AdministratorApiService := rest.NewAdministratorApiService()
+	jwtKeys, err := config.ReadKeyPair(&cfg.JwtSignKeys)
+	if err != nil {
+		glog.Fatalf(`Could not load key pair: %v`, err)
+	}
+
+	con, err := storage.Connect(&cfg.Database)
+	if err != nil {
+		glog.Fatalf("Could not connect to database: %v", err)
+	}
+
+	if err := con.Migrate(&cfg.Database.DbName); err != nil && err.Error() != "no change" {
+		glog.Fatalf("Database migration failed: %v", err)
+	}
+
+	glog.Infof("Server started")
+
+	AdministratorApiService := service.NewAdministratorApiService()
 	AdministratorApiController := rest.NewAdministratorApiController(AdministratorApiService)
 
-	DefaultApiService := rest.NewDefaultApiService()
+	DefaultApiService := service.NewDefaultApiService()
 	DefaultApiController := rest.NewDefaultApiController(DefaultApiService)
 
-	LeaderApiService := rest.NewLeaderApiService()
+	LeaderApiService := service.NewLeaderApiService()
 	LeaderApiController := rest.NewLeaderApiController(LeaderApiService)
 
-	MemberApiService := rest.NewMemberApiService()
+	MemberApiService := service.NewMemberApiService()
 	MemberApiController := rest.NewMemberApiController(MemberApiService)
 
-	router := rest.NewRouter(jwtKeys, AdministratorApiController, DefaultApiController, LeaderApiController, MemberApiController)
+	router := common.NewRouter(jwtKeys, AdministratorApiController, DefaultApiController, LeaderApiController, MemberApiController)
+	router.Use(middlewares.StorageMiddleWare(con))
+	router.Use(middlewares.AuthzMiddleware(con))
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	glog.Fatal(http.ListenAndServe(":8080", router))
 }

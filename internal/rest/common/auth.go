@@ -1,4 +1,4 @@
-package rest
+package common
 
 import (
 	"context"
@@ -17,9 +17,8 @@ type BasicAuthCredentials struct {
 }
 
 type AuthContext struct {
-	UserCredentials BasicAuthCredentials
-	JWTBasicClaims  jwt.Claims
-	JWTCustomClaims map[string]interface{}
+	UserCredentials *BasicAuthCredentials
+	ParsedJWT       *jwt.JSONWebToken
 }
 
 const (
@@ -41,7 +40,7 @@ func AuthnMiddleware(next http.Handler, jwtKeys interface{}, authnRequired bool)
 			if !authnRequired {
 				next.ServeHTTP(w, r)
 			} else {
-				EncodeJSONResponse(`{"error": `+noTokenError+`}`, func(i int) *int { return &i }(http.StatusUnauthorized), nil, w)
+				EncodeJSONResponse(map[string]string{"error": noTokenError}, func(i int) *int { return &i }(http.StatusUnauthorized), nil, w)
 			}
 			return
 		}
@@ -50,7 +49,7 @@ func AuthnMiddleware(next http.Handler, jwtKeys interface{}, authnRequired bool)
 		tokenDetails := strings.SplitN(bearerToken[0], " ", 2)
 
 		if len(tokenDetails) < 2 {
-			EncodeJSONResponse(`{"error": `+malformedAuthzError+`}`, func(i int) *int { return &i }(http.StatusUnauthorized), nil, w)
+			EncodeJSONResponse(map[string]string{"error": malformedAuthzError}, func(i int) *int { return &i }(http.StatusUnauthorized), nil, w)
 			return
 		}
 
@@ -62,13 +61,14 @@ func AuthnMiddleware(next http.Handler, jwtKeys interface{}, authnRequired bool)
 			// parse signed JWT
 			parsedJWT, err := jwt.ParseSigned(token)
 			if err != nil {
-				EncodeJSONResponse(`{"error": `+jwtParseError+`}`, func(i int) *int { return &i }(http.StatusUnauthorized), nil, w)
+				EncodeJSONResponse(map[string]string{"error": jwtParseError}, func(i int) *int { return &i }(http.StatusUnauthorized), nil, w)
 				return
 			}
 
 			// check signature and extract claims
-			if err := parsedJWT.Claims(jwtKeys, &authContext.JWTBasicClaims, &authContext.JWTCustomClaims); err != nil {
-				EncodeJSONResponse(`{"error": `+jwtParseError+`}`, func(i int) *int { return &i }(http.StatusUnauthorized), nil, w)
+			basicClaims := &jwt.Claims{}
+			if err := parsedJWT.Claims(jwtKeys, &basicClaims); err != nil {
+				EncodeJSONResponse(map[string]string{"error": jwtSignatureInvalidError}, func(i int) *int { return &i }(http.StatusUnauthorized), nil, w)
 				return
 			}
 
@@ -76,22 +76,22 @@ func AuthnMiddleware(next http.Handler, jwtKeys interface{}, authnRequired bool)
 			expected := jwt.Expected{
 				Time: time.Now(),
 			}
-			if err := authContext.JWTBasicClaims.Validate(expected); err != nil {
-				EncodeJSONResponse(`{"error": `+jwtExpiredError+`}`, func(i int) *int { return &i }(http.StatusUnauthorized), nil, w)
+			if err := basicClaims.Validate(expected); err != nil {
+				EncodeJSONResponse(map[string]string{"error": jwtExpiredError}, func(i int) *int { return &i }(http.StatusUnauthorized), nil, w)
 				return
 			}
 		case "basic":
 			username, password, ok := r.BasicAuth()
 			if !ok {
-				EncodeJSONResponse(`{"error": `+basicAuthzMalformedError+`}`, func(i int) *int { return &i }(http.StatusUnauthorized), nil, w)
+				EncodeJSONResponse(map[string]string{"error": basicAuthzMalformedError}, func(i int) *int { return &i }(http.StatusUnauthorized), nil, w)
 				return
 			}
-			authContext.UserCredentials = BasicAuthCredentials{
+			authContext.UserCredentials = &BasicAuthCredentials{
 				Username: username,
 				Password: password,
 			}
 		default:
-			EncodeJSONResponse(`{"error": `+authzUnknownError+`}`, func(i int) *int { return &i }(http.StatusUnauthorized), nil, w)
+			EncodeJSONResponse(map[string]string{"error": authzUnknownError}, func(i int) *int { return &i }(http.StatusUnauthorized), nil, w)
 			return
 		}
 		// augment request context with auth context
