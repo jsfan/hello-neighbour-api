@@ -3,11 +3,13 @@ package dal
 import (
 	"context"
 	"database/sql"
+
+	"github.com/jsfan/hello-neighbour-api/internal/rest/model"
+
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
-	"github.com/jsfan/hello-neighbour-api/pkg"
 )
 
 func (dalInstance *DAL) SelectUserByEmail(ctx context.Context, email string) (user *models.UserProfile, errVal error) {
@@ -56,7 +58,7 @@ func (dalInstance *DAL) SelectUserByEmail(ctx context.Context, email string) (us
 	return &userProfile, nil
 }
 
-func (dalInstance *DAL) InsertUser(ctx context.Context, userIn *pkg.UserIn) error {
+func (dalInstance *DAL) InsertUser(ctx context.Context, userIn *model.UserIn) error {
 	church := &userIn.Church
 	if *church == "" {
 		church = nil

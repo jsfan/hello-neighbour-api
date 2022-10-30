@@ -11,7 +11,7 @@ type Store struct {
 	DAL dalInterface.AccessInterface
 }
 
-func ConnectStore(dbConfig *config.DatabaseConfig) (connection storeInterface.DataInterface, errVal error) {
+func Connect(dbConfig *config.DatabaseConfig) (connection storeInterface.DataInterface, errVal error) {
 	dalInstance, err := dal.Connect(dbConfig)
 	if err != nil {
 		return nil, err

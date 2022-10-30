@@ -2,11 +2,12 @@ package session
 
 import (
 	"crypto/rsa"
+	"fmt"
+	"time"
+
 	"github.com/jsfan/hello-neighbour-api/internal/config"
-	"github.com/pkg/errors"
 	"gopkg.in/square/go-jose.v2"
 	"gopkg.in/square/go-jose.v2/jwt"
-	"time"
 )
 
 const issuer = "Hello Neighbour Team"
@@ -34,19 +35,14 @@ func NewJWT() *jwtWrapper {
 	}
 }
 
-func (jwtWrapper *jwtWrapper) Validate(rawJWT string) error {
-	tok, err := jwt.ParseSigned(rawJWT)
-	if err != nil {
-		return errors.Wrap(err, "could not parse JWT")
-	}
-
+func (jwtWrapper *jwtWrapper) Validate(parsedJWT *jwt.JSONWebToken) error {
 	expectedBase := jwt.Expected{
 		Issuer:  issuer,
 		Subject: subject,
 		Time:    time.Now(),
 	}
 	ourClaims := config.UserSession{}
-	if err := tok.Claims(&signingKey.PublicKey, &expectedBase, &ourClaims); err != nil {
+	if err := parsedJWT.Claims(&signingKey.PublicKey, &expectedBase, &ourClaims); err != nil {
 		return err
 	}
 
@@ -56,11 +52,11 @@ func (jwtWrapper *jwtWrapper) Validate(rawJWT string) error {
 
 func (jwtWrapper *jwtWrapper) Build(sessionClaims *config.UserSession) error {
 	if signingKey == nil {
-		return errors.New("no signing key loaded")
+		return fmt.Errorf("no signing key loaded")
 	}
 	signer, err := jose.NewSigner(jose.SigningKey{Algorithm: jose.PS512, Key: signingKey}, nil)
 	if err != nil {
-		return errors.Wrap(err, "could not create JWT signer")
+		return fmt.Errorf("could not create JWT signer: %w", err)
 	}
 	claims := jwt.Claims{
 		Issuer:   issuer,
@@ -69,7 +65,7 @@ func (jwtWrapper *jwtWrapper) Build(sessionClaims *config.UserSession) error {
 		IssuedAt: jwt.NewNumericDate(time.Now()),
 	}
 	jwtWrapper.rawJWT, err = jwt.Signed(signer).Claims(claims).Claims(sessionClaims).CompactSerialize()
-	return errors.Wrap(err, "could not build JWT")
+	return fmt.Errorf("could not build JWT: %w", err)
 }
 
 func (jwtWrapper *jwtWrapper) GetRaw() string {

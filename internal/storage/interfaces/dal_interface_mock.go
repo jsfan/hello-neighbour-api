@@ -2,9 +2,11 @@ package interfaces
 
 import (
 	"context"
+
+	"github.com/jsfan/hello-neighbour-api/internal/rest/model"
+
 	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
-	"github.com/jsfan/hello-neighbour-api/pkg"
 )
 
 type CallSignature struct {
@@ -79,13 +81,13 @@ func (mDAL *MockDAL) DeleteUserByPubId(ctx context.Context, userPubId *uuid.UUID
 	return castError(response[0])
 }
 
-func (mDAL *MockDAL) InsertChurch(ctx context.Context, churchIn *pkg.ChurchIn) (church *models.ChurchProfile, errVal error) {
+func (mDAL *MockDAL) InsertChurch(ctx context.Context, churchIn *model.ChurchIn) (church *models.ChurchProfile, errVal error) {
 	addCall(mDAL, "InsertChurch", ctx, churchIn)
 	response := getResponse(mDAL, "InsertChurch")
 	return response[0].(*models.ChurchProfile), castError(response[1])
 }
 
-func (mDAL *MockDAL) InsertUser(ctx context.Context, userIn *pkg.UserIn) error {
+func (mDAL *MockDAL) InsertUser(ctx context.Context, userIn *model.UserIn) error {
 	addCall(mDAL, "InsertUser", ctx, userIn)
 	response := getResponse(mDAL, "InsertUser")
 	return castError(response[0])

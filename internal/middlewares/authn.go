@@ -2,62 +2,50 @@ package middlewares
 
 import (
 	"context"
-	"github.com/google/logger"
+	"net/http"
+
+	"github.com/golang/glog"
 	"github.com/jsfan/hello-neighbour-api/internal/config"
-	"github.com/jsfan/hello-neighbour-api/internal/endpoints"
+	"github.com/jsfan/hello-neighbour-api/internal/interfaces"
+	"github.com/jsfan/hello-neighbour-api/internal/rest/common"
 	"github.com/jsfan/hello-neighbour-api/internal/session"
 	"github.com/jsfan/hello-neighbour-api/internal/utils"
-	"net/http"
-	"strings"
 )
 
 const authHeader = "Authorization"
 
-func sendUnauthorizedResponse(w http.ResponseWriter) {
-	endpoints.SendErrorResponse(w, http.StatusUnauthorized, "Unauthenticated")
-}
-
-func AuthnMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		bearerToken, ok := r.Header[authHeader]
-		if !ok {
-			if r.RequestURI == "/v0/user" {
-				next.ServeHTTP(w, r)
+func AuthzMiddleware(masterStore interfaces.DataInterface) func(handlerFunc http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			authCtx := r.Context().Value(common.AuthContextKey).(*common.AuthContext)
+			if authCtx == nil {
+				common.EncodeJSONResponse(map[string]interface{}{"error": "Internal Server Error", "code": 500}, func(i int) *int { return &i }(http.StatusInternalServerError), nil, w)
+				return
+			}
+			userSession := &config.UserSession{}
+			// check if HTTP Basic or Bearer auth
+			if authCtx.UserCredentials != nil {
+				// check user credentials
+				creds := authCtx.UserCredentials
+				var authenticated bool
+				userSession, authenticated = utils.CheckBasicAuth(r.Context(), masterStore.Clone(), creds.Username, creds.Password)
+				if !authenticated {
+					common.EncodeJSONResponse(map[string]string{"error": "Login credentials invalid."}, func(i int) *int { return &i }(http.StatusUnauthorized), nil, w)
+					return
+				}
 			} else {
-				sendUnauthorizedResponse(w)
+				// check claims
+				ourJWT := session.NewJWT()
+				if err := ourJWT.Validate(authCtx.ParsedJWT); err != nil {
+					glog.Infof("Could not validate JWT: %+v", err)
+					common.EncodeJSONResponse(map[string]string{"error": "JWT claims invalid."}, func(i int) *int { return &i }(http.StatusUnauthorized), nil, w)
+					return
+				}
+				userSession = ourJWT.SessionDetails
 			}
-			return
-		}
-		// validate JWT
-		// TODO: Go through all authorisation headers instead?
-		tokenDetails := strings.SplitN(bearerToken[0], " ", 2)
-		tokenType := strings.ToLower(tokenDetails[0])
-		var userSession *config.UserSession
-		switch tokenType {
-		case "bearer":
-			ourJwt := session.NewJWT()
-			if err := ourJwt.Validate(tokenDetails[1]); err != nil {
-				logger.Infof("Could not validate JWT: %+v", err)
-				sendUnauthorizedResponse(w)
-				return
-			}
-			userSession = ourJwt.SessionDetails
-		case "basic":
-			var authFail bool
-			if userSession, authFail = utils.CheckBasicAuth(r); authFail == true {
-				sendUnauthorizedResponse(w)
-				return
-			} else if userSession == nil {
-				endpoints.SendErrorResponse(w, http.StatusBadRequest, "Malformed basic authentication")
-				return
-			}
-		default:
-			sendUnauthorizedResponse(w)
-			return
-		}
-		// augment request context with user session
-		ctx := context.WithValue(r.Context(), config.SessionKey, userSession)
-		// Call the next handler, which can be another middleware in the chain, or the final handler.
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
+			ctx = context.WithValue(r.Context(), config.SessionKey, userSession)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
 }

@@ -7,7 +7,6 @@ import (
 	"encoding/asn1"
 	"encoding/pem"
 	"fmt"
-	"github.com/pkg/errors"
 	"os"
 )
 
@@ -51,7 +50,7 @@ func readPemEncoded(fileName string) (keyBlock *pem.Block, errVal error) {
 	}
 	decodedKey, _ := pem.Decode(pemKey)
 	if decodedKey == nil {
-		return nil, errors.New(fmt.Sprintf(`Could not decode key "%s".`, fileName))
+		return nil, fmt.Errorf(`could not decode key "%s"`, fileName)
 	}
 	return decodedKey, nil
 }
@@ -79,7 +78,7 @@ func readPublicKey(keyFile string) (pubKey *rsa.PublicKey, errVal error) {
 func ReadKeyPair(keyFiles *KeyPair) (keyPair *rsa.PrivateKey, errVal error) {
 	if _, err := os.Stat(keyFiles.PrivateKey); err != nil && os.IsNotExist(err) {
 		if err := generateNewKeyPair(keyFiles); err != nil {
-			return nil, errors.Wrap(err, "could not generate new signing key pair")
+			return nil, fmt.Errorf("could not generate new signing key pair: %w", err)
 		}
 	}
 	keyPair, err := readPrivateKey(keyFiles.PrivateKey)

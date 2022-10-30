@@ -1,0 +1,19 @@
+generatorName: go-server
+inputSpec: api/swagger.yaml
+templateDir: api/templates
+gitRepoId: hello-neighbour-api
+gitUserId: jsfan
+additionalProperties:
+  addResponseHeaders: true
+  enumClassPrefix: false
+  featureCORS: false
+  hideGenerationTimestamp: true
+  packageName: rest
+  packageVersion: 0.0.3
+  router: mux
+  serverPort: 8080
+  sourceFolder: internal/rest
+files:
+  auth.mustache:
+    folder: internal/rest
+    destinationFilename: "auth.go"

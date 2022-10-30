@@ -2,15 +2,16 @@ package storage_test
 
 import (
 	"context"
+	"testing"
+
 	"github.com/google/uuid"
+	"github.com/jsfan/hello-neighbour-api/internal/rest/model"
 	"github.com/jsfan/hello-neighbour-api/internal/storage"
 	"github.com/jsfan/hello-neighbour-api/internal/storage/interfaces/mocks"
 	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
-	"github.com/jsfan/hello-neighbour-api/pkg"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestStore_GetUserByEmail(t *testing.T) {
@@ -63,7 +64,7 @@ func TestStore_RegisterUser(t *testing.T) {
 
 	expectedDob := "1964-01-07"
 	expectedDescription := "A Description"
-	userIn := &pkg.UserIn{
+	userIn := &model.UserIn{
 		Email:       "test@example.com",
 		FirstName:   "Test",
 		LastName:    "User",
@@ -101,7 +102,7 @@ func TestStore_RegisterUser(t *testing.T) {
 		Return(nil).
 		Run(func(args mock.Arguments) {
 			ctxRcv := args.Get(0).(context.Context)
-			userRcv := args.Get(1).(*pkg.UserIn)
+			userRcv := args.Get(1).(*model.UserIn)
 			assert.Equal(t, ctxRcv, ctx)
 			assert.Equal(t, userRcv, userIn)
 		})

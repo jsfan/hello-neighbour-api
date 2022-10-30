@@ -1,14 +1,16 @@
 package utils
 
 import (
+	"context"
 	"fmt"
-	"github.com/google/logger"
+
+	"github.com/golang/glog"
+
 	"github.com/google/uuid"
 	"github.com/jsfan/hello-neighbour-api/internal/config"
 	"github.com/jsfan/hello-neighbour-api/internal/interfaces"
 	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
 	"github.com/jsfan/hello-neighbour-api/internal/utils/crypto"
-	"net/http"
 )
 
 func userSessionFromProfile(profile *models.UserProfile) (userSession *config.UserSession) {
@@ -33,26 +35,19 @@ func userSessionFromProfile(profile *models.UserProfile) (userSession *config.Us
 	}
 }
 
-func CheckBasicAuth(r *http.Request) (userSession *config.UserSession, authFail bool) {
-	username, password, ok := r.BasicAuth()
-	if !ok {
-		return nil, false
-	}
-
+func CheckBasicAuth(ctx context.Context, store interfaces.DataInterface, username, password string) (*config.UserSession, bool) {
 	if password == "" {
 		return nil, false
 	}
 
-	store := r.Context().Value(config.MasterStore).(interfaces.DataInterface)
-
-	userProfile, err := store.GetUserByEmail(r.Context(), username)
+	userProfile, err := store.GetUserByEmail(ctx, username)
 	if err != nil {
 		// TODO: Send a 500 unless this was a "Not found"
-		logger.Error(err)
-		return nil, true
+		glog.Error(err)
+		return nil, false
 	}
 	if ok := crypto.CheckPassword([]byte(userProfile.PasswordHash), []byte(password)); !ok {
-		return nil, true
+		return nil, false
 	}
-	return userSessionFromProfile(userProfile), false
+	return userSessionFromProfile(userProfile), true
 }

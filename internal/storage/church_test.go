@@ -2,21 +2,21 @@ package storage_test
 
 import (
 	"context"
-	"github.com/jsfan/hello-neighbour-api/internal/storage"
-	"github.com/jsfan/hello-neighbour-api/internal/storage/interfaces/mocks"
-	"github.com/magiconair/properties/assert"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/jsfan/hello-neighbour-api/internal/rest/model"
+	"github.com/jsfan/hello-neighbour-api/internal/storage"
+	"github.com/jsfan/hello-neighbour-api/internal/storage/interfaces/mocks"
 	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
-	"github.com/jsfan/hello-neighbour-api/pkg"
+	"github.com/magiconair/properties/assert"
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func TestStore_AddChurch(t *testing.T) {
 	// TODO: Add error cases
-	churchIn := &pkg.ChurchIn{
+	churchIn := &model.ChurchIn{
 		Name:                  "Test Church",
 		Description:           "description",
 		Address:               "Church Avenue",
@@ -53,7 +53,7 @@ func TestStore_AddChurch(t *testing.T) {
 		Return(expectedChurch, nil).
 		Run(func(args mock.Arguments) {
 			ctxRcv := args.Get(0).(context.Context)
-			churchInRv := args.Get(1).(*pkg.ChurchIn)
+			churchInRv := args.Get(1).(*model.ChurchIn)
 			assert.Equal(t, ctxRcv, ctx)
 			assert.Equal(t, churchInRv, churchIn)
 		})

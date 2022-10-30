@@ -3,6 +3,7 @@ package dal
 import (
 	"database/sql"
 	"fmt"
+
 	"github.com/jsfan/hello-neighbour-api/internal/config"
 	"github.com/jsfan/hello-neighbour-api/internal/storage/interfaces"
 )

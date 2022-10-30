@@ -251,7 +251,13 @@ paths:
         content:
           application/json:
             schema:
-              type: boolean
+              required:
+                - code
+                - message
+              type: object
+              properties:
+                isActive:
+                  type: boolean
         required: true
       responses:
         204:
@@ -1843,10 +1849,8 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
   securitySchemes:
     jwtAuth:
-      type: apiKey
-      name: Authorization
-      in: header
-      x-token-type: Bearer
+      type: http
+      scheme: bearer
     basicAuth:
       type: http
       scheme: basic

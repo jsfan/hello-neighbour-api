@@ -2,10 +2,10 @@ package config
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
+
+	"gopkg.in/yaml.v3"
 )
 
 type sessionKey string
@@ -35,7 +35,7 @@ const MasterStore masterStore = "store"
 func readFile(fileName string) (fileContents []byte, errVal error) {
 	fileHandle, err := os.Open(fileName)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("Could not open config file %s: ", fileName))
+		return nil, fmt.Errorf("could not open config file %s: %w", fileName, err)
 	}
 	return ioutil.ReadAll(fileHandle)
 }
@@ -43,12 +43,12 @@ func readFile(fileName string) (fileContents []byte, errVal error) {
 func ReadConfig(fileName string) (cfg *Config, errVal error) {
 	rawCfg, err := readFile(fileName)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("Could not read config file %s: ", fileName))
+		return nil, fmt.Errorf("could not read config file %s: %w", fileName, err)
 	}
 	var config *Config
 	err = yaml.Unmarshal(rawCfg, &config)
 	if err != nil {
-		return nil, errors.Wrap(err, "Could not unmarshal config: ")
+		return nil, fmt.Errorf("could not unmarshal config %s: %w", fileName, err)
 	}
 	return config, nil
 }

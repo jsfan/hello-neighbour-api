@@ -2,13 +2,14 @@ package dal
 
 import (
 	"context"
+
 	sq "github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
+	"github.com/jsfan/hello-neighbour-api/internal/rest/model"
 	"github.com/jsfan/hello-neighbour-api/internal/storage/models"
-	"github.com/jsfan/hello-neighbour-api/pkg"
 )
 
-func (dalInstance *DAL) InsertChurch(ctx context.Context, churchIn *pkg.ChurchIn) (church *models.ChurchProfile, errVal error) {
+func (dalInstance *DAL) InsertChurch(ctx context.Context, churchIn *model.ChurchIn) (church *models.ChurchProfile, errVal error) {
 	var churchProfile models.ChurchProfile
 	err := sq.
 		Insert("church").
