@@ -10,8 +10,11 @@
 package common
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
@@ -19,6 +22,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/golang/glog"
 	"github.com/gorilla/mux"
 )
 
@@ -62,8 +66,14 @@ func NewRouter(jwtKeys interface{}, routers ...Router) *mux.Router {
 	return router
 }
 
+func sendInternalServerError(err error, w http.ResponseWriter) {
+	glog.Errorf("%+v", err)
+	w.WriteHeader(http.StatusInternalServerError)
+	w.Write([]byte(`{message: "Internal server error"}`))
+}
+
 // EncodeJSONResponse uses the json encoder to write an interface to the http response with an optional status code
-func EncodeJSONResponse(i interface{}, status *int, headers map[string][]string, w http.ResponseWriter) error {
+func EncodeJSONResponse(i interface{}, status *int, headers map[string][]string, w http.ResponseWriter) {
 	wHeader := w.Header()
 	if headers != nil {
 		for key, values := range headers {
@@ -73,13 +83,24 @@ func EncodeJSONResponse(i interface{}, status *int, headers map[string][]string,
 		}
 	}
 	wHeader.Set("Content-Type", "application/json; charset=UTF-8")
+	payload, err := json.Marshal(i)
+	if err != nil {
+		sendInternalServerError(fmt.Errorf("Failed to encode JSON payload: %+v", err), w)
+		return
+	}
+	buf := bytes.NewBuffer(nil)
+	json.HTMLEscape(buf, payload)
+	if payload, err = io.ReadAll(buf); err != nil {
+		sendInternalServerError(fmt.Errorf("Failed to escape HTML in JSON payload: %+v", err), w)
+		return
+	}
 	if status != nil {
 		w.WriteHeader(*status)
 	} else {
 		w.WriteHeader(http.StatusOK)
 	}
 
-	return json.NewEncoder(w).Encode(i)
+	w.Write(payload)
 }
 
 // ReadFormFileToTempFile reads file data from a request form and writes it to a temporary file

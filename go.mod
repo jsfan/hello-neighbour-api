@@ -8,13 +8,12 @@ require github.com/golang/glog v1.0.0
 
 require (
 	github.com/Masterminds/squirrel v1.5.3
-	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/google/uuid v1.3.0
 	github.com/magiconair/properties v1.8.6
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.1
-	github.com/vektra/mockery/v2 v2.14.0
+	github.com/vektra/mockery/v2 v2.14.1
 	golang.org/x/crypto v0.1.0
 	gopkg.in/square/go-jose.v2 v2.6.0
 	gopkg.in/yaml.v3 v3.0.1

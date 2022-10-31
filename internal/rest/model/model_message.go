@@ -9,9 +9,7 @@
 
 package model
 
-import (
-	"github.com/jsfan/hello-neighbour-api/internal/rest/common"
-)
+import "github.com/jsfan/hello-neighbour-api/internal/rest/common"
 
 type Message struct {
 	Group string `json:"group"`

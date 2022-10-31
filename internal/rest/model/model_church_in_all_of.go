@@ -9,9 +9,7 @@
 
 package model
 
-import (
-	"github.com/jsfan/hello-neighbour-api/internal/rest/common"
-)
+import "github.com/jsfan/hello-neighbour-api/internal/rest/common"
 
 type ChurchInAllOf struct {
 	GroupSize int32 `json:"group_size"`

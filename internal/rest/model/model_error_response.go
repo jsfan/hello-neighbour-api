@@ -9,9 +9,7 @@
 
 package model
 
-import (
-	"github.com/jsfan/hello-neighbour-api/internal/rest/common"
-)
+import "github.com/jsfan/hello-neighbour-api/internal/rest/common"
 
 type ErrorResponse struct {
 	Code int32 `json:"code"`
