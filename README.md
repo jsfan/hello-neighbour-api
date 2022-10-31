@@ -34,3 +34,35 @@ where `<your config file>` is the name of your copy of the configuration file.
 ## Deployment
 
 This software is not yet ready for production deployment.
+
+## Regeneration from specs
+
+The scaffolding for this serrvice was generated using the [openapi-generator](https://openapi-generator.tech) project.
+You can regenerate it using that same generator e.g. via its Docker image (from repository root):
+
+    docker run --user $(id -u):$(id -g) --rm -v$(pwd):/data -w /data openapitools/openapi-generator-cli generate -c /data/openapi-generator.yml
+
+The generated files will all be written to the folder `internal/rest` and you will want to move the model files to `internal/rest/model`
+and the following files to `internal/common`:
+
+    auth.go
+    error.go
+    helpers.go
+    impl.go
+    logger.go
+    routers.go
+
+Make sure that the imports are updated accordingly (an IDE will usually handle that for you).
+
+If you have updated the endpoints, you may have changes to the `internal/rest/*_service.go` files. In that case, you will
+have to merge the new skeleton with your existing files because these will contain custom code.
+
+The templates used by the generator are stored in `api/templates` and the configuration in `openapi-generator.yml`. Ignored
+files are listed in `.openapi-generator-ignore`.
+
+All custom code should either be added to the `*_service.go` files or in files outside the `rest` package and just called from the `*_service.go` files.
+
+## Continuous Integration
+
+The GitHub Actions CI runs [golanglint-ci](https://github.com/golangci/golangci-lint) and any unit tests it finds. PRs
+are gated on both.
