@@ -23,7 +23,7 @@ func (store *Store) RegisterUser(ctx context.Context, userIn *model.UserIn) (use
 	}
 	defer func() {
 		if errVal != nil {
-			store.DAL.CancelTransaction()
+			store.DAL.CancelTransaction() // nolint:errcheck
 			return
 		}
 		errVal = store.DAL.CompleteTransaction()
