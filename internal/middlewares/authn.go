@@ -12,18 +12,16 @@ import (
 	"github.com/jsfan/hello-neighbour-api/internal/utils"
 )
 
-const authHeader = "Authorization"
-
 func AuthzMiddleware(masterStore interfaces.DataInterface) func(handlerFunc http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
-			authCtx := r.Context().Value(common.AuthContextKey).(*common.AuthContext)
+			authCtx := ctx.Value(common.AuthContextKey).(*common.AuthContext)
 			if authCtx == nil {
 				common.EncodeJSONResponse(map[string]interface{}{"error": "Internal Server Error", "code": 500}, func(i int) *int { return &i }(http.StatusInternalServerError), nil, w)
 				return
 			}
-			userSession := &config.UserSession{}
+			var userSession *config.UserSession
 			// check if HTTP Basic or Bearer auth
 			if authCtx.UserCredentials != nil {
 				// check user credentials
@@ -44,7 +42,7 @@ func AuthzMiddleware(masterStore interfaces.DataInterface) func(handlerFunc http
 				}
 				userSession = ourJWT.SessionDetails
 			}
-			ctx = context.WithValue(r.Context(), config.SessionKey, userSession)
+			ctx = context.WithValue(ctx, config.SessionKey, userSession)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

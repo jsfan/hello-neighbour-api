@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -37,7 +37,7 @@ func readFile(fileName string) (fileContents []byte, errVal error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not open config file %s: %w", fileName, err)
 	}
-	return ioutil.ReadAll(fileHandle)
+	return io.ReadAll(fileHandle)
 }
 
 func ReadConfig(fileName string) (cfg *Config, errVal error) {
